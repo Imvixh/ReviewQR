@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"on-surface":"#0b1c30","surface-container-lowest":"#ffffff","on-primary-fixed":"#001a41","on-background":"#0b1c30","surface":"#f8f9ff","tertiary-fixed":"#89fa9b","outline":"#727785","surface-tint":"#005bc0","error":"#ba1a1a","on-tertiary-fixed-variant":"#005320","primary-fixed":"#d8e2ff","secondary-fixed-dim":"#bec6e0","surface-variant":"#d3e4fe","surface-container-high":"#dce9ff","primary":"#005bbf","background":"#f8f9ff","on-primary-container":"#ffffff","inverse-on-surface":"#eaf1ff","surface-container":"#e5eeff","error-container":"#ffdad6","primary-fixed-dim":"#adc7ff","surface-container-low":"#eff4ff","surface-dim":"#cbdbf5","on-tertiary-fixed":"#002108","surface-bright":"#f8f9ff","on-surface-variant":"#414754","on-primary":"#ffffff","primary-container":"#1a73e8","inverse-primary":"#adc7ff","on-secondary-fixed":"#131b2e","tertiary":"#006d2c","on-error-container":"#93000a","secondary":"#565e74","tertiary-fixed-dim":"#6ddd81","inverse-surface":"#213145","outline-variant":"#c1c6d6","secondary-container":"#dae2fd","tertiary-container":"#008939","on-error":"#ffffff","on-secondary-fixed-variant":"#3f465c","on-secondary":"#ffffff","on-secondary-container":"#5c647a","on-primary-fixed-variant":"#004493","secondary-fixed":"#dae2fd","surface-container-highest":"#d3e4fe","on-tertiary":"#ffffff","on-tertiary-container":"#ffffff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-2xl":"3rem","gutter":"1.5rem","margin-mobile":"1rem","space-xs":"0.25rem","space-sm":"0.5rem","space-2xs":"0.125rem","space-xl":"2rem","margin":"2rem","space-md":"1rem","space-lg":"1.5rem","gutter-mobile":"0.75rem"},"fontFamily":{"headline-lg":["Plus Jakarta Sans"],"display-hero-mobile":["Plus Jakarta Sans"],"headline-md":["Plus Jakarta Sans"],"label-lg":["Inter"],"body-sm":["Inter"],"headline-sm":["Plus Jakarta Sans"],"body-lg":["Inter"],"label-caps":["Inter"],"display-hero":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"],"label-md":["Inter"],"body-md":["Inter"]},"fontSize":{"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.02em","fontWeight":"700"}],"display-hero-mobile":["28px",{"lineHeight":"34px","letterSpacing":"-0.02em","fontWeight":"800"}],"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-sm":["18px",{"lineHeight":"24px","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"label-caps":["11px",{"lineHeight":"14px","letterSpacing":"0.06em","fontWeight":"700"}],"display-hero":["40px",{"lineHeight":"48px","letterSpacing":"-0.03em","fontWeight":"800"}],"headline-lg-mobile":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased min-h-screen"><aside class="fixed left-0 top-0 bottom-0 w-64 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col"><div class="h-16 px-space-lg flex items-center gap-space-sm"><div class="w-9 h-9 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center shadow-sm"><svg class="w-5 h-5 stroke-[2.2]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><rect height="7" rx="1.5" width="7" x="3" y="3"></rect><rect height="7" rx="1.5" width="7" x="14" y="3"></rect><rect height="7" rx="1.5" width="7" x="3" y="14"></rect><path d="M14 14h3v3h-3z"></path><path d="M20 14v3"></path><path d="M14 20h3"></path><path d="M20 20v.01"></path></svg></div><div class="flex items-center gap-1.5"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">ReviewQR</span><span class="px-1.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-caps text-[10px] uppercase font-bold tracking-wider">SaaS</span></div></div><nav class="px-space-md py-space-sm space-y-space-2xs flex flex-col" data-active-classes="bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-xl shadow-[0_1px_3px_0_rgba(15,23,42,0.05)]"><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="overview" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><rect height="7" rx="1" width="7" x="3" y="3"></rect><rect height="7" rx="1" width="7" x="14" y="3"></rect><rect height="7" rx="1" width="7" x="14" y="14"></rect><rect height="7" rx="1" width="7" x="3" y="14"></rect></svg><span>Overview</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="create-qr" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path></svg><span>Create Review QR</span></a><a aria-current="page" class="flex items-center gap-space-sm px-space-md py-2.5 transition-all bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-xl shadow-[0_1px_3px_0_rgba(15,23,42,0.05)]" data-path="my-qr-codes" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><rect height="5" rx="1" width="5" x="3" y="3"></rect><rect height="5" rx="1" width="5" x="16" y="3"></rect><rect height="5" rx="1" width="5" x="3" y="16"></rect><path d="M21 16h-3a2 2 0 0 0-2 2v3"></path><path d="M21 21v.01"></path><path d="M12 7v3a2 2 0 0 1-2 2H7"></path><path d="M3 12h.01"></path><path d="M12 3h.01"></path><path d="M12 16v.01"></path><path d="M16 12h1"></path><path d="M21 12v.01"></path><path d="M12 21v-1"></path></svg><span>My QR Codes</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="business-profile" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span>Business Profile</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="analytics" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg><span>Analytics</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="settings" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg><span>Settings</span></a></nav></div><div class="p-space-md m-space-md rounded-xl bg-surface-container-low flex flex-col gap-space-xs"><div class="flex items-center justify-between"><span class="font-label-caps text-label-caps uppercase text-primary font-bold">Pro Plan</span><span class="text-[10px] font-label-caps uppercase bg-tertiary-fixed text-on-tertiary-fixed px-1.5 py-0.5 rounded-full font-semibold">Active</span></div><div class="font-label-lg text-label-lg text-on-surface truncate font-semibold">Royal Palace Hotel</div><div class="font-body-sm text-body-sm text-on-surface-variant truncate">Restaurant · Bettiah, Bihar</div><div class="pt-space-xs flex items-center justify-between"><a class="font-label-md text-label-md text-primary hover:text-on-primary-fixed-variant transition-colors flex items-center gap-1.5 font-medium" data-path="help-support" href="#"><svg class="w-4 h-4 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" x2="12.01" y1="17" y2="17"></line></svg>Quick Support</a><svg class="w-4 h-4 text-tertiary stroke-[2]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-space-lg"><div class="flex items-center gap-space-md flex-1 max-w-md"><div class="relative w-full flex items-center"><svg class="w-5 h-5 absolute left-3 text-outline stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" x2="16.65" y1="21" y2="16.65"></line></svg><input class="w-full h-10 pl-10 pr-4 rounded-xl bg-surface-container-low font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest transition-all" placeholder="Search QR codes, reviews, or templates..." type="text"/></div></div><div class="flex items-center gap-space-md"><div class="hidden md:flex items-center p-1 rounded-xl bg-surface-container-low"><a class="px-3 py-1.5 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-primary shadow-[0_1px_2px_rgba(0,0,0,0.04)] font-semibold" data-path="overview" href="#">Business Dashboard</a><a class="px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="customer-mobile" href="#">Customer Mobile</a></div><button aria-label="Notifications" class="relative p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all"><svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error"></span></button><a aria-label="Help Documentation" class="p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all flex items-center justify-center" data-path="documentation" href="#"><svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" x2="12.01" y1="17" y2="17"></line></svg></a><div class="flex items-center gap-space-sm pl-space-xs cursor-pointer"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="font-label-lg text-label-lg text-on-primary font-bold leading-none">RP</span></div><div class="hidden lg:flex flex-col text-left"><span class="font-label-lg text-label-lg text-on-surface leading-tight truncate max-w-[130px] font-semibold">Royal Palace Hotel</span><span class="font-body-sm text-body-sm text-on-surface-variant leading-tight">Manager</span></div><svg class="w-4 h-4 text-on-surface-variant stroke-[2]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg></div></div></header><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<div class="p-space-lg md:p-space-xl flex flex-col gap-space-xl">
+<!-- Top Header & Action Banner -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs text-primary font-label-caps uppercase tracking-wider mb-1">
+<span>Workspace</span>
+<span class="text-outline">/</span>
+<span>QR Operations</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">My QR Codes</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage, customize, and download your physical &amp; counter review QR touchpoints.</p>
+</div>
+<div class="flex items-center gap-space-sm">
+<button class="h-11 px-4 rounded-xl bg-surface-container-lowest text-on-surface font-label-lg text-label-lg shadow-sm hover:bg-surface-container-high transition-all flex items-center gap-2" id="quickTourBtn">
+<span class="material-symbols-outlined text-[19px] text-secondary">tune</span>
+          Batch Export
+        </button>
+<button class="h-11 px-5 rounded-xl bg-primary-container text-on-primary font-label-lg text-label-lg shadow-md hover:bg-primary transition-all flex items-center gap-2" id="openNewQrBtn">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span>+ Create New QR Code</span>
+</button>
+</div>
+</div>
+<!-- Top Summary KPI Cards (4 Bento Stats) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<!-- KPI 1 -->
+<div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute -right-4 -top-4 w-20 h-20 bg-primary-fixed/20 rounded-full blur-xl pointer-events-none"></div>
+<div class="flex items-center justify-between">
+<span class="font-label-caps uppercase text-on-surface-variant font-bold">Total QR Codes</span>
+<div class="w-8 h-8 rounded-lg bg-surface-container-high text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">qr_code_2</span>
+</div>
+</div>
+<div class="mt-4 flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-on-surface font-bold">6</span>
+<span class="font-body-sm text-body-sm text-tertiary flex items-center font-medium">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span> +2 this month
+          </span>
+</div>
+<div class="w-full bg-surface-container-low h-1.5 rounded-full mt-4 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 86%;"></div>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between">
+<span class="font-label-caps uppercase text-on-surface-variant font-bold">Active QR Codes</span>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-[10px] uppercase font-bold flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-ping"></span>
+            83% Active
+          </span>
+</div>
+<div class="mt-4 flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-on-surface font-bold">5</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">of 6 deployed</span>
+</div>
+<div class="flex items-center gap-1.5 text-body-sm text-tertiary mt-4">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span>All high-priority stands live</span>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between">
+<span class="font-label-caps uppercase text-on-surface-variant font-bold">Total Scans</span>
+<div class="w-8 h-8 rounded-lg bg-surface-container-high text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</div>
+</div>
+<div class="mt-4 flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-on-surface font-bold">1,428</span>
+<span class="font-body-sm text-body-sm text-tertiary flex items-center font-medium">
+<span class="material-symbols-outlined text-[16px]">trending_up</span> +18.4%
+          </span>
+</div>
+<div class="flex items-center justify-between text-body-sm text-on-surface-variant mt-4">
+<span>Conversion avg: <strong class="text-on-surface font-semibold">68.1%</strong></span>
+<span class="text-primary font-label-md text-label-md">High</span>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between">
+<span class="font-label-caps uppercase text-on-surface-variant font-bold">Recently Created</span>
+<div class="w-8 h-8 rounded-lg bg-secondary-container text-on-secondary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">history</span>
+</div>
+</div>
+<div class="mt-3">
+<div class="font-headline-sm text-headline-sm text-on-surface truncate">Rooftop Sky Lounge</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Created 2 days ago · Table Tent</div>
+</div>
+<div class="pt-3 flex items-center justify-between text-label-md text-label-md text-primary font-semibold">
+<span>Auto-sync connected</span>
+<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+</div>
+</div>
+</div>
+<!-- Filter & Control Toolbar -->
+<div class="p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-space-md">
+<!-- Search Input -->
+<div class="relative flex-1 min-w-[280px]">
+<span class="material-symbols-outlined absolute left-3.5 top-3 text-outline text-[20px]">search</span>
+<input class="w-full h-11 pl-11 pr-4 rounded-xl bg-surface-container-low font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest transition-all" id="qrSearchInput" placeholder="Search QR codes by title, location or tag..." type="text"/>
+</div>
+<!-- Filters & Controls Group -->
+<div class="flex flex-wrap items-center gap-space-sm">
+<!-- Status Filter -->
+<div class="relative">
+<select class="appearance-none h-11 pl-3.5 pr-9 rounded-xl bg-surface-container-low font-label-md text-label-md text-on-surface focus:outline-none focus:bg-surface-container-lowest transition-all cursor-pointer" id="statusFilter">
+<option value="all">All Statuses (6)</option>
+<option value="active">Active (5)</option>
+<option value="draft">Draft / Inactive (1)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-3 text-on-surface-variant pointer-events-none text-[18px]">expand_more</span>
+</div>
+<!-- Category Filter -->
+<div class="relative">
+<select class="appearance-none h-11 pl-3.5 pr-9 rounded-xl bg-surface-container-low font-label-md text-label-md text-on-surface focus:outline-none focus:bg-surface-container-lowest transition-all cursor-pointer" id="categoryFilter">
+<option value="all">All Categories</option>
+<option value="restaurant">Restaurant &amp; Lounge</option>
+<option value="cafe">Cafe &amp; Bakery</option>
+<option value="hotel">Hotel &amp; Reception</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-3 text-on-surface-variant pointer-events-none text-[18px]">expand_more</span>
+</div>
+<!-- Sort Select -->
+<div class="relative">
+<select class="appearance-none h-11 pl-3.5 pr-9 rounded-xl bg-surface-container-low font-label-md text-label-md text-on-surface focus:outline-none focus:bg-surface-container-lowest transition-all cursor-pointer">
+<option>Sort by: Most Scans</option>
+<option>Sort by: Newest First</option>
+<option>Sort by: Highest Conversion</option>
+<option>Sort by: Alphabetical</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-3 text-on-surface-variant pointer-events-none text-[18px]">unfold_more</span>
+</div>
+<!-- View Toggle Buttons -->
+<div class="p-1 rounded-xl bg-surface-container-low flex items-center">
+<button class="p-1.5 rounded-lg bg-surface-container-lowest text-primary shadow-sm" id="viewGridBtn" title="Grid View">
+<span class="material-symbols-outlined text-[19px]">grid_view</span>
+</button>
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors" id="viewListBtn" title="List View">
+<span class="material-symbols-outlined text-[19px]">format_list_bulleted</span>
+</button>
+</div>
+</div>
+</div>
+<!-- QR Codes Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-space-lg" id="qrGridContainer">
+<!-- Card 1: Featured / Royal Palace Hotel - Main Reception -->
+<div class="qr-item rounded-2xl bg-surface-container-lowest shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group" data-category="hotel" data-status="active" data-title="Royal Palace Hotel Main Reception">
+<div class="p-space-md bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-[11px] uppercase font-bold flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Active
+            </span>
+<span class="px-2 py-0.5 rounded-md bg-primary-fixed text-on-primary-fixed font-label-caps text-[10px] uppercase font-bold">Featured Poster</span>
+</div>
+<button class="p-1.5 text-on-surface-variant hover:text-primary rounded-lg hover:bg-surface-container-lowest transition-colors" onclick="openDrawer('Royal Palace Hotel — Main Reception', 'Oct 12, 2024', '642', '74.2%', 'g.page/r/royalpalace-bettiah/review')" title="Quick Preview">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+<!-- Mini Poster Preview Container -->
+<div class="relative p-space-lg bg-surface-container-low flex items-center justify-center">
+<div class="w-56 bg-surface-container-lowest rounded-xl shadow-lg p-4 flex flex-col items-center text-center transform group-hover:-translate-y-1 transition-transform duration-300">
+<!-- Google Review Banner -->
+<div class="flex items-center gap-1.5 mb-1.5">
+<svg class="w-4 h-4" viewbox="0 0 24 24">
+<path d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z" fill="#4285F4"></path>
+<path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z" fill="#34A853"></path>
+<path d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z" fill="#FBBC05"></path>
+<path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
+</svg>
+<span class="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-wider font-bold">Review Us On Google</span>
+</div>
+<div class="flex items-center text-[#FBBC04] text-[13px] mb-2 tracking-tight">
+              ★★★★★
+            </div>
+<!-- Stylized QR Code Box -->
+<div class="w-28 h-28 bg-surface-container-high rounded-lg p-2 flex items-center justify-center relative">
+<svg class="w-full h-full text-on-surface" fill="currentColor" viewbox="0 0 100 100">
+<!-- Outer Corners -->
+<rect fill="none" height="28" rx="4" stroke="currentColor" stroke-width="7" width="28" x="5" y="5"></rect>
+<rect fill="currentColor" height="12" width="12" x="13" y="13"></rect>
+<rect fill="none" height="28" rx="4" stroke="currentColor" stroke-width="7" width="28" x="67" y="5"></rect>
+<rect fill="currentColor" height="12" width="12" x="75" y="13"></rect>
+<rect fill="none" height="28" rx="4" stroke="currentColor" stroke-width="7" width="28" x="5" y="67"></rect>
+<rect fill="currentColor" height="12" width="12" x="13" y="75"></rect>
+<!-- Matrix Data -->
+<rect height="8" width="8" x="42" y="10"></rect>
+<rect height="6" width="6" x="52" y="18"></rect>
+<rect height="8" width="16" x="42" y="30"></rect>
+<rect height="14" width="8" x="10" y="44"></rect>
+<rect height="6" width="12" x="25" y="46"></rect>
+<rect fill="#1A73E8" height="12" width="12" x="44" y="44"></rect>
+<rect height="6" width="14" x="68" y="44"></rect>
+<rect height="14" width="6" x="86" y="52"></rect>
+<rect height="18" width="8" x="42" y="68"></rect>
+<rect height="6" width="14" x="60" y="70"></rect>
+<rect height="12" width="12" x="80" y="75"></rect>
+<circle cx="50" cy="50" fill="#ffffff" r="3"></circle>
+</svg>
+</div>
+<div class="font-label-caps text-[9px] text-on-surface uppercase font-bold tracking-wider mt-2">Royal Palace Hotel</div>
+<div class="text-[8px] text-outline font-body-sm">Scan with camera to review</div>
+</div>
+</div>
+<!-- Body Details -->
+<div class="p-space-lg flex flex-col flex-1 justify-between">
+<div>
+<div class="flex items-start justify-between gap-2">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold leading-tight">Royal Palace Hotel — Main Reception</h3>
+</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant mt-1">Restaurant &amp; Lounge · Bettiah, Bihar</div>
+<div class="grid grid-cols-2 gap-space-sm mt-4 p-3 rounded-xl bg-surface-container-low">
+<div>
+<div class="font-label-caps text-label-caps uppercase text-outline">Total Scans</div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-bold mt-0.5">642</div>
+</div>
+<div>
+<div class="font-label-caps text-label-caps uppercase text-outline">Conversion</div>
+<div class="font-headline-sm text-headline-sm text-tertiary font-bold mt-0.5">74.2%</div>
+</div>
+</div>
+<!-- Destination Link Pill -->
+<div class="mt-3 flex items-center justify-between p-2 rounded-lg bg-surface-container-high/60">
+<div class="flex items-center gap-1.5 overflow-hidden">
+<span class="material-symbols-outlined text-[16px] text-primary shrink-0">link</span>
+<span class="font-body-sm text-body-sm text-on-surface truncate">g.page/r/royalpalace-bettiah/review</span>
+</div>
+<button class="text-primary hover:text-on-primary-fixed-variant p-1 rounded transition-colors text-[13px] font-semibold shrink-0" onclick="copyToClipboard('https://g.page/r/royalpalace-bettiah/review', this)" title="Copy URL">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+</div>
+<!-- Bottom Actions Bar -->
+<div class="pt-4 mt-4 flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1" onclick="openDrawer('Royal Palace Hotel — Main Reception', 'Oct 12, 2024', '642', '74.2%', 'g.page/r/royalpalace-bettiah/review')" title="Visual Stand Preview">
+<span class="material-symbols-outlined text-[17px]">preview</span>
+<span>Preview</span>
+</button>
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1" title="Customize Design">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+<span>Edit</span>
+</button>
+</div>
+<div class="flex items-center gap-1.5">
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-lowest text-primary shadow-sm hover:bg-primary hover:text-on-primary font-label-md text-label-md transition-all flex items-center gap-1" onclick="triggerDownload('PNG')">
+<span class="material-symbols-outlined text-[16px]">image</span>
+<span>PNG</span>
+</button>
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-lowest text-primary shadow-sm hover:bg-primary hover:text-on-primary font-label-md text-label-md transition-all flex items-center gap-1" onclick="triggerDownload('PDF')">
+<span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+<span>PDF</span>
+</button>
+<div class="relative dropdown-container">
+<button class="h-9 w-9 rounded-lg hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors" onclick="toggleDropdown(this)">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+<div class="dropdown-menu hidden absolute right-0 bottom-full mb-1 w-44 rounded-xl bg-surface-container-lowest shadow-xl p-1 z-30">
+<button class="w-full text-left px-3 py-2 text-body-sm font-body-sm rounded-lg hover:bg-surface-container-high flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-[16px]">content_copy</span> Duplicate Stand
+                  </button>
+<button class="w-full text-left px-3 py-2 text-body-sm font-body-sm rounded-lg hover:bg-surface-container-high flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-[16px]">analytics</span> Scan Analytics
+                  </button>
+<button class="w-full text-left px-3 py-2 text-body-sm font-body-sm rounded-lg hover:bg-error-container text-error flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">archive</span> Archive Code
+                  </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2: Royal Palace Hotel - Dining Hall 1 -->
+<div class="qr-item rounded-2xl bg-surface-container-lowest shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group" data-category="restaurant" data-status="active" data-title="Royal Palace Hotel Dining Hall 1">
+<div class="p-space-md bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-[11px] uppercase font-bold flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Active
+            </span>
+<span class="text-body-sm text-outline">Tables 1-12</span>
+</div>
+<button class="p-1.5 text-on-surface-variant hover:text-primary rounded-lg hover:bg-surface-container-lowest transition-colors" onclick="openDrawer('Royal Palace Hotel — Dining Hall 1', 'Nov 01, 2024', '514', '69.0%', 'g.page/r/royalpalace-dining1/review')" title="Quick Preview">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+<!-- Poster Thumbnail: Modern Navy Style -->
+<div class="relative p-space-lg bg-surface-container-low flex items-center justify-center">
+<div class="w-56 bg-inverse-surface rounded-xl shadow-lg p-4 flex flex-col items-center text-center transform group-hover:-translate-y-1 transition-transform duration-300">
+<div class="text-[9px] font-label-caps text-secondary-fixed uppercase tracking-wider font-bold mb-1">Modern Navy Stand</div>
+<div class="flex items-center text-[#FBBC04] text-[13px] mb-2 tracking-tight">★★★★★</div>
+<div class="w-28 h-28 bg-surface-container-lowest rounded-lg p-2 flex items-center justify-center">
+<svg class="w-full h-full text-inverse-surface" fill="currentColor" viewbox="0 0 100 100">
+<rect fill="none" height="28" rx="3" stroke="currentColor" stroke-width="7" width="28" x="5" y="5"></rect>
+<rect fill="currentColor" height="12" width="12" x="13" y="13"></rect>
+<rect fill="none" height="28" rx="3" stroke="currentColor" stroke-width="7" width="28" x="67" y="5"></rect>
+<rect fill="currentColor" height="12" width="12" x="75" y="13"></rect>
+<rect fill="none" height="28" rx="3" stroke="currentColor" stroke-width="7" width="28" x="5" y="67"></rect>
+<rect fill="currentColor" height="12" width="12" x="13" y="75"></rect>
+<rect height="8" width="14" x="40" y="8"></rect>
+<rect height="14" width="6" x="58" y="16"></rect>
+<rect fill="#1A73E8" height="18" width="18" x="42" y="38"></rect>
+<rect height="8" width="18" x="12" y="46"></rect>
+<rect height="8" width="16" x="68" y="42"></rect>
+<rect height="12" width="8" x="86" y="54"></rect>
+<rect height="12" width="12" x="42" y="72"></rect>
+<rect height="12" width="16" x="72" y="76"></rect>
+</svg>
+</div>
+<div class="font-label-caps text-[9px] text-inverse-on-surface uppercase font-bold tracking-wider mt-2">Dining Hall 1</div>
+<div class="text-[8px] text-secondary-fixed-dim">Leave your dining review</div>
+</div>
+</div>
+<!-- Body Details -->
+<div class="p-space-lg flex flex-col flex-1 justify-between">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold leading-tight">Royal Palace Hotel — Dining Hall 1 (Tables 1-12)</h3>
+<div class="text-body-sm font-body-sm text-on-surface-variant mt-1">Restaurant &amp; Lounge · Bettiah</div>
+<div class="grid grid-cols-2 gap-space-sm mt-4 p-3 rounded-xl bg-surface-container-low">
+<div>
+<div class="font-label-caps text-label-caps uppercase text-outline">Total Scans</div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-bold mt-0.5">514</div>
+</div>
+<div>
+<div class="font-label-caps text-label-caps uppercase text-outline">Created Date</div>
+<div class="font-body-md text-body-md text-on-surface font-semibold mt-0.5">Nov 01, 2024</div>
+</div>
+</div>
+<div class="mt-3 flex items-center justify-between p-2 rounded-lg bg-surface-container-high/60">
+<div class="flex items-center gap-1.5 overflow-hidden">
+<span class="material-symbols-outlined text-[16px] text-primary shrink-0">link</span>
+<span class="font-body-sm text-body-sm text-on-surface truncate">g.page/r/royalpalace-dining1/review</span>
+</div>
+<button class="text-primary p-1 rounded text-[13px] font-semibold shrink-0" onclick="copyToClipboard('https://g.page/r/royalpalace-dining1/review', this)" title="Copy URL">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+</div>
+<div class="pt-4 mt-4 flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1" onclick="openDrawer('Royal Palace Hotel — Dining Hall 1', 'Nov 01, 2024', '514', '69.0%', 'g.page/r/royalpalace-dining1/review')">
+<span class="material-symbols-outlined text-[17px]">preview</span>
+<span>Preview</span>
+</button>
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+<span>Edit</span>
+</button>
+</div>
+<div class="flex items-center gap-1.5">
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-lowest text-primary shadow-sm hover:bg-primary hover:text-on-primary font-label-md text-label-md transition-all flex items-center gap-1" onclick="triggerDownload('PNG')">
+<span class="material-symbols-outlined text-[16px]">image</span>
+<span>PNG</span>
+</button>
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-lowest text-primary shadow-sm hover:bg-primary hover:text-on-primary font-label-md text-label-md transition-all flex items-center gap-1" onclick="triggerDownload('PDF')">
+<span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+<span>PDF</span>
+</button>
+<div class="relative dropdown-container">
+<button class="h-9 w-9 rounded-lg hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors" onclick="toggleDropdown(this)">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+<div class="dropdown-menu hidden absolute right-0 bottom-full mb-1 w-44 rounded-xl bg-surface-container-lowest shadow-xl p-1 z-30">
+<button class="w-full text-left px-3 py-2 text-body-sm font-body-sm rounded-lg hover:bg-surface-container-high flex items-center gap-2 text-on-surface">Duplicate Stand</button>
+<button class="w-full text-left px-3 py-2 text-body-sm font-body-sm rounded-lg hover:bg-surface-container-high flex items-center gap-2 text-on-surface">Scan Analytics</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3: Royal Palace Hotel - Rooftop Sky Lounge -->
+<div class="qr-item rounded-2xl bg-surface-container-lowest shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group" data-category="hotel" data-status="active" data-title="Royal Palace Hotel Rooftop Sky Lounge">
+<div class="p-space-md bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-[11px] uppercase font-bold flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Active
+            </span>
+<span class="text-body-sm text-outline">Gold Template</span>
+</div>
+<button class="p-1.5 text-on-surface-variant hover:text-primary rounded-lg hover:bg-surface-container-lowest transition-colors" onclick="openDrawer('Royal Palace Hotel — Rooftop Sky Lounge', 'Nov 15, 2024', '192', '62.5%', 'g.page/r/royalpalace-skylounge/review')">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+<!-- Poster Thumbnail: Royal Gold Template -->
+<div class="relative p-space-lg bg-surface-container-low flex items-center justify-center">
+<div class="w-56 bg-surface-container-lowest rounded-xl shadow-lg p-4 flex flex-col items-center text-center transform group-hover:-translate-y-1 transition-transform duration-300">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center mb-1">
+<span class="material-symbols-outlined text-[18px]">local_bar</span>
+</div>
+<div class="font-label-caps text-[9px] text-[#A16207] uppercase font-bold tracking-wider">Royal Gold Signature</div>
+<div class="flex items-center text-[#FBBC04] text-[13px] my-1 tracking-tight">★★★★★</div>
+<div class="w-28 h-28 bg-surface-container-low rounded-lg p-2 flex items-center justify-center">
+<svg class="w-full h-full text-on-surface" fill="currentColor" viewbox="0 0 100 100">
+<rect fill="none" height="28" rx="2" stroke="currentColor" stroke-width="7" width="28" x="5" y="5"></rect>
+<rect height="12" width="12" x="13" y="13"></rect>
+<rect fill="none" height="28" rx="2" stroke="currentColor" stroke-width="7" width="28" x="67" y="5"></rect>
+<rect height="12" width="12" x="75" y="13"></rect>
+<rect fill="none" height="28" rx="2" stroke="currentColor" stroke-width="7" width="28" x="5" y="67"></rect>
+<rect height="12" width="12" x="13" y="75"></rect>
+<rect height="10" width="10" x="42" y="12"></rect>
+<rect height="8" width="8" x="58" y="24"></rect>
+<rect fill="#EAB308" height="12" width="12" x="44" y="44"></rect>
+<rect height="10" width="14" x="14" y="44"></rect>
+<rect height="6" width="14" x="68" y="46"></rect>
+<rect height="10" width="8" x="84" y="58"></rect>
+<rect height="10" width="10" x="44" y="74"></rect>
+<rect height="14" width="14" x="68" y="72"></rect>
+</svg>
+</div>
+<div class="font-label-caps text-[9px] text-on-surface uppercase font-bold tracking-wider mt-2">Sky Lounge &amp; Bar</div>
+</div>
+</div>
+<div class="p-space-lg flex flex-col flex-1 justify-between">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold leading-tight">Royal Palace Hotel — Rooftop Sky Lounge</h3>
+<div class="text-body-sm font-body-sm text-on-surface-variant mt-1">Lounge &amp; Bar · 5th Floor Deck</div>
+<div class="grid grid-cols-2 gap-space-sm mt-4 p-3 rounded-xl bg-surface-container-low">
+<div>
+<div class="font-label-caps text-label-caps uppercase text-outline">Total Scans</div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-bold mt-0.5">192</div>
+</div>
+<div>
+<div class="font-label-caps text-label-caps uppercase text-outline">Created Date</div>
+<div class="font-body-md text-body-md text-on-surface font-semibold mt-0.5">Nov 15, 2024</div>
+</div>
+</div>
+<div class="mt-3 flex items-center justify-between p-2 rounded-lg bg-surface-container-high/60">
+<div class="flex items-center gap-1.5 overflow-hidden">
+<span class="material-symbols-outlined text-[16px] text-primary shrink-0">link</span>
+<span class="font-body-sm text-body-sm text-on-surface truncate">g.page/r/royalpalace-skylounge/review</span>
+</div>
+<button class="text-primary p-1 rounded text-[13px] font-semibold shrink-0" onclick="copyToClipboard('https://g.page/r/royalpalace-skylounge/review', this)" title="Copy URL">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+</div>
+<div class="pt-4 mt-4 flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1" onclick="openDrawer('Royal Palace Hotel — Rooftop Sky Lounge', 'Nov 15, 2024', '192', '62.5%', 'g.page/r/royalpalace-skylounge/review')">
+<span class="material-symbols-outlined text-[17px]">preview</span>
+<span>Preview</span>
+</button>
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+<span>Edit</span>
+</button>
+</div>
+<div class="flex items-center gap-1.5">
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-lowest text-primary shadow-sm hover:bg-primary hover:text-on-primary font-label-md text-label-md transition-all flex items-center gap-1" onclick="triggerDownload('PNG')">
+<span class="material-symbols-outlined text-[16px]">image</span>
+<span>PNG</span>
+</button>
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-lowest text-primary shadow-sm hover:bg-primary hover:text-on-primary font-label-md text-label-md transition-all flex items-center gap-1" onclick="triggerDownload('PDF')">
+<span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+<span>PDF</span>
+</button>
+<div class="relative dropdown-container">
+<button class="h-9 w-9 rounded-lg hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors" onclick="toggleDropdown(this)">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+<div class="dropdown-menu hidden absolute right-0 bottom-full mb-1 w-44 rounded-xl bg-surface-container-lowest shadow-xl p-1 z-30">
+<button class="w-full text-left px-3 py-2 text-body-sm font-body-sm rounded-lg hover:bg-surface-container-high flex items-center gap-2 text-on-surface">Duplicate Stand</button>
+<button class="w-full text-left px-3 py-2 text-body-sm font-body-sm rounded-lg hover:bg-surface-container-high flex items-center gap-2 text-on-surface">Scan Analytics</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 4: Urban Cafe & Bakery -->
+<div class="qr-item rounded-2xl bg-surface-container-lowest shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group" data-category="cafe" data-status="active" data-title="Urban Cafe Bakery Counter Stand">
+<div class="p-space-md bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-[11px] uppercase font-bold flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Active
+            </span>
+<span class="text-body-sm text-outline">Bistro Green</span>
+</div>
+<button class="p-1.5 text-on-surface-variant hover:text-primary rounded-lg hover:bg-surface-container-lowest transition-colors" onclick="openDrawer('Urban Cafe &amp; Bakery — Counter Stand', 'Dec 04, 2024', '80', '58.0%', 'g.page/r/urbancafe-station/review')">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+<!-- Poster Thumbnail: Minimal White with Bistro Green -->
+<div class="relative p-space-lg bg-surface-container-low flex items-center justify-center">
+<div class="w-56 bg-surface-container-lowest rounded-xl shadow-lg p-4 flex flex-col items-center text-center transform group-hover:-translate-y-1 transition-transform duration-300">
+<div class="h-2 w-full bg-tertiary rounded-full mb-2"></div>
+<div class="font-headline-sm text-[12px] text-on-surface font-bold">URBAN CAFE &amp; BAKERY</div>
+<div class="flex items-center text-[#FBBC04] text-[13px] my-1 tracking-tight">★★★★★</div>
+<div class="w-28 h-28 bg-surface-container-high rounded-lg p-2 flex items-center justify-center">
+<svg class="w-full h-full text-tertiary" fill="currentColor" viewbox="0 0 100 100">
+<rect fill="none" height="28" rx="4" stroke="currentColor" stroke-width="7" width="28" x="5" y="5"></rect>
+<rect height="12" width="12" x="13" y="13"></rect>
+<rect fill="none" height="28" rx="4" stroke="currentColor" stroke-width="7" width="28" x="67" y="5"></rect>
+<rect height="12" width="12" x="75" y="13"></rect>
+<rect fill="none" height="28" rx="4" stroke="currentColor" stroke-width="7" width="28" x="5" y="67"></rect>
+<rect height="12" width="12" x="13" y="75"></rect>
+<rect height="12" width="8" x="42" y="14"></rect>
+<rect height="8" width="6" x="58" y="18"></rect>
+<rect fill="#005bbf" height="12" width="12" x="44" y="44"></rect>
+<rect height="6" width="14" x="14" y="48"></rect>
+<rect height="10" width="12" x="68" y="46"></rect>
+<rect height="10" width="8" x="84" y="58"></rect>
+<rect height="12" width="12" x="42" y="74"></rect>
+<rect height="14" width="14" x="68" y="74"></rect>
+</svg>
+</div>
+<div class="font-label-caps text-[8px] text-on-surface-variant uppercase tracking-wider mt-2">Station Road Branch</div>
+</div>
+</div>
+<div class="p-space-lg flex flex-col flex-1 justify-between">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold leading-tight">Urban Cafe &amp; Bakery — Counter Stand</h3>
+<div class="text-body-sm font-body-sm text-on-surface-variant mt-1">Cafe · Station Road Branch</div>
+<div class="grid grid-cols-2 gap-space-sm mt-4 p-3 rounded-xl bg-surface-container-low">
+<div>
+<div class="font-label-caps text-label-caps uppercase text-outline">Total Scans</div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-bold mt-0.5">80</div>
+</div>
+<div>
+<div class="font-label-caps text-label-caps uppercase text-outline">Created Date</div>
+<div class="font-body-md text-body-md text-on-surface font-semibold mt-0.5">Dec 04, 2024</div>
+</div>
+</div>
+<div class="mt-3 flex items-center justify-between p-2 rounded-lg bg-surface-container-high/60">
+<div class="flex items-center gap-1.5 overflow-hidden">
+<span class="material-symbols-outlined text-[16px] text-primary shrink-0">link</span>
+<span class="font-body-sm text-body-sm text-on-surface truncate">g.page/r/urbancafe-station/review</span>
+</div>
+<button class="text-primary p-1 rounded text-[13px] font-semibold shrink-0" onclick="copyToClipboard('https://g.page/r/urbancafe-station/review', this)" title="Copy URL">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+</div>
+<div class="pt-4 mt-4 flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1" onclick="openDrawer('Urban Cafe &amp; Bakery — Counter Stand', 'Dec 04, 2024', '80', '58.0%', 'g.page/r/urbancafe-station/review')">
+<span class="material-symbols-outlined text-[17px]">preview</span>
+<span>Preview</span>
+</button>
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+<span>Edit</span>
+</button>
+</div>
+<div class="flex items-center gap-1.5">
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-lowest text-primary shadow-sm hover:bg-primary hover:text-on-primary font-label-md text-label-md transition-all flex items-center gap-1" onclick="triggerDownload('PNG')">
+<span class="material-symbols-outlined text-[16px]">image</span>
+<span>PNG</span>
+</button>
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-lowest text-primary shadow-sm hover:bg-primary hover:text-on-primary font-label-md text-label-md transition-all flex items-center gap-1" onclick="triggerDownload('PDF')">
+<span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+<span>PDF</span>
+</button>
+<div class="relative dropdown-container">
+<button class="h-9 w-9 rounded-lg hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors" onclick="toggleDropdown(this)">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+<div class="dropdown-menu hidden absolute right-0 bottom-full mb-1 w-44 rounded-xl bg-surface-container-lowest shadow-xl p-1 z-30">
+<button class="w-full text-left px-3 py-2 text-body-sm font-body-sm rounded-lg hover:bg-surface-container-high flex items-center gap-2 text-on-surface">Duplicate Stand</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 5: Sharma Family Restaurant -->
+<div class="qr-item rounded-2xl bg-surface-container-lowest shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group" data-category="restaurant" data-status="active" data-title="Sharma Restaurant Takeaway Counter">
+<div class="p-space-md bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-[11px] uppercase font-bold flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Active
+            </span>
+<span class="text-body-sm text-outline">Classic Google</span>
+</div>
+<button class="p-1.5 text-on-surface-variant hover:text-primary rounded-lg hover:bg-surface-container-lowest transition-colors" onclick="openDrawer('Sharma Restaurant — Takeaway Counter', 'Jan 10, 2025', '48', '52.1%', 'g.page/r/sharma-takeaway/review')">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</div>
+<!-- Poster Thumbnail: Google Classic with Color Accents -->
+<div class="relative p-space-lg bg-surface-container-low flex items-center justify-center">
+<div class="w-56 bg-surface-container-lowest rounded-xl shadow-lg p-4 flex flex-col items-center text-center transform group-hover:-translate-y-1 transition-transform duration-300">
+<div class="flex items-center gap-1 mb-1">
+<span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-error"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-[#FBBC04]"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary"></span>
+</div>
+<div class="font-label-caps text-[9px] text-on-surface uppercase font-bold tracking-wider">Help us grow on Google</div>
+<div class="flex items-center text-[#FBBC04] text-[13px] my-1 tracking-tight">★★★★★</div>
+<div class="w-28 h-28 bg-surface-container-high rounded-lg p-2 flex items-center justify-center">
+<svg class="w-full h-full text-on-surface" fill="currentColor" viewbox="0 0 100 100">
+<rect fill="none" height="28" rx="3" stroke="currentColor" stroke-width="7" width="28" x="5" y="5"></rect>
+<rect height="12" width="12" x="13" y="13"></rect>
+<rect fill="none" height="28" rx="3" stroke="currentColor" stroke-width="7" width="28" x="67" y="5"></rect>
+<rect height="12" width="12" x="75" y="13"></rect>
+<rect fill="none" height="28" rx="3" stroke="currentColor" stroke-width="7" width="28" x="5" y="67"></rect>
+<rect height="12" width="12" x="13" y="75"></rect>
+<rect height="12" width="6" x="42" y="16"></rect>
+<rect height="6" width="8" x="56" y="20"></rect>
+<rect fill="#EA4335" height="14" width="14" x="42" y="44"></rect>
+<rect height="6" width="14" x="12" y="44"></rect>
+<rect height="6" width="14" x="70" y="46"></rect>
+<rect height="12" width="6" x="84" y="58"></rect>
+<rect height="12" width="10" x="44" y="74"></rect>
+<rect height="12" width="12" x="72" y="74"></rect>
+</svg>
+</div>
+<div class="font-label-caps text-[9px] text-on-surface uppercase font-bold tracking-wider mt-2">Takeaway Billing Desk</div>
+</div>
+</div>
+<div class="p-space-lg flex flex-col flex-1 justify-between">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold leading-tight">Sharma Restaurant — Takeaway Counter</h3>
+<div class="text-body-sm font-body-sm text-on-surface-variant mt-1">Casual Dining · Billing Section</div>
+<div class="grid grid-cols-2 gap-space-sm mt-4 p-3 rounded-xl bg-surface-container-low">
+<div>
+<div class="font-label-caps text-label-caps uppercase text-outline">Total Scans</div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-bold mt-0.5">48</div>
+</div>
+<div>
+<div class="font-label-caps text-label-caps uppercase text-outline">Created Date</div>
+<div class="font-body-md text-body-md text-on-surface font-semibold mt-0.5">Jan 10, 2025</div>
+</div>
+</div>
+<div class="mt-3 flex items-center justify-between p-2 rounded-lg bg-surface-container-high/60">
+<div class="flex items-center gap-1.5 overflow-hidden">
+<span class="material-symbols-outlined text-[16px] text-primary shrink-0">link</span>
+<span class="font-body-sm text-body-sm text-on-surface truncate">g.page/r/sharma-takeaway/review</span>
+</div>
+<button class="text-primary p-1 rounded text-[13px] font-semibold shrink-0" onclick="copyToClipboard('https://g.page/r/sharma-takeaway/review', this)" title="Copy URL">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+</div>
+<div class="pt-4 mt-4 flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1" onclick="openDrawer('Sharma Restaurant — Takeaway Counter', 'Jan 10, 2025', '48', '52.1%', 'g.page/r/sharma-takeaway/review')">
+<span class="material-symbols-outlined text-[17px]">preview</span>
+<span>Preview</span>
+</button>
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[17px]">edit</span>
+<span>Edit</span>
+</button>
+</div>
+<div class="flex items-center gap-1.5">
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-lowest text-primary shadow-sm hover:bg-primary hover:text-on-primary font-label-md text-label-md transition-all flex items-center gap-1" onclick="triggerDownload('PNG')">
+<span class="material-symbols-outlined text-[16px]">image</span>
+<span>PNG</span>
+</button>
+<button class="h-9 px-2.5 rounded-lg bg-surface-container-lowest text-primary shadow-sm hover:bg-primary hover:text-on-primary font-label-md text-label-md transition-all flex items-center gap-1" onclick="triggerDownload('PDF')">
+<span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+<span>PDF</span>
+</button>
+<div class="relative dropdown-container">
+<button class="h-9 w-9 rounded-lg hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant transition-colors" onclick="toggleDropdown(this)">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+<div class="dropdown-menu hidden absolute right-0 bottom-full mb-1 w-44 rounded-xl bg-surface-container-lowest shadow-xl p-1 z-30">
+<button class="w-full text-left px-3 py-2 text-body-sm font-body-sm rounded-lg hover:bg-surface-container-high flex items-center gap-2 text-on-surface">Duplicate Stand</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 6: Draft / Inactive -->
+<div class="qr-item rounded-2xl bg-surface-container-lowest shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden opacity-90 hover:opacity-100 group" data-category="hotel" data-status="draft" data-title="Royal Palace Hotel Banquet Hall VIP">
+<div class="p-space-md bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded-full bg-surface-container-highest text-on-surface-variant font-label-caps text-[11px] uppercase font-bold flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span> Draft / Inactive
+            </span>
+</div>
+<span class="text-body-sm font-body-sm text-outline">Unpublished</span>
+</div>
+<!-- Poster Thumbnail Placeholder for Draft -->
+<div class="relative p-space-lg bg-surface-container-low flex items-center justify-center">
+<div class="w-56 h-60 rounded-xl bg-surface-container-high/60 flex flex-col items-center justify-center text-center p-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-lowest text-outline flex items-center justify-center mb-2 shadow-sm">
+<span class="material-symbols-outlined text-[24px]">pending</span>
+</div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-semibold text-[14px]">Design Incomplete</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Destination review link and stand template not yet configured.</p>
+</div>
+</div>
+<div class="p-space-lg flex flex-col flex-1 justify-between">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold leading-tight">Royal Palace Hotel — Banquet Hall VIP</h3>
+<div class="text-body-sm font-body-sm text-on-surface-variant mt-1">Hotel Event Space · Bettiah</div>
+<div class="grid grid-cols-2 gap-space-sm mt-4 p-3 rounded-xl bg-surface-container-low">
+<div>
+<div class="font-label-caps text-label-caps uppercase text-outline">Total Scans</div>
+<div class="font-headline-sm text-headline-sm text-outline font-bold mt-0.5">0</div>
+</div>
+<div>
+<div class="font-label-caps text-label-caps uppercase text-outline">Setup Status</div>
+<div class="font-body-md text-body-md text-error font-semibold mt-0.5">Pending URL</div>
+</div>
+</div>
+<div class="mt-3 p-2 rounded-lg bg-surface-container-low text-body-sm text-outline flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">info</span>
+<span>Needs Google Business Place ID</span>
+</div>
+</div>
+<div class="pt-4 mt-4 flex items-center justify-between">
+<button class="h-10 px-4 rounded-xl bg-primary-container text-on-primary font-label-md text-label-md font-semibold hover:bg-primary transition-all flex items-center gap-1.5 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">build</span>
+<span>Finish Setup</span>
+</button>
+<button class="h-10 px-3 rounded-xl text-error hover:bg-error-container/40 font-label-md text-label-md transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+<span>Delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination & Summary Footer -->
+<div class="p-space-md rounded-xl bg-surface-container-lowest shadow-sm flex flex-col sm:flex-row items-center justify-between gap-space-md">
+<div class="font-body-md text-body-md text-on-surface-variant">
+        Showing <span class="font-semibold text-on-surface">1</span> to <span class="font-semibold text-on-surface">6</span> of <span class="font-semibold text-on-surface">6</span> QR Codes
+      </div>
+<div class="flex items-center gap-1">
+<button class="h-9 w-9 rounded-lg flex items-center justify-center text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors" disabled="">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="h-9 w-9 rounded-lg flex items-center justify-center bg-primary-container text-on-primary font-label-md text-label-md font-semibold shadow-sm">
+          1
+        </button>
+<button class="h-9 w-9 rounded-lg flex items-center justify-center text-outline hover:text-on-surface hover:bg-surface-container-high transition-colors" disabled="">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Stands per page:</span>
+<select class="h-8 px-2 rounded-lg bg-surface-container-low font-label-md text-label-md text-on-surface focus:outline-none">
+<option>12</option>
+<option>24</option>
+<option>48</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Slide-Over Drawer: Stand Preview & Live Specs Modal -->
+<div class="fixed inset-0 bg-inverse-surface/40 backdrop-blur-sm z-50 hidden transition-opacity opacity-0 flex justify-end" id="previewDrawerBackdrop">
+<div class="w-full max-w-lg bg-surface-container-lowest h-full shadow-2xl flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-out overflow-y-auto" id="previewDrawerPanel">
+<div>
+<!-- Drawer Header -->
+<div class="p-space-lg flex items-center justify-between bg-surface-container-low">
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary"></span>
+<span class="font-label-caps text-label-caps uppercase text-on-surface font-bold tracking-wider">Live Stand Inspector</span>
+</div>
+<button class="h-8 w-8 rounded-lg hover:bg-surface-container-high text-on-surface-variant flex items-center justify-center transition-colors" onclick="closeDrawer()">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Stand Graphic Big Showcase -->
+<div class="p-space-lg flex flex-col items-center bg-surface-container-low/50">
+<div class="w-64 bg-surface-container-lowest rounded-2xl shadow-xl p-5 flex flex-col items-center text-center">
+<div class="flex items-center gap-1.5 mb-2">
+<svg class="w-4 h-4" viewbox="0 0 24 24">
+<path d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z" fill="#4285F4"></path>
+<path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z" fill="#34A853"></path>
+<path d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z" fill="#FBBC05"></path>
+<path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
+</svg>
+<span class="font-label-caps text-[10px] text-on-surface font-bold uppercase tracking-wider">Leave Us A Review</span>
+</div>
+<div class="flex items-center text-[#FBBC04] text-[16px] mb-2 tracking-tight">★★★★★</div>
+<div class="w-36 h-36 bg-surface-container-high rounded-xl p-2.5 flex items-center justify-center my-1">
+<svg class="w-full h-full text-on-surface" fill="currentColor" viewbox="0 0 100 100">
+<rect fill="none" height="28" rx="4" stroke="currentColor" stroke-width="7" width="28" x="5" y="5"></rect>
+<rect height="12" width="12" x="13" y="13"></rect>
+<rect fill="none" height="28" rx="4" stroke="currentColor" stroke-width="7" width="28" x="67" y="5"></rect>
+<rect height="12" width="12" x="75" y="13"></rect>
+<rect fill="none" height="28" rx="4" stroke="currentColor" stroke-width="7" width="28" x="5" y="67"></rect>
+<rect height="12" width="12" x="13" y="75"></rect>
+<rect height="8" width="8" x="42" y="10"></rect>
+<rect height="6" width="6" x="52" y="18"></rect>
+<rect height="8" width="16" x="42" y="30"></rect>
+<rect height="14" width="8" x="10" y="44"></rect>
+<rect height="6" width="12" x="25" y="46"></rect>
+<rect fill="#1A73E8" height="12" width="12" x="44" y="44"></rect>
+<rect height="6" width="14" x="68" y="44"></rect>
+<rect height="14" width="6" x="86" y="52"></rect>
+<rect height="18" width="8" x="42" y="68"></rect>
+<rect height="6" width="14" x="60" y="70"></rect>
+<rect height="12" width="12" x="80" y="75"></rect>
+</svg>
+</div>
+<div class="font-headline-sm text-headline-sm text-on-surface font-bold text-[14px] mt-2" id="drawerStandTitle">Royal Palace Hotel</div>
+<div class="text-[10px] text-on-surface-variant font-body-sm mt-0.5">High-Resolution Physical Print Template</div>
+</div>
+</div>
+<!-- Specifications Breakdown -->
+<div class="p-space-lg flex flex-col gap-space-md">
+<div>
+<span class="font-label-caps uppercase text-outline font-bold">Stand Placement Title</span>
+<div class="font-headline-md text-headline-md text-on-surface font-bold mt-1" id="drawerTitle">Royal Palace Hotel — Main Reception</div>
+</div>
+<div class="grid grid-cols-2 gap-space-sm">
+<div class="p-3 rounded-xl bg-surface-container-low">
+<span class="font-label-caps uppercase text-outline">Total Scans</span>
+<div class="font-headline-sm text-headline-sm text-on-surface font-bold mt-0.5" id="drawerScans">642</div>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low">
+<span class="font-label-caps uppercase text-outline">Estimated Conversion</span>
+<div class="font-headline-sm text-headline-sm text-tertiary font-bold mt-0.5" id="drawerConversion">74.2%</div>
+</div>
+</div>
+<div>
+<span class="font-label-caps uppercase text-outline font-bold">Review Target URL</span>
+<div class="p-3 rounded-xl bg-surface-container-low flex items-center justify-between mt-1">
+<span class="font-body-md text-body-md text-on-surface truncate" id="drawerUrl">g.page/r/royalpalace-bettiah/review</span>
+<button class="text-primary hover:text-on-primary-fixed-variant p-1 rounded font-semibold text-label-md" onclick="copyToClipboard(document.getElementById('drawerUrl').innerText, this)">
+                Copy
+              </button>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-surface-container-high/60 flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[22px] shrink-0 mt-0.5">print</span>
+<div>
+<div class="font-label-lg text-label-lg text-on-surface font-semibold">Print-Ready Specifications</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                Outputs at 300 DPI with CMYK color separation. Compatible with acrylic tent sizes: 4"×6", 5"×7", and A5 table stands.
+              </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Drawer Footer Actions -->
+<div class="p-space-lg bg-surface-container-low flex items-center gap-space-sm">
+<button class="flex-1 h-11 rounded-xl bg-surface-container-lowest text-primary shadow-sm hover:bg-surface-container-high font-label-lg text-label-lg transition-all flex items-center justify-center gap-2" onclick="triggerDownload('PNG'); closeDrawer();">
+<span class="material-symbols-outlined text-[18px]">download</span>
+          Download PNG
+        </button>
+<button class="flex-1 h-11 rounded-xl bg-primary-container text-on-primary shadow-md hover:bg-primary font-label-lg text-label-lg transition-all flex items-center justify-center gap-2" onclick="triggerDownload('PDF'); closeDrawer();">
+<span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+          Download PDF
+        </button>
+</div>
+</div>
+</div>
+<!-- Notification Toast Component -->
+<div class="fixed bottom-6 right-6 px-4 py-3 rounded-xl bg-inverse-surface text-inverse-on-surface font-label-lg text-label-lg shadow-2xl flex items-center gap-2.5 transform translate-y-16 opacity-0 transition-all duration-300 z-50" id="copyToast">
+<span class="material-symbols-outlined text-tertiary-fixed text-[20px]">check_circle</span>
+<span id="toastMessage">Link copied to clipboard!</span>
+</div>
+<script>
+    // Copy to clipboard helper
+    function copyToClipboard(text, triggerEl) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(showToast).catch(fallbackCopy);
+      } else {
+        fallbackCopy();
+      }
+      function fallbackCopy() {
+        const temp = document.createElement('input');
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+        showToast();
+      }
+      function showToast() {
+        const toast = document.getElementById('copyToast');
+        const msg = document.getElementById('toastMessage');
+        msg.innerText = 'Copied to clipboard: ' + (text.length > 28 ? text.substring(0, 25) + '...' : text);
+        toast.classList.remove('translate-y-16', 'opacity-0');
+        setTimeout(() => {
+          toast.classList.add('translate-y-16', 'opacity-0');
+        }, 2600);
+      }
+    }
+
+    // Dropdown toggle handler
+    function toggleDropdown(btn) {
+      const parent = btn.closest('.dropdown-container');
+      const menu = parent.querySelector('.dropdown-menu');
+      const isHidden = menu.classList.contains('hidden');
+      document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden'));
+      if (isHidden) {
+        menu.classList.remove('hidden');
+      }
+    }
+
+    // Global document click to dismiss dropdowns
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.dropdown-container')) {
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden'));
+      }
+    });
+
+    // Drawer preview controllers
+    function openDrawer(title, created, scans, conv, url) {
+      const backdrop = document.getElementById('previewDrawerBackdrop');
+      const panel = document.getElementById('previewDrawerPanel');
+      
+      document.getElementById('drawerTitle').innerText = title;
+      document.getElementById('drawerStandTitle').innerText = title.split('—')[0].trim();
+      document.getElementById('drawerScans').innerText = scans;
+      document.getElementById('drawerConversion').innerText = conv;
+      document.getElementById('drawerUrl').innerText = url;
+
+      backdrop.classList.remove('hidden');
+      setTimeout(() => {
+        backdrop.classList.remove('opacity-0');
+        panel.classList.remove('translate-x-full');
+      }, 10);
+    }
+
+    function closeDrawer() {
+      const backdrop = document.getElementById('previewDrawerBackdrop');
+      const panel = document.getElementById('previewDrawerPanel');
+      backdrop.classList.add('opacity-0');
+      panel.classList.add('translate-x-full');
+      setTimeout(() => {
+        backdrop.classList.add('hidden');
+      }, 300);
+    }
+
+    // Download mock handler
+    function triggerDownload(format) {
+      const toast = document.getElementById('copyToast');
+      const msg = document.getElementById('toastMessage');
+      msg.innerText = 'Preparing ' + format + ' print bundle...';
+      toast.classList.remove('translate-y-16', 'opacity-0');
+      setTimeout(() => {
+        msg.innerText = format + ' downloaded successfully!';
+        setTimeout(() => {
+          toast.classList.add('translate-y-16', 'opacity-0');
+        }, 1500);
+      }, 800);
+    }
+
+    // Live search & filters interaction
+    const searchInput = document.getElementById('qrSearchInput');
+    const statusSelect = document.getElementById('statusFilter');
+    const categorySelect = document.getElementById('categoryFilter');
+    const cards = document.querySelectorAll('.qr-item');
+
+    function filterCards() {
+      const q = (searchInput.value || '').toLowerCase().trim();
+      const status = statusSelect.value;
+      const cat = categorySelect.value;
+
+      cards.forEach(card => {
+        const title = card.getAttribute('data-title').toLowerCase();
+        const cardStatus = card.getAttribute('data-status');
+        const cardCat = card.getAttribute('data-category');
+
+        const matchesQuery = !q || title.includes(q);
+        const matchesStatus = (status === 'all') || (cardStatus === status);
+        const matchesCat = (cat === 'all') || (cardCat === cat);
+
+        if (matchesQuery && matchesStatus && matchesCat) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    searchInput.addEventListener('input', filterCards);
+    statusSelect.addEventListener('change', filterCards);
+    categorySelect.addEventListener('change', filterCards);
+
+    // View toggle state (Grid vs List visual representation)
+    const viewGridBtn = document.getElementById('viewGridBtn');
+    const viewListBtn = document.getElementById('viewListBtn');
+    const container = document.getElementById('qrGridContainer');
+
+    viewListBtn.addEventListener('click', () => {
+      viewListBtn.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+      viewListBtn.classList.remove('text-on-surface-variant');
+      viewGridBtn.classList.remove('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+      viewGridBtn.classList.add('text-on-surface-variant');
+
+      container.classList.remove('md:grid-cols-2', 'xl:grid-cols-3');
+      container.classList.add('grid-cols-1');
+    });
+
+    viewGridBtn.addEventListener('click', () => {
+      viewGridBtn.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+      viewGridBtn.classList.remove('text-on-surface-variant');
+      viewListBtn.classList.remove('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+      viewListBtn.classList.add('text-on-surface-variant');
+
+      container.classList.remove('grid-cols-1');
+      container.classList.add('md:grid-cols-2', 'xl:grid-cols-3');
+    });
+  </script>
+</div></main></div></body></html>

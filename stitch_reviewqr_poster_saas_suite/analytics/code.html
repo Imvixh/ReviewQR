@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"on-surface":"#0b1c30","surface-container-lowest":"#ffffff","on-primary-fixed":"#001a41","on-background":"#0b1c30","surface":"#f8f9ff","tertiary-fixed":"#89fa9b","outline":"#727785","surface-tint":"#005bc0","error":"#ba1a1a","on-tertiary-fixed-variant":"#005320","primary-fixed":"#d8e2ff","secondary-fixed-dim":"#bec6e0","surface-variant":"#d3e4fe","surface-container-high":"#dce9ff","primary":"#005bbf","background":"#f8f9ff","on-primary-container":"#ffffff","inverse-on-surface":"#eaf1ff","surface-container":"#e5eeff","error-container":"#ffdad6","primary-fixed-dim":"#adc7ff","surface-container-low":"#eff4ff","surface-dim":"#cbdbf5","on-tertiary-fixed":"#002108","surface-bright":"#f8f9ff","on-surface-variant":"#414754","on-primary":"#ffffff","primary-container":"#1a73e8","inverse-primary":"#adc7ff","on-secondary-fixed":"#131b2e","tertiary":"#006d2c","on-error-container":"#93000a","secondary":"#565e74","tertiary-fixed-dim":"#6ddd81","inverse-surface":"#213145","outline-variant":"#c1c6d6","secondary-container":"#dae2fd","tertiary-container":"#008939","on-error":"#ffffff","on-secondary-fixed-variant":"#3f465c","on-secondary":"#ffffff","on-secondary-container":"#5c647a","on-primary-fixed-variant":"#004493","secondary-fixed":"#dae2fd","surface-container-highest":"#d3e4fe","on-tertiary":"#ffffff","on-tertiary-container":"#ffffff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-2xl":"3rem","gutter":"1.5rem","margin-mobile":"1rem","space-xs":"0.25rem","space-sm":"0.5rem","space-2xs":"0.125rem","space-xl":"2rem","margin":"2rem","space-md":"1rem","space-lg":"1.5rem","gutter-mobile":"0.75rem"},"fontFamily":{"headline-lg":["Plus Jakarta Sans"],"display-hero-mobile":["Plus Jakarta Sans"],"headline-md":["Plus Jakarta Sans"],"label-lg":["Inter"],"body-sm":["Inter"],"headline-sm":["Plus Jakarta Sans"],"body-lg":["Inter"],"label-caps":["Inter"],"display-hero":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"],"label-md":["Inter"],"body-md":["Inter"]},"fontSize":{"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.02em","fontWeight":"700"}],"display-hero-mobile":["28px",{"lineHeight":"34px","letterSpacing":"-0.02em","fontWeight":"800"}],"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-sm":["18px",{"lineHeight":"24px","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"label-caps":["11px",{"lineHeight":"14px","letterSpacing":"0.06em","fontWeight":"700"}],"display-hero":["40px",{"lineHeight":"48px","letterSpacing":"-0.03em","fontWeight":"800"}],"headline-lg-mobile":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased min-h-screen"><aside class="fixed left-0 top-0 bottom-0 w-64 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col"><div class="h-16 px-space-lg flex items-center gap-space-sm"><div class="w-9 h-9 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center shadow-sm"><svg class="w-5 h-5 stroke-[2.2]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><rect height="7" rx="1.5" width="7" x="3" y="3"></rect><rect height="7" rx="1.5" width="7" x="14" y="3"></rect><rect height="7" rx="1.5" width="7" x="3" y="14"></rect><path d="M14 14h3v3h-3z"></path><path d="M20 14v3"></path><path d="M14 20h3"></path><path d="M20 20v.01"></path></svg></div><div class="flex items-center gap-1.5"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">ReviewQR</span><span class="px-1.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-caps text-[10px] uppercase font-bold tracking-wider">SaaS</span></div></div><nav class="px-space-md py-space-sm space-y-space-2xs flex flex-col" data-active-classes="bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-xl shadow-[0_1px_3px_0_rgba(15,23,42,0.05)]"><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="overview" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><rect height="7" rx="1" width="7" x="3" y="3"></rect><rect height="7" rx="1" width="7" x="14" y="3"></rect><rect height="7" rx="1" width="7" x="14" y="14"></rect><rect height="7" rx="1" width="7" x="3" y="14"></rect></svg><span>Overview</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="create-qr" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path></svg><span>Create Review QR</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="my-qr-codes" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><rect height="5" rx="1" width="5" x="3" y="3"></rect><rect height="5" rx="1" width="5" x="16" y="3"></rect><rect height="5" rx="1" width="5" x="3" y="16"></rect><path d="M21 16h-3a2 2 0 0 0-2 2v3"></path><path d="M21 21v.01"></path><path d="M12 7v3a2 2 0 0 1-2 2H7"></path><path d="M3 12h.01"></path><path d="M12 3h.01"></path><path d="M12 16v.01"></path><path d="M16 12h1"></path><path d="M21 12v.01"></path><path d="M12 21v-1"></path></svg><span>My QR Codes</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="business-profile" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span>Business Profile</span></a><a aria-current="page" class="flex items-center gap-space-sm px-space-md py-2.5 transition-all bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-xl shadow-[0_1px_3px_0_rgba(15,23,42,0.05)]" data-path="analytics" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg><span>Analytics</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="settings" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg><span>Settings</span></a></nav></div><div class="p-space-md m-space-md rounded-xl bg-surface-container-low flex flex-col gap-space-xs"><div class="flex items-center justify-between"><span class="font-label-caps text-label-caps uppercase text-primary font-bold">Pro Plan</span><span class="text-[10px] font-label-caps uppercase bg-tertiary-fixed text-on-tertiary-fixed px-1.5 py-0.5 rounded-full font-semibold">Active</span></div><div class="font-label-lg text-label-lg text-on-surface truncate font-semibold">Royal Palace Hotel</div><div class="font-body-sm text-body-sm text-on-surface-variant truncate">Restaurant · Bettiah, Bihar</div><div class="pt-space-xs flex items-center justify-between"><a class="font-label-md text-label-md text-primary hover:text-on-primary-fixed-variant transition-colors flex items-center gap-1.5 font-medium" data-path="help-support" href="#"><svg class="w-4 h-4 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" x2="12.01" y1="17" y2="17"></line></svg>Quick Support</a><svg class="w-4 h-4 text-tertiary stroke-[2]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-space-lg"><div class="flex items-center gap-space-md flex-1 max-w-md"><div class="relative w-full flex items-center"><svg class="w-5 h-5 absolute left-3 text-outline stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" x2="16.65" y1="21" y2="16.65"></line></svg><input class="w-full h-10 pl-10 pr-4 rounded-xl bg-surface-container-low font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest transition-all" placeholder="Search QR codes, reviews, or templates..." type="text"/></div></div><div class="flex items-center gap-space-md"><div class="hidden md:flex items-center p-1 rounded-xl bg-surface-container-low"><a class="px-3 py-1.5 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-primary shadow-[0_1px_2px_rgba(0,0,0,0.04)] font-semibold" data-path="overview" href="#">Business Dashboard</a><a class="px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="customer-mobile" href="#">Customer Mobile</a></div><button aria-label="Notifications" class="relative p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all"><svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error"></span></button><a aria-label="Help Documentation" class="p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all flex items-center justify-center" data-path="documentation" href="#"><svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" x2="12.01" y1="17" y2="17"></line></svg></a><div class="flex items-center gap-space-sm pl-space-xs cursor-pointer"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="font-label-lg text-label-lg text-on-primary font-bold leading-none">RP</span></div><div class="hidden lg:flex flex-col text-left"><span class="font-label-lg text-label-lg text-on-surface leading-tight truncate max-w-[130px] font-semibold">Royal Palace Hotel</span><span class="font-body-sm text-body-sm text-on-surface-variant leading-tight">Manager</span></div><svg class="w-4 h-4 text-on-surface-variant stroke-[2]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg></div></div></header><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<div class="p-space-lg lg:p-space-xl flex flex-col gap-space-xl max-w-7xl mx-auto w-full">
+<!-- Top Action & Filter Header -->
+<div class="flex flex-col xl:flex-row xl:items-end justify-between gap-space-lg">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-caps text-label-caps uppercase tracking-wider font-semibold">Telemetry &amp; Conversions</span>
+<span class="text-outline-variant">•</span>
+<span class="font-label-md text-label-md text-tertiary flex items-center gap-1 font-medium">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span> Live Stream Active
+          </span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Analytics</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+          Understand how customers interact with your review QR codes and measure conversion from scan to Google Reviews.
+        </p>
+</div>
+<!-- Controls Deck -->
+<div class="flex flex-wrap items-center gap-space-sm">
+<!-- Date Pills -->
+<div class="flex items-center bg-surface-container-low p-1 rounded-xl shadow-sm">
+<button class="px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors">Last 7 days</button>
+<button class="px-3.5 py-1.5 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-primary shadow-[0_1px_3px_rgba(0,0,0,0.06)] font-semibold">Last 30 days</button>
+<button class="px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors">Last 90 days</button>
+<button class="px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors">Custom Range</button>
+</div>
+<!-- Location Dropdown Pill -->
+<div class="relative">
+<button class="h-10 px-3.5 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-2 font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-[18px] text-primary">store</span>
+<span class="truncate max-w-[190px] font-semibold">All Locations (Royal Palace Hotel)</span>
+<span class="material-symbols-outlined text-[18px] text-outline">expand_more</span>
+</button>
+</div>
+<!-- Export CSV/PDF -->
+<button class="h-10 px-4 rounded-xl bg-primary text-on-primary font-label-md text-label-md flex items-center gap-2 shadow-[0_10px_15px_-3px_rgba(0,91,191,0.2)] hover:bg-on-primary-fixed-variant transition-all active:scale-95 font-semibold">
+<span class="material-symbols-outlined text-[18px]">ios_share</span>
+<span>Export CSV / PDF</span>
+</button>
+</div>
+</div>
+<!-- 4 KPI Summary Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<!-- KPI 1 -->
+<div class="p-space-lg rounded-2xl bg-surface-container-lowest shadow-[0_1px_4px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow flex flex-col justify-between gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider font-bold">Total QR Scans</span>
+<div class="w-10 h-10 rounded-xl bg-primary-fixed/60 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">qr_code_scanner</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="font-display-hero text-[34px] leading-tight text-on-surface font-extrabold tracking-tight">1,428</span>
+<span class="inline-flex items-center text-tertiary font-label-md text-label-md font-bold">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span>18.4%
+            </span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">vs previous 30 days period</span>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 78%"></div>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="p-space-lg rounded-2xl bg-surface-container-lowest shadow-[0_1px_4px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow flex flex-col justify-between gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider font-bold">Unique Visitors</span>
+<div class="w-10 h-10 rounded-xl bg-surface-container-high text-on-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">person_check</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="font-display-hero text-[34px] leading-tight text-on-surface font-extrabold tracking-tight">1,190</span>
+<span class="px-2 py-0.5 rounded-md bg-secondary-fixed text-on-secondary-fixed font-label-caps text-[11px] font-bold">83.3% unique</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Deduplicated guest device fingerprints</span>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 83.3%"></div>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="p-space-lg rounded-2xl bg-surface-container-lowest shadow-[0_1px_4px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow flex flex-col justify-between gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider font-bold">QR-to-Google Clicks</span>
+<div class="w-10 h-10 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">open_in_new</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="font-display-hero text-[34px] leading-tight text-on-surface font-extrabold tracking-tight">1,034</span>
+<span class="inline-flex items-center text-tertiary font-label-md text-label-md font-bold">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>+22.1%
+            </span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Tapped 'Copy &amp; Go to Google'</span>
+</div>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 72%"></div>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="p-space-lg rounded-2xl bg-surface-container-lowest shadow-[0_1px_4px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow flex flex-col justify-between gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider font-bold">Click-Through Rate (CTR)</span>
+<div class="w-10 h-10 rounded-xl bg-primary-fixed text-on-primary-fixed-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">rate_review</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex items-baseline gap-2">
+<span class="font-display-hero text-[34px] leading-tight text-on-surface font-extrabold tracking-tight">72.4%</span>
+<span class="px-2 py-0.5 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-[11px] font-bold">High Trust</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Scan to Google handoff efficiency</span>
+</div>
+<!-- Micro sparkline -->
+<div class="flex items-end gap-1 h-3 w-full pt-0.5">
+<div class="flex-1 bg-primary/20 h-[30%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/30 h-[45%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/40 h-[60%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/50 h-[50%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/60 h-[75%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/80 h-[85%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary h-[100%] rounded-t-sm"></div>
+</div>
+</div>
+</div>
+<!-- Charts & Visualizations Section (2-Column Grid) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
+<!-- Left Chart Card: 30-day timeline with dual metrics (7 cols) -->
+<div class="lg:col-span-7 bg-surface-container-lowest p-space-lg rounded-3xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] flex flex-col justify-between">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between pb-space-md gap-2">
+<div>
+<span class="font-label-caps text-label-caps uppercase text-primary font-bold">Trend Analysis</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">QR Scans &amp; Outbound Review Clicks Over Time</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">30-day chronological progression highlighting Saturday rushes</p>
+</div>
+<!-- Legend -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface">
+<span class="w-3 h-3 rounded-full bg-primary inline-block"></span> Scans
+            </div>
+<div class="flex items-center gap-1.5 font-label-md text-label-md text-on-surface">
+<span class="w-3 h-3 rounded-full bg-tertiary inline-block"></span> Google Clicks
+            </div>
+</div>
+</div>
+<!-- Inline SVG Timeline Chart -->
+<div class="relative w-full h-64 my-space-sm flex items-end">
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 600 220">
+<defs>
+<lineargradient id="scansGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#005bbf" stop-opacity="0.25"></stop>
+<stop offset="100%" stop-color="#005bbf" stop-opacity="0.0"></stop>
+</lineargradient>
+<lineargradient id="clicksGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#006d2c" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#006d2c" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+<!-- Horizontal Grid lines -->
+<line stroke="#eff4ff" stroke-width="1.5" x1="0" x2="600" y1="20" y2="20"></line>
+<line stroke="#eff4ff" stroke-width="1.5" x1="0" x2="600" y1="70" y2="70"></line>
+<line stroke="#eff4ff" stroke-width="1.5" x1="0" x2="600" y1="120" y2="120"></line>
+<line stroke="#eff4ff" stroke-width="1.5" x1="0" x2="600" y1="170" y2="170"></line>
+<line stroke="#e5eeff" stroke-width="1.5" x1="0" x2="600" y1="210" y2="210"></line>
+<!-- Area fills -->
+<path d="M 0,170 Q 50,165 90,140 T 180,95 T 270,130 T 360,65 T 450,45 T 530,90 T 600,60 L 600,210 L 0,210 Z" fill="url(#scansGradient)"></path>
+<path d="M 0,185 Q 50,180 90,160 T 180,125 T 270,150 T 360,95 T 450,80 T 530,120 T 600,90 L 600,210 L 0,210 Z" fill="url(#clicksGradient)"></path>
+<!-- Primary Scans Line -->
+<path d="M 0,170 Q 50,165 90,140 T 180,95 T 270,130 T 360,65 T 450,45 T 530,90 T 600,60" fill="none" stroke="#005bbf" stroke-linecap="round" stroke-width="3"></path>
+<!-- Secondary Google Outbound Clicks Line -->
+<path d="M 0,185 Q 50,180 90,160 T 180,125 T 270,150 T 360,95 T 450,80 T 530,120 T 600,90" fill="none" stroke="#006d2c" stroke-dasharray="4 2" stroke-linecap="round" stroke-width="2.5"></path>
+<!-- Peak Callout Point on Nov 16 -->
+<circle cx="450" cy="45" fill="#005bbf" r="5" stroke="#ffffff" stroke-width="2"></circle>
+<circle cx="450" cy="80" fill="#006d2c" r="5" stroke="#ffffff" stroke-width="2"></circle>
+<line opacity="0.6" stroke="#005bbf" stroke-dasharray="3 3" stroke-width="1.5" x1="450" x2="450" y1="25" y2="210"></line>
+</svg>
+<!-- Interactive Highlight Tooltip pinned near peak point -->
+<div class="absolute right-[18%] top-1 bg-on-surface text-on-primary-container px-3 py-2 rounded-xl shadow-xl flex flex-col gap-0.5 pointer-events-none z-10">
+<div class="flex items-center justify-between gap-3 text-[10px] font-label-caps uppercase tracking-wider text-surface-variant font-bold">
+<span>Sat, Nov 16 (Peak Rush)</span>
+<span class="text-tertiary-fixed">76.4% CTR</span>
+</div>
+<div class="flex items-center gap-2 font-label-md text-label-md font-semibold">
+<span class="text-primary-fixed-dim">68 Scans</span>
+<span>•</span>
+<span class="text-tertiary-fixed-dim">52 Google Clicks</span>
+</div>
+</div>
+</div>
+<!-- Timeline axis indicators -->
+<div class="flex justify-between items-center text-outline font-label-caps text-label-caps pt-2 border-t-0 uppercase">
+<span>Oct 25</span>
+<span>Nov 01</span>
+<span>Nov 08</span>
+<span class="text-primary font-bold">Nov 16 (Saturday Peak)</span>
+<span>Nov 23</span>
+</div>
+</div>
+<!-- Right Chart Card: Location Stand Breakdown & Template Efficacy (5 cols) -->
+<div class="lg:col-span-5 bg-surface-container-lowest p-space-lg rounded-3xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] flex flex-col justify-between gap-space-md">
+<div>
+<span class="font-label-caps text-label-caps uppercase text-primary font-bold">Physical Stand Analytics</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Stand Placement &amp; Template Efficacy</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Contribution of real-world touchpoints to conversion</p>
+</div>
+<!-- Stand Location Progress Bars -->
+<div class="flex flex-col gap-3.5">
+<!-- Stand 1 -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-primary"></span>
+<span class="font-semibold text-on-surface">Reception &amp; Counter</span>
+<span class="text-on-surface-variant font-normal text-xs">(Acrylic Stand A6)</span>
+</div>
+<span class="font-bold text-on-surface">642 scans <span class="text-outline text-xs">(45%)</span></span>
+</div>
+<div class="w-full bg-surface-container-low h-2.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full transition-all duration-500" style="width: 45%"></div>
+</div>
+</div>
+<!-- Stand 2 -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary"></span>
+<span class="font-semibold text-on-surface">Dining Hall 1</span>
+<span class="text-on-surface-variant font-normal text-xs">(Wood Block Stand A5)</span>
+</div>
+<span class="font-bold text-on-surface">514 scans <span class="text-outline text-xs">(36%)</span></span>
+</div>
+<div class="w-full bg-surface-container-low h-2.5 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full transition-all duration-500" style="width: 36%"></div>
+</div>
+</div>
+<!-- Stand 3 -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
+<span class="font-semibold text-on-surface">Rooftop Sky Lounge</span>
+<span class="text-on-surface-variant font-normal text-xs">(Triangular Tent A6)</span>
+</div>
+<span class="font-bold text-on-surface">192 scans <span class="text-outline text-xs">(13%)</span></span>
+</div>
+<div class="w-full bg-surface-container-low h-2.5 rounded-full overflow-hidden">
+<div class="bg-primary-container h-full rounded-full transition-all duration-500" style="width: 13%"></div>
+</div>
+</div>
+<!-- Stand 4 -->
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<span class="font-semibold text-on-surface">Takeaway Counter / Delivery</span>
+<span class="text-on-surface-variant font-normal text-xs">(Sticker)</span>
+</div>
+<span class="font-bold text-on-surface">80 scans <span class="text-outline text-xs">(6%)</span></span>
+</div>
+<div class="w-full bg-surface-container-low h-2.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full transition-all duration-500" style="width: 6%"></div>
+</div>
+</div>
+</div>
+<!-- Template Efficacy Segmented Bar -->
+<div class="p-space-md rounded-2xl bg-surface-container-low flex flex-col gap-2 mt-1">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant font-bold">Template Theme Efficacy</span>
+<span class="font-label-caps text-label-caps text-primary font-bold">Google Classic Leads (52%)</span>
+</div>
+<div class="h-3 w-full rounded-full flex overflow-hidden gap-0.5">
+<div class="bg-primary-container h-full" style="width: 52%" title="Google Classic: 52%"></div>
+<div class="bg-primary-fixed-dim h-full" style="width: 32%" title="Minimal White: 32%"></div>
+<div class="bg-secondary-fixed h-full" style="width: 16%" title="Royal Gold: 16%"></div>
+</div>
+<div class="flex items-center justify-between text-[11px] font-label-md text-on-surface-variant pt-0.5">
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-primary-container"></span> Google Classic</span>
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-primary-fixed-dim"></span> Minimal White</span>
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-secondary-fixed"></span> Royal Gold</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Detailed Stand & Location Performance Table Card -->
+<div class="bg-surface-container-lowest rounded-3xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] p-space-lg flex flex-col gap-space-md">
+<!-- Table Controls Bar -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Detailed Stand &amp; Location Performance</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Drilldown of conversion funnels across every deployed touchpoint</p>
+</div>
+<div class="flex items-center gap-space-sm flex-wrap">
+<!-- Filter Search -->
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-outline text-[18px]">search</span>
+<input class="h-9 pl-9 pr-3 rounded-xl bg-surface-container-low font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest transition-all" placeholder="Search stand or placement..." type="text"/>
+</div>
+<!-- Stand Type Filter -->
+<button class="h-9 px-3 rounded-xl bg-surface-container-low font-label-md text-label-md text-on-surface flex items-center gap-1 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[16px] text-outline">tune</span>
+<span>All Types</span>
+</button>
+</div>
+</div>
+<!-- Data Table Responsive Wrapper -->
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left font-body-md text-body-md border-collapse min-w-[760px]">
+<thead>
+<tr class="bg-surface-container-low/60 text-on-surface-variant font-label-caps text-label-caps uppercase tracking-wider rounded-xl">
+<th class="py-3 px-4 rounded-l-xl font-bold">QR Stand / Location</th>
+<th class="py-3 px-3 font-bold">Placement Type</th>
+<th class="py-3 px-3 text-right font-bold">Total Scans</th>
+<th class="py-3 px-3 text-right font-bold">Assistant Visits</th>
+<th class="py-3 px-3 text-right font-bold">Copy Button</th>
+<th class="py-3 px-3 text-right font-bold">Google Outbound</th>
+<th class="py-3 px-3 text-right font-bold">Conversion (CTR)</th>
+<th class="py-3 px-4 rounded-r-xl text-center font-bold">Status &amp; Trend</th>
+</tr>
+</thead>
+<tbody class="divide-y-0">
+<!-- Row 1: Front Reception -->
+<tr class="hover:bg-surface-container-low/40 transition-colors group">
+<td class="py-4 px-4 font-semibold text-on-surface">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary-fixed/50 text-primary flex items-center justify-center flex-shrink-0 group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">qr_code_2</span>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface font-semibold leading-tight">Front Reception &amp; Counter</span>
+<span class="font-body-sm text-body-sm text-outline">Main Lobby entrance</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-3 text-on-surface-variant">
+<span class="px-2.5 py-1 rounded-lg bg-surface-container font-label-md text-label-md text-on-surface-variant">Counter Acrylic (A6)</span>
+</td>
+<td class="py-4 px-3 text-right font-bold text-on-surface">642</td>
+<td class="py-4 px-3 text-right text-on-surface-variant">620</td>
+<td class="py-4 px-3 text-right text-on-surface-variant">480</td>
+<td class="py-4 px-3 text-right font-semibold text-primary">478</td>
+<td class="py-4 px-3 text-right">
+<div class="flex flex-col items-end">
+<span class="font-bold text-tertiary">74.4%</span>
+<div class="w-16 bg-surface-container-high h-1 rounded-full overflow-hidden mt-1">
+<div class="bg-tertiary h-full rounded-full" style="width: 74.4%"></div>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> Top Performer
+                </span>
+</td>
+</tr>
+<!-- Row 2: Dining Hall 1 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors group">
+<td class="py-4 px-4 font-semibold text-on-surface">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center flex-shrink-0 group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">restaurant</span>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface font-semibold leading-tight">Dining Hall 1 (Tables 1-12)</span>
+<span class="font-body-sm text-body-sm text-outline">Ground floor dining area</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-3 text-on-surface-variant">
+<span class="px-2.5 py-1 rounded-lg bg-surface-container font-label-md text-label-md text-on-surface-variant">Wood Block Stand (A5)</span>
+</td>
+<td class="py-4 px-3 text-right font-bold text-on-surface">514</td>
+<td class="py-4 px-3 text-right text-on-surface-variant">498</td>
+<td class="py-4 px-3 text-right text-on-surface-variant">382</td>
+<td class="py-4 px-3 text-right font-semibold text-primary">376</td>
+<td class="py-4 px-3 text-right">
+<div class="flex flex-col items-end">
+<span class="font-bold text-tertiary">73.1%</span>
+<div class="w-16 bg-surface-container-high h-1 rounded-full overflow-hidden mt-1">
+<div class="bg-tertiary h-full rounded-full" style="width: 73.1%"></div>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-high text-primary font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> Steady Rush
+                </span>
+</td>
+</tr>
+<!-- Row 3: Rooftop Sky Lounge -->
+<tr class="hover:bg-surface-container-low/40 transition-colors group">
+<td class="py-4 px-4 font-semibold text-on-surface">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary-fixed/50 text-primary flex items-center justify-center flex-shrink-0 group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">deck</span>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface font-semibold leading-tight">Rooftop Sky Lounge</span>
+<span class="font-body-sm text-body-sm text-outline">Evening cocktails &amp; dinner</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-3 text-on-surface-variant">
+<span class="px-2.5 py-1 rounded-lg bg-surface-container font-label-md text-label-md text-on-surface-variant">Triangular Tent (A6)</span>
+</td>
+<td class="py-4 px-3 text-right font-bold text-on-surface">192</td>
+<td class="py-4 px-3 text-right text-on-surface-variant">185</td>
+<td class="py-4 px-3 text-right text-on-surface-variant">138</td>
+<td class="py-4 px-3 text-right font-semibold text-primary">134</td>
+<td class="py-4 px-3 text-right">
+<div class="flex flex-col items-end">
+<span class="font-bold text-tertiary">69.8%</span>
+<div class="w-16 bg-surface-container-high h-1 rounded-full overflow-hidden mt-1">
+<div class="bg-tertiary h-full rounded-full" style="width: 69.8%"></div>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-[14px]">nightlight</span> Active Evenings
+                </span>
+</td>
+</tr>
+<!-- Row 4: Takeaway Counter -->
+<tr class="hover:bg-surface-container-low/40 transition-colors group">
+<td class="py-4 px-4 font-semibold text-on-surface">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center flex-shrink-0 group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">takeout_dining</span>
+</div>
+<div class="flex flex-col">
+<span class="text-on-surface font-semibold leading-tight">Takeaway Counter</span>
+<span class="font-body-sm text-body-sm text-outline">Express pickup window</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-3 text-on-surface-variant">
+<span class="px-2.5 py-1 rounded-lg bg-surface-container font-label-md text-label-md text-on-surface-variant">Counter Sticker (10cm)</span>
+</td>
+<td class="py-4 px-3 text-right font-bold text-on-surface">80</td>
+<td class="py-4 px-3 text-right text-on-surface-variant">74</td>
+<td class="py-4 px-3 text-right text-on-surface-variant">48</td>
+<td class="py-4 px-3 text-right font-semibold text-primary">46</td>
+<td class="py-4 px-3 text-right">
+<div class="flex flex-col items-end">
+<span class="font-bold text-on-surface-variant">57.5%</span>
+<div class="w-16 bg-surface-container-high h-1 rounded-full overflow-hidden mt-1">
+<div class="bg-primary/50 h-full rounded-full" style="width: 57.5%"></div>
+</div>
+</div>
+</td>
+<td class="py-4 px-4 text-center">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-error-container text-on-error-container font-label-caps text-label-caps font-bold">
+<span class="material-symbols-outlined text-[14px]">priority_high</span> Needs Visibility
+                </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination / Row Summary -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between pt-space-xs text-on-surface-variant font-body-sm text-body-sm gap-2">
+<span>Showing 4 of 4 active review stands</span>
+<div class="flex items-center gap-1">
+<button class="px-2.5 py-1 rounded-lg bg-surface-container-low text-on-surface-variant cursor-not-allowed font-label-md text-label-md" disabled="">Previous</button>
+<button class="px-3 py-1 rounded-lg bg-primary text-on-primary font-label-md text-label-md font-semibold">1</button>
+<button class="px-2.5 py-1 rounded-lg bg-surface-container-low text-on-surface-variant cursor-not-allowed font-label-md text-label-md" disabled="">Next</button>
+</div>
+</div>
+</div>
+<!-- Data Disclaimer Notice Box -->
+<div class="p-space-md rounded-2xl bg-surface-container-low flex items-start gap-3 text-on-surface-variant shadow-sm">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5 flex-shrink-0">info</span>
+<p class="font-body-sm text-body-sm leading-relaxed">
+<strong class="font-semibold text-on-surface">Data Disclaimer:</strong> Data reflects physical QR scans and in-app clicks to Google Reviews. Final reviews submitted on Google Maps are managed independently by Google and customer accounts according to Google's Review Policies.
+      </p>
+</div>
+</div>
+</div></main></div></body></html>

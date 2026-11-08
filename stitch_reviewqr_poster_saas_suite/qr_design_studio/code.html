@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"on-surface":"#0b1c30","surface-container-lowest":"#ffffff","on-primary-fixed":"#001a41","on-background":"#0b1c30","surface":"#f8f9ff","tertiary-fixed":"#89fa9b","outline":"#727785","surface-tint":"#005bc0","error":"#ba1a1a","on-tertiary-fixed-variant":"#005320","primary-fixed":"#d8e2ff","secondary-fixed-dim":"#bec6e0","surface-variant":"#d3e4fe","surface-container-high":"#dce9ff","primary":"#005bbf","background":"#f8f9ff","on-primary-container":"#ffffff","inverse-on-surface":"#eaf1ff","surface-container":"#e5eeff","error-container":"#ffdad6","primary-fixed-dim":"#adc7ff","surface-container-low":"#eff4ff","surface-dim":"#cbdbf5","on-tertiary-fixed":"#002108","surface-bright":"#f8f9ff","on-surface-variant":"#414754","on-primary":"#ffffff","primary-container":"#1a73e8","inverse-primary":"#adc7ff","on-secondary-fixed":"#131b2e","tertiary":"#006d2c","on-error-container":"#93000a","secondary":"#565e74","tertiary-fixed-dim":"#6ddd81","inverse-surface":"#213145","outline-variant":"#c1c6d6","secondary-container":"#dae2fd","tertiary-container":"#008939","on-error":"#ffffff","on-secondary-fixed-variant":"#3f465c","on-secondary":"#ffffff","on-secondary-container":"#5c647a","on-primary-fixed-variant":"#004493","secondary-fixed":"#dae2fd","surface-container-highest":"#d3e4fe","on-tertiary":"#ffffff","on-tertiary-container":"#ffffff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-2xl":"3rem","gutter":"1.5rem","margin-mobile":"1rem","space-xs":"0.25rem","space-sm":"0.5rem","space-2xs":"0.125rem","space-xl":"2rem","margin":"2rem","space-md":"1rem","space-lg":"1.5rem","gutter-mobile":"0.75rem"},"fontFamily":{"headline-lg":["Plus Jakarta Sans"],"display-hero-mobile":["Plus Jakarta Sans"],"headline-md":["Plus Jakarta Sans"],"label-lg":["Inter"],"body-sm":["Inter"],"headline-sm":["Plus Jakarta Sans"],"body-lg":["Inter"],"label-caps":["Inter"],"display-hero":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"],"label-md":["Inter"],"body-md":["Inter"]},"fontSize":{"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.02em","fontWeight":"700"}],"display-hero-mobile":["28px",{"lineHeight":"34px","letterSpacing":"-0.02em","fontWeight":"800"}],"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-sm":["18px",{"lineHeight":"24px","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"label-caps":["11px",{"lineHeight":"14px","letterSpacing":"0.06em","fontWeight":"700"}],"display-hero":["40px",{"lineHeight":"48px","letterSpacing":"-0.03em","fontWeight":"800"}],"headline-lg-mobile":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased min-h-screen"><aside class="fixed left-0 top-0 bottom-0 w-64 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col"><div class="h-16 px-space-lg flex items-center gap-space-sm"><img alt="ReviewQR Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1WgE2-y3RJ4XNRbRovE7ot3hleJ-FiOWvkX4zLaOejN5Rs1CsIFm-adeOhL98Wt3xPVnLAT3tBFDdcSRIwKiXGorBX_OhsHhXPwQgKsXfIU_EmBZOelQlNHLjXUeNB3CvXDNKLIJbS34sjY9h4RyEPCbwf39N4JjF2sQWgEcMp9GG_rEt3nOGKbFDZjKHkBg4G0mJy5gFG3IO1IHFjF1k850N0yA7UnB7rElDFeJ6vj"/><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">ReviewQR</span></div><nav class="px-space-md py-space-sm space-y-space-2xs flex flex-col" data-active-classes="bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-xl shadow-[0_1px_3px_0_rgba(15,23,42,0.05)]"><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="overview" href="#"><span class="material-symbols-outlined text-[20px]">grid_view</span><span>Overview</span></a><a aria-current="page" class="flex items-center gap-space-sm px-space-md py-2.5 transition-all bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-xl shadow-[0_1px_3px_0_rgba(15,23,42,0.05)]" data-path="create-review-qr" href="#"><span class="material-symbols-outlined text-[20px]">add_circle</span><span>Create Review QR</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="my-qr-codes" href="#"><span class="material-symbols-outlined text-[20px]">qr_code_2</span><span>My QR Codes</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="business-profile" href="#"><span class="material-symbols-outlined text-[20px]">storefront</span><span>Business Profile</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="design-templates" href="#"><span class="material-symbols-outlined text-[20px]">palette</span><span>Design Templates</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="analytics" href="#"><span class="material-symbols-outlined text-[20px]">insights</span><span>Analytics</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="settings" href="#"><span class="material-symbols-outlined text-[20px]">settings</span><span>Settings</span></a></nav></div><div class="p-space-md m-space-md rounded-xl bg-surface-container-low flex flex-col gap-space-xs"><div class="flex items-center justify-between"><span class="font-label-caps text-label-caps uppercase text-primary font-bold">Pro Plan</span><span class="material-symbols-outlined text-tertiary text-[18px]">verified</span></div><div class="font-label-lg text-label-lg text-on-surface truncate">Royal Palace Hotel</div><div class="font-body-sm text-body-sm text-on-surface-variant truncate">Restaurant · Bettiah, Bihar</div><div class="pt-space-xs flex items-center justify-between"><a class="font-label-md text-label-md text-primary hover:text-on-primary-fixed-variant transition-colors flex items-center gap-space-2xs" data-path="help-support" href="#"><span class="material-symbols-outlined text-[16px]">support_agent</span>Quick Support</a><span class="text-[10px] font-label-caps uppercase bg-tertiary-fixed text-on-tertiary-fixed px-1.5 py-0.5 rounded-full font-semibold">Active</span></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-space-lg"><div class="flex items-center gap-space-md flex-1 max-w-md"><div class="relative w-full flex items-center"><span class="material-symbols-outlined absolute left-3 text-outline text-[20px]">search</span><input class="w-full h-10 pl-10 pr-4 rounded-xl bg-surface-container-low font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest transition-all" placeholder="Search QR codes, reviews, or templates..." type="text"/></div></div><div class="flex items-center gap-space-md"><div class="hidden md:flex items-center p-1 rounded-xl bg-surface-container-low"><a class="px-3 py-1.5 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-primary shadow-[0_1px_2px_rgba(0,0,0,0.04)]" data-path="overview" href="#">Business Dashboard</a><a class="px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="mobile-preview" href="#">Customer Mobile</a></div><button aria-label="Notifications" class="relative p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all"><span class="material-symbols-outlined text-[22px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error"></span></button><a aria-label="Help Documentation" class="p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all flex items-center justify-center" data-path="documentation" href="#"><span class="material-symbols-outlined text-[22px]">help_outline</span></a><div class="flex items-center gap-space-sm pl-space-xs cursor-pointer"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><div class="hidden lg:flex flex-col text-left"><span class="font-label-lg text-label-lg text-on-surface leading-tight truncate max-w-[130px]">Royal Palace</span><span class="font-body-sm text-body-sm text-on-surface-variant leading-tight">Manager</span></div><span class="material-symbols-outlined text-on-surface-variant text-[18px]">arrow_drop_down</span></div></div></header><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<!-- Studio Top Context Header / Flow Bar -->
+<div class="px-space-lg py-space-md bg-surface-container-lowest shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center text-primary font-headline-sm">
+<span class="material-symbols-outlined text-[24px]">palette</span>
+</div>
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">QR Design Studio</span>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-label-caps uppercase">Step 2 of 3</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Live visual customizer for counter displays, table tents, and print standees</p>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-low font-body-sm text-body-sm text-secondary">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+        Autosaved 14s ago
+      </div>
+<button class="px-3.5 py-2 rounded-xl bg-surface-container-high hover:bg-surface-variant font-label-md text-label-md text-on-surface transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">history</span>
+        Drafts
+      </button>
+<button class="px-4 py-2 rounded-xl bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md shadow-sm transition-all flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">print</span>
+        Export Assets
+      </button>
+</div>
+</div>
+<!-- Workspace Grid: 2-Column Desktop Setup -->
+<div class="p-space-lg grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- Left Column: Customization Studio Controls (5 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-space-md">
+<!-- Studio Navigation Subtabs -->
+<div class="flex p-1 rounded-xl bg-surface-container shadow-sm overflow-x-auto text-nowrap">
+<button class="flex-1 px-3 py-2 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-primary shadow-sm flex items-center justify-center gap-1.5" id="tab-brand-btn" onclick="switchSection('branding')">
+<span class="material-symbols-outlined text-[18px]">badge</span>
+          Branding
+        </button>
+<button class="flex-1 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface flex items-center justify-center gap-1.5 transition-colors" id="tab-qr-btn" onclick="switchSection('qrstyle')">
+<span class="material-symbols-outlined text-[18px]">qr_code_2</span>
+          QR Code
+        </button>
+<button class="flex-1 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface flex items-center justify-center gap-1.5 transition-colors" id="tab-tpl-btn" onclick="switchSection('templates')">
+<span class="material-symbols-outlined text-[18px]">style</span>
+          Templates
+        </button>
+<button class="flex-1 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface flex items-center justify-center gap-1.5 transition-colors" id="tab-content-btn" onclick="switchSection('content')">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+          Copy
+        </button>
+<button class="flex-1 px-3 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface flex items-center justify-center gap-1.5 transition-colors" id="tab-print-btn" onclick="switchSection('print')">
+<span class="material-symbols-outlined text-[18px]">aspect_ratio</span>
+          Sizes
+        </button>
+</div>
+<!-- Panel 1: Business Info & Branding -->
+<div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-space-md" id="section-branding">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-label-caps text-label-caps font-bold">1</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Business &amp; Identity</h2>
+</div>
+<span class="font-label-caps text-label-caps text-tertiary bg-tertiary-fixed/30 px-2 py-0.5 rounded-full uppercase">Verified Place</span>
+</div>
+<div class="space-y-space-sm">
+<label class="font-label-md text-label-md text-on-surface-variant">Business Display Name</label>
+<div class="relative">
+<input class="w-full h-11 px-3.5 rounded-xl bg-surface-container-low font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all" id="input-biz-name" oninput="updateLiveText()" type="text" value="Royal Palace Hotel"/>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-primary text-[20px]">verified</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-space-sm">
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant">Category</label>
+<input class="w-full h-11 px-3.5 rounded-xl bg-surface-container-low font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all" id="input-biz-cat" oninput="updateLiveText()" type="text" value="Restaurant &amp; Lounge"/>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant">City / Branch</label>
+<input class="w-full h-11 px-3.5 rounded-xl bg-surface-container-low font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all" id="input-biz-loc" oninput="updateLiveText()" type="text" value="Bettiah, Bihar"/>
+</div>
+</div>
+<!-- Logo Uploader Box -->
+<div class="space-y-1.5">
+<label class="font-label-md text-label-md text-on-surface-variant">Brand Crest / Logo Mark</label>
+<div class="p-3 rounded-xl bg-surface-container-low flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-xl bg-surface-container-lowest shadow-sm flex items-center justify-center p-1 overflow-hidden">
+<img class="w-full h-full object-contain" data-alt="A refined minimalist royal crown insignia emblem rendered in metallic champagne gold on clean white background, luxurious vector logo for boutique hospitality hotel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBf1SMRirelc3co9b6JIhVoB1-3j55tl_plCe81R0wJOfMhah9DwXkj_b8lkXO6BpzGgyIYDBmFcbVm-2JNQelyPNCz6Mq5qkvXxnpg41cFqWhhNINzarkApa7Dbphp1dr2S0RocpSqwtrTDr0Oe2EAnj_PclXSV5Y1Tj6Jb1RYF4jo-ouica8desefkYx5r9prPGt7B37egPUlr2JohS4ZrthR66UdT53GTMizy5M"/>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">royal_crest_dark.svg</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">SVG • 48 KB • Scalable Vector</span>
+</div>
+</div>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-variant font-label-md text-label-md text-primary transition-all">
+              Change
+            </button>
+</div>
+</div>
+<!-- Accent Color Swatches -->
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-on-surface-variant">Poster Accent Palette</label>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Active: Google Royal Blue</span>
+</div>
+<div class="flex items-center gap-2.5">
+<button class="w-9 h-9 rounded-full bg-primary-container ring-4 ring-primary-fixed flex items-center justify-center shadow-sm text-on-primary" onclick="setAccent('#1a73e8')" title="Google Blue">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</button>
+<button class="w-9 h-9 rounded-full bg-amber-600 hover:scale-105 transition-transform shadow-sm" onclick="setAccent('#D97706')" title="Warm Amber Gold"></button>
+<button class="w-9 h-9 rounded-full bg-red-600 hover:scale-105 transition-transform shadow-sm" onclick="setAccent('#EA4335')" title="Google Ruby Red"></button>
+<button class="w-9 h-9 rounded-full bg-green-600 hover:scale-105 transition-transform shadow-sm" onclick="setAccent('#34A853')" title="Google Emerald"></button>
+<button class="w-9 h-9 rounded-full bg-on-surface hover:scale-105 transition-transform shadow-sm" onclick="setAccent('#0b1c30')" title="Obsidian Slate"></button>
+<div class="flex items-center h-9 px-2 rounded-lg bg-surface-container-low text-xs font-mono text-on-surface-variant">
+              #1A73E8
+            </div>
+</div>
+</div>
+</div>
+<!-- Panel 2: QR Code Customization -->
+<div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-space-md" id="section-qrstyle">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-label-caps text-label-caps font-bold">2</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">QR Code Architecture</h2>
+</div>
+<span class="font-label-caps text-label-caps bg-surface-container text-on-surface-variant px-2 py-0.5 rounded-full">Level H (30% ECC)</span>
+</div>
+<!-- QR Dot Style -->
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Module &amp; Eye Geometry</label>
+<div class="grid grid-cols-4 gap-2">
+<button class="p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-center flex flex-col items-center gap-1 transition-all">
+<span class="material-symbols-outlined text-outline">grid_on</span>
+<span class="font-label-caps text-label-caps text-on-surface">Classic</span>
+</button>
+<button class="p-2.5 rounded-xl bg-primary-fixed text-on-primary-fixed font-semibold text-center flex flex-col items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-primary">circle</span>
+<span class="font-label-caps text-label-caps">Rounded</span>
+</button>
+<button class="p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-center flex flex-col items-center gap-1 transition-all">
+<span class="material-symbols-outlined text-outline">grain</span>
+<span class="font-label-caps text-label-caps text-on-surface">Dots</span>
+</button>
+<button class="p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-center flex flex-col items-center gap-1 transition-all">
+<span class="material-symbols-outlined text-outline">filter_center_focus</span>
+<span class="font-label-caps text-label-caps text-on-surface">Premium Eye</span>
+</button>
+</div>
+</div>
+<!-- Center Badge Choice -->
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant">Center Emblem</label>
+<div class="grid grid-cols-2 gap-space-sm">
+<label class="flex items-center gap-3 p-3 rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition-colors">
+<input checked="" class="text-primary focus:ring-0" name="center_icon" type="radio"/>
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-sm">
+<svg class="w-4 h-4" viewbox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"></path></svg>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Official Google G</span>
+</div>
+</label>
+<label class="flex items-center gap-3 p-3 rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition-colors">
+<input class="text-primary focus:ring-0" name="center_icon" type="radio"/>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-on-surface-variant">crown</span>
+<span class="font-label-md text-label-md text-on-surface">Business Logo</span>
+</div>
+</label>
+</div>
+</div>
+</div>
+<!-- Panel 3: Templates (6 Presets) -->
+<div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-space-md" id="section-templates">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-label-caps text-label-caps font-bold">3</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Display Poster Preset</h2>
+</div>
+<span class="font-body-sm text-body-sm text-primary cursor-pointer hover:underline">Explore 24+</span>
+</div>
+<div class="grid grid-cols-3 gap-space-sm">
+<!-- Preset 1 -->
+<div class="p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition-all flex flex-col gap-1.5 items-center">
+<div class="w-full h-16 rounded-lg bg-surface-container-lowest shadow-inner flex flex-col items-center justify-center border-t-2 border-primary">
+<div class="w-6 h-6 rounded bg-on-surface/80 mb-1"></div>
+<div class="w-10 h-1 bg-outline-variant rounded"></div>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface text-center">Minimal White</span>
+</div>
+<!-- Preset 2 (Selected) -->
+<div class="p-2.5 rounded-xl bg-primary-fixed text-on-primary-fixed cursor-pointer transition-all flex flex-col gap-1.5 items-center ring-2 ring-primary">
+<div class="w-full h-16 rounded-lg bg-surface-container-lowest shadow-inner flex flex-col items-center justify-center relative overflow-hidden">
+<div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-blue-500 via-red-500 to-amber-500"></div>
+<div class="w-6 h-6 rounded bg-primary flex items-center justify-center text-white text-[10px] mb-1 font-bold">G</div>
+<div class="w-10 h-1 bg-amber-400 rounded"></div>
+</div>
+<span class="font-label-caps text-label-caps font-bold text-center">Google Classic</span>
+</div>
+<!-- Preset 3 -->
+<div class="p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition-all flex flex-col gap-1.5 items-center">
+<div class="w-full h-16 rounded-lg bg-amber-50 shadow-inner flex flex-col items-center justify-center border-t-2 border-amber-600">
+<div class="w-6 h-6 rounded bg-amber-600 mb-1"></div>
+<div class="w-10 h-1 bg-amber-300 rounded"></div>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface text-center">Royal Gold</span>
+</div>
+<!-- Preset 4 -->
+<div class="p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition-all flex flex-col gap-1.5 items-center">
+<div class="w-full h-16 rounded-lg bg-blue-900 shadow-inner flex flex-col items-center justify-center">
+<div class="w-6 h-6 rounded bg-white mb-1"></div>
+<div class="w-10 h-1 bg-blue-300 rounded"></div>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface text-center">Modern Navy</span>
+</div>
+<!-- Preset 5 -->
+<div class="p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition-all flex flex-col gap-1.5 items-center">
+<div class="w-full h-16 rounded-lg bg-emerald-50 shadow-inner flex flex-col items-center justify-center border-t-2 border-emerald-600">
+<div class="w-6 h-6 rounded bg-emerald-700 mb-1"></div>
+<div class="w-10 h-1 bg-emerald-400 rounded"></div>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface text-center">Bistro Green</span>
+</div>
+<!-- Preset 6 -->
+<div class="p-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition-all flex flex-col gap-1.5 items-center">
+<div class="w-full h-16 rounded-lg bg-zinc-900 shadow-inner flex flex-col items-center justify-center">
+<div class="w-6 h-6 rounded bg-amber-400 mb-1"></div>
+<div class="w-10 h-1 bg-zinc-600 rounded"></div>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface text-center">Dark Luxury</span>
+</div>
+</div>
+</div>
+<!-- Panel 4: Copywriting & Content -->
+<div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-space-md" id="section-content">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-label-caps text-label-caps font-bold">4</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Content &amp; Microcopy</h2>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant">Primary Poster Headline</label>
+<input class="w-full h-11 px-3.5 rounded-xl bg-surface-container-low font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20" id="input-headline" oninput="updateLiveText()" type="text" value="Review us on Google"/>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant">Call-to-Action Footer Text</label>
+<input class="w-full h-11 px-3.5 rounded-xl bg-surface-container-low font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20" id="input-cta" oninput="updateLiveText()" type="text" value="Scan to share your experience"/>
+</div>
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-amber-500 text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface">Show 5-Star Recommendation Bar</span>
+</div>
+<input checked="" class="w-4 h-4 rounded text-primary focus:ring-0" type="checkbox"/>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant">Hospitality Perks Note (Optional)</label>
+<input class="w-full h-11 px-3.5 rounded-xl bg-surface-container-low font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20" type="text" value="Your honest feedback helps our culinary staff serve you better ❤️"/>
+</div>
+</div>
+<!-- Panel 5: Print Sizes & Bleed -->
+<div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col gap-space-md" id="section-print">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-label-caps text-label-caps font-bold">5</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Format &amp; Stand Hardware</h2>
+</div>
+<div class="grid grid-cols-3 gap-2">
+<button class="p-3 rounded-xl bg-primary-fixed text-on-primary-fixed font-semibold text-left flex flex-col gap-0.5">
+<span class="font-label-md text-label-md">Table Tent</span>
+<span class="font-body-sm text-body-sm opacity-80">A6 (105×148mm)</span>
+</button>
+<button class="p-3 rounded-xl bg-surface-container-low hover:bg-surface-container text-left flex flex-col gap-0.5">
+<span class="font-label-md text-label-md text-on-surface">Counter Stand</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">A5 (148×210mm)</span>
+</button>
+<button class="p-3 rounded-xl bg-surface-container-low hover:bg-surface-container text-left flex flex-col gap-0.5">
+<span class="font-label-md text-label-md text-on-surface">Wall Poster</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">A4 (210×297mm)</span>
+</button>
+</div>
+<div class="flex items-center justify-between pt-1">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">Commercial Print Crop Marks</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Adds 3mm bleed zone and alignment ticks for professional print shops</span>
+</div>
+<input checked="" class="w-4 h-4 rounded text-primary focus:ring-0" type="checkbox"/>
+</div>
+</div>
+</div>
+<!-- Right Column: Live Realistic QR Poster Preview Workspace (7 cols) -->
+<div class="lg:col-span-7 flex flex-col gap-space-md sticky top-20">
+<!-- Canvas Control Toolbar -->
+<div class="p-space-sm px-space-md rounded-xl bg-surface-container-lowest shadow-sm flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-1.5">
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-high font-label-md text-label-md text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+            Front View
+          </button>
+<button class="px-3 py-1.5 rounded-lg hover:bg-surface-container font-label-md text-label-md text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">view_in_ar</span>
+            Acrylic Mockup
+          </button>
+<div class="h-4 w-px bg-surface-container mx-1"></div>
+<div class="flex items-center gap-1 text-on-surface-variant font-label-caps text-label-caps">
+<button class="p-1 hover:bg-surface-container rounded"><span class="material-symbols-outlined text-[18px]">remove</span></button>
+<span>100%</span>
+<button class="p-1 hover:bg-surface-container rounded"><span class="material-symbols-outlined text-[18px]">add</span></button>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<a class="px-3 py-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-1.5 transition-colors" data-path="mobile-preview" href="#">
+<span class="material-symbols-outlined text-[18px] text-tertiary">smartphone</span>
+            Test Scan Flow
+          </a>
+<button class="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant" title="Fullscreen View">
+<span class="material-symbols-outlined text-[20px]">fullscreen</span>
+</button>
+</div>
+</div>
+<!-- The Real Poster Canvas Workspace (Simulating physical printed table tent) -->
+<div class="relative w-full rounded-2xl bg-surface-container-low p-space-xl flex flex-col items-center justify-center overflow-hidden shadow-inner min-h-[640px]">
+<!-- Ambient Studio Backdrop Decor -->
+<div class="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-primary/5 blur-3xl pointer-events-none"></div>
+<div class="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-amber-500/5 blur-3xl pointer-events-none"></div>
+<!-- Physical Acrylic Table Tent Stand / Card -->
+<div class="relative w-full max-w-[380px] bg-surface-container-lowest rounded-3xl shadow-[0_25px_50px_-12px_rgba(15,23,42,0.18)] overflow-hidden flex flex-col items-center transition-all duration-300">
+<!-- Top Decorative Arc / Google Landmark Band -->
+<div class="w-full pt-8 pb-5 px-6 flex flex-col items-center text-center relative bg-gradient-to-b from-surface-container-low to-transparent">
+<!-- Subtle Multi-colored Brand Bar Accent -->
+<div class="w-20 h-1.5 rounded-full bg-gradient-to-r from-[#4285F4] via-[#EA4335] via-[#FBBC05] to-[#34A853] mb-4"></div>
+<!-- Business Crest Embellishment -->
+<div class="w-12 h-12 rounded-2xl bg-surface-container-lowest shadow-sm flex items-center justify-center p-2 mb-2">
+<span class="material-symbols-outlined text-[32px] text-amber-600" style="font-variation-settings: 'FILL' 1;">hotel_class</span>
+</div>
+<h1 class="font-headline-md text-headline-md tracking-wider text-on-surface uppercase font-extrabold leading-tight" id="poster-title">
+              ROYAL PALACE HOTEL
+            </h1>
+<p class="font-label-caps text-label-caps tracking-widest text-on-surface-variant uppercase mt-1" id="poster-meta">
+              RESTAURANT · BETTIAH
+            </p>
+</div>
+<!-- Central Scannable QR Component -->
+<div class="p-4 bg-surface-container-lowest flex flex-col items-center w-full px-8">
+<div class="relative p-5 rounded-2xl bg-surface-container-lowest shadow-[0_4px_20px_rgba(0,0,0,0.06)] flex items-center justify-center">
+<!-- Clean SVG QR Vector Grid Representation with Rounded Dots -->
+<svg class="w-56 h-56 text-on-surface" fill="currentColor" viewbox="0 0 100 100">
+<!-- Outer Finder Eye Top-Left -->
+<rect fill="#1a73e8" height="26" rx="6" width="26" x="5" y="5"></rect>
+<rect fill="white" height="18" rx="4" width="18" x="9" y="9"></rect>
+<rect fill="#1a73e8" height="10" rx="3" width="10" x="13" y="13"></rect>
+<!-- Outer Finder Eye Top-Right -->
+<rect fill="#1a73e8" height="26" rx="6" width="26" x="69" y="5"></rect>
+<rect fill="white" height="18" rx="4" width="18" x="73" y="9"></rect>
+<rect fill="#1a73e8" height="10" rx="3" width="10" x="77" y="13"></rect>
+<!-- Outer Finder Eye Bottom-Left -->
+<rect fill="#1a73e8" height="26" rx="6" width="26" x="5" y="69"></rect>
+<rect fill="white" height="18" rx="4" width="18" x="9" y="73"></rect>
+<rect fill="#1a73e8" height="10" rx="3" width="10" x="13" y="77"></rect>
+<!-- Stylized Data Dot Matrix Pattern -->
+<circle cx="40" cy="10" r="3.2"></circle>
+<circle cx="50" cy="10" r="3.2"></circle>
+<circle cx="60" cy="10" r="3.2"></circle>
+<circle cx="40" cy="20" r="3.2"></circle>
+<circle cx="50" cy="20" r="3.2"></circle>
+<circle cx="60" cy="20" r="3.2"></circle>
+<circle cx="10" cy="40" r="3.2"></circle>
+<circle cx="20" cy="40" r="3.2"></circle>
+<circle cx="30" cy="40" r="3.2"></circle>
+<circle cx="70" cy="40" r="3.2"></circle>
+<circle cx="80" cy="40" r="3.2"></circle>
+<circle cx="90" cy="40" r="3.2"></circle>
+<circle cx="10" cy="50" r="3.2"></circle>
+<circle cx="20" cy="50" r="3.2"></circle>
+<circle cx="80" cy="50" r="3.2"></circle>
+<circle cx="90" cy="50" r="3.2"></circle>
+<circle cx="10" cy="60" r="3.2"></circle>
+<circle cx="20" cy="60" r="3.2"></circle>
+<circle cx="30" cy="60" r="3.2"></circle>
+<circle cx="70" cy="60" r="3.2"></circle>
+<circle cx="80" cy="60" r="3.2"></circle>
+<circle cx="90" cy="60" r="3.2"></circle>
+<circle cx="40" cy="70" r="3.2"></circle>
+<circle cx="50" cy="70" r="3.2"></circle>
+<circle cx="60" cy="70" r="3.2"></circle>
+<circle cx="70" cy="70" r="3.2"></circle>
+<circle cx="90" cy="70" r="3.2"></circle>
+<circle cx="40" cy="80" r="3.2"></circle>
+<circle cx="60" cy="80" r="3.2"></circle>
+<circle cx="80" cy="80" r="3.2"></circle>
+<circle cx="90" cy="80" r="3.2"></circle>
+<circle cx="40" cy="90" r="3.2"></circle>
+<circle cx="50" cy="90" r="3.2"></circle>
+<circle cx="70" cy="90" r="3.2"></circle>
+<circle cx="80" cy="90" r="3.2"></circle>
+</svg>
+<!-- Central Google G Badge -->
+<div class="absolute w-12 h-12 rounded-full bg-surface-container-lowest shadow-md flex items-center justify-center p-1.5">
+<svg class="w-7 h-7" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"></path>
+</svg>
+</div>
+</div>
+</div>
+<!-- Bottom Poster Callout Banner -->
+<div class="w-full flex flex-col items-center px-6 pb-6 pt-1 text-center">
+<div class="flex items-center gap-1.5 my-2">
+<span class="font-headline-md text-headline-md font-bold text-on-surface">Review us on</span>
+<span class="font-headline-md text-headline-md font-extrabold text-[#4285F4]">G<span class="text-[#EA4335]">o</span><span class="text-[#FBBC05]">o</span><span class="text-[#4285F4]">g</span><span class="text-[#34A853]">l</span><span class="text-[#EA4335]">e</span></span>
+</div>
+<!-- 5 Gold Stars Rating Display -->
+<div class="flex items-center justify-center gap-1.5 text-amber-400 my-1">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<!-- Primary Action Callout Strip -->
+<div class="mt-4 w-full py-2.5 px-4 rounded-xl bg-primary text-on-primary font-label-md text-label-md font-semibold flex items-center justify-center gap-2 shadow-sm">
+<span id="poster-cta">Scan to share your experience</span>
+<span class="material-symbols-outlined text-[16px] text-red-300" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+<!-- Stand Footing Shadow Illusion -->
+<div class="w-full h-2 bg-gradient-to-b from-outline-variant/30 to-transparent"></div>
+</div>
+<!-- Mockup Acrylic Table Base Reflection -->
+<div class="w-80 h-3 bg-surface-container-high rounded-full blur-[2px] mt-2 opacity-80"></div>
+</div>
+<!-- Action Panel & Quick Export Suite -->
+<div class="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col md:flex-row items-center justify-between gap-space-md">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-headline-sm">
+<span class="material-symbols-outlined text-[22px]">check_circle</span>
+</div>
+<div>
+<div class="font-label-lg text-label-lg text-on-surface">Ready for High-Res Print</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">300 DPI CMYK PDF + Vector SVG + Ultra HD PNG</div>
+</div>
+</div>
+<div class="flex items-center gap-space-sm w-full md:w-auto">
+<button class="flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-surface-container-high hover:bg-surface-variant font-label-md text-label-md text-on-surface transition-all flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">download</span>
+            Download PNG
+          </button>
+<button class="flex-1 md:flex-none px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md shadow-md transition-all flex items-center justify-center gap-2">
+<span>Continue to Print</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Interactive Flow Assistant Bar (Mirroring the Review Pipeline Banner) -->
+<div class="p-space-md rounded-xl bg-surface-container-low flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px] text-primary">groups</span>
+<span class="font-body-sm text-body-sm">
+            ReviewQR auto-assists your guests with AI suggestion chips, but Google's final submission remains 100% direct and compliant.
+          </span>
+</div>
+<a class="font-label-md text-label-md text-primary hover:underline text-nowrap" data-path="documentation" href="#">Learn More</a>
+</div>
+</div>
+</div>
+</div>
+<script>
+  function switchSection(sectionId) {
+    const sections = ['branding', 'qrstyle', 'templates', 'content', 'print'];
+    sections.forEach(id => {
+      const el = document.getElementById('section-' + id);
+      if (el) {
+        if (id === sectionId) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          el.classList.add('ring-2', 'ring-primary/40');
+          setTimeout(() => el.classList.remove('ring-2', 'ring-primary/40'), 1200);
+        }
+      }
+    });
+  }
+
+  function updateLiveText() {
+    const bizInput = document.getElementById('input-biz-name');
+    const catInput = document.getElementById('input-biz-cat');
+    const locInput = document.getElementById('input-biz-loc');
+    const ctaInput = document.getElementById('input-cta');
+
+    const posterTitle = document.getElementById('poster-title');
+    const posterMeta = document.getElementById('poster-meta');
+    const posterCta = document.getElementById('poster-cta');
+
+    if (bizInput && posterTitle) {
+      posterTitle.innerText = bizInput.value.toUpperCase() || 'YOUR BUSINESS NAME';
+    }
+    if (catInput && locInput && posterMeta) {
+      posterMeta.innerText = ((catInput.value || 'RESTAURANT') + ' · ' + (locInput.value || 'BRANCH')).toUpperCase();
+    }
+    if (ctaInput && posterCta) {
+      posterCta.innerText = ctaInput.value || 'Scan to share your experience';
+    }
+  }
+
+  function setAccent(color) {
+    const qrFinders = document.querySelectorAll('#section-qrstyle svg rect[fill="#1a73e8"]');
+    // Micro interaction confirmation feedback
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-6 right-6 bg-inverse-surface text-inverse-on-surface px-4 py-2 rounded-xl text-xs font-semibold shadow-lg z-50 transition-all';
+    toast.innerText = 'Color updated to ' + color;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 1600);
+  }
+</script></main></div></body></html>

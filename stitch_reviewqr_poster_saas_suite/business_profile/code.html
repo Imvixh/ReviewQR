@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"on-surface":"#0b1c30","surface-container-lowest":"#ffffff","on-primary-fixed":"#001a41","on-background":"#0b1c30","surface":"#f8f9ff","tertiary-fixed":"#89fa9b","outline":"#727785","surface-tint":"#005bc0","error":"#ba1a1a","on-tertiary-fixed-variant":"#005320","primary-fixed":"#d8e2ff","secondary-fixed-dim":"#bec6e0","surface-variant":"#d3e4fe","surface-container-high":"#dce9ff","primary":"#005bbf","background":"#f8f9ff","on-primary-container":"#ffffff","inverse-on-surface":"#eaf1ff","surface-container":"#e5eeff","error-container":"#ffdad6","primary-fixed-dim":"#adc7ff","surface-container-low":"#eff4ff","surface-dim":"#cbdbf5","on-tertiary-fixed":"#002108","surface-bright":"#f8f9ff","on-surface-variant":"#414754","on-primary":"#ffffff","primary-container":"#1a73e8","inverse-primary":"#adc7ff","on-secondary-fixed":"#131b2e","tertiary":"#006d2c","on-error-container":"#93000a","secondary":"#565e74","tertiary-fixed-dim":"#6ddd81","inverse-surface":"#213145","outline-variant":"#c1c6d6","secondary-container":"#dae2fd","tertiary-container":"#008939","on-error":"#ffffff","on-secondary-fixed-variant":"#3f465c","on-secondary":"#ffffff","on-secondary-container":"#5c647a","on-primary-fixed-variant":"#004493","secondary-fixed":"#dae2fd","surface-container-highest":"#d3e4fe","on-tertiary":"#ffffff","on-tertiary-container":"#ffffff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-2xl":"3rem","gutter":"1.5rem","margin-mobile":"1rem","space-xs":"0.25rem","space-sm":"0.5rem","space-2xs":"0.125rem","space-xl":"2rem","margin":"2rem","space-md":"1rem","space-lg":"1.5rem","gutter-mobile":"0.75rem"},"fontFamily":{"headline-lg":["Plus Jakarta Sans"],"display-hero-mobile":["Plus Jakarta Sans"],"headline-md":["Plus Jakarta Sans"],"label-lg":["Inter"],"body-sm":["Inter"],"headline-sm":["Plus Jakarta Sans"],"body-lg":["Inter"],"label-caps":["Inter"],"display-hero":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"],"label-md":["Inter"],"body-md":["Inter"]},"fontSize":{"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.02em","fontWeight":"700"}],"display-hero-mobile":["28px",{"lineHeight":"34px","letterSpacing":"-0.02em","fontWeight":"800"}],"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-sm":["18px",{"lineHeight":"24px","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"label-caps":["11px",{"lineHeight":"14px","letterSpacing":"0.06em","fontWeight":"700"}],"display-hero":["40px",{"lineHeight":"48px","letterSpacing":"-0.03em","fontWeight":"800"}],"headline-lg-mobile":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased min-h-screen"><aside class="fixed left-0 top-0 bottom-0 w-64 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col"><div class="h-16 px-space-lg flex items-center gap-space-sm"><div class="w-9 h-9 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center shadow-sm"><svg class="w-5 h-5 stroke-[2.2]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><rect height="7" rx="1.5" width="7" x="3" y="3"></rect><rect height="7" rx="1.5" width="7" x="14" y="3"></rect><rect height="7" rx="1.5" width="7" x="3" y="14"></rect><path d="M14 14h3v3h-3z"></path><path d="M20 14v3"></path><path d="M14 20h3"></path><path d="M20 20v.01"></path></svg></div><div class="flex items-center gap-1.5"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">ReviewQR</span><span class="px-1.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-caps text-[10px] uppercase font-bold tracking-wider">SaaS</span></div></div><nav class="px-space-md py-space-sm space-y-space-2xs flex flex-col" data-active-classes="bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-xl shadow-[0_1px_3px_0_rgba(15,23,42,0.05)]"><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="overview" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><rect height="7" rx="1" width="7" x="3" y="3"></rect><rect height="7" rx="1" width="7" x="14" y="3"></rect><rect height="7" rx="1" width="7" x="14" y="14"></rect><rect height="7" rx="1" width="7" x="3" y="14"></rect></svg><span>Overview</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="create-qr" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path></svg><span>Create Review QR</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="my-qr-codes" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><rect height="5" rx="1" width="5" x="3" y="3"></rect><rect height="5" rx="1" width="5" x="16" y="3"></rect><rect height="5" rx="1" width="5" x="3" y="16"></rect><path d="M21 16h-3a2 2 0 0 0-2 2v3"></path><path d="M21 21v.01"></path><path d="M12 7v3a2 2 0 0 1-2 2H7"></path><path d="M3 12h.01"></path><path d="M12 3h.01"></path><path d="M12 16v.01"></path><path d="M16 12h1"></path><path d="M21 12v.01"></path><path d="M12 21v-1"></path></svg><span>My QR Codes</span></a><a aria-current="page" class="flex items-center gap-space-sm px-space-md py-2.5 transition-all bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-xl shadow-[0_1px_3px_0_rgba(15,23,42,0.05)]" data-path="business-profile" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span>Business Profile</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="analytics" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg><span>Analytics</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="settings" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg><span>Settings</span></a></nav></div><div class="p-space-md m-space-md rounded-xl bg-surface-container-low flex flex-col gap-space-xs"><div class="flex items-center justify-between"><span class="font-label-caps text-label-caps uppercase text-primary font-bold">Pro Plan</span><span class="text-[10px] font-label-caps uppercase bg-tertiary-fixed text-on-tertiary-fixed px-1.5 py-0.5 rounded-full font-semibold">Active</span></div><div class="font-label-lg text-label-lg text-on-surface truncate font-semibold">Royal Palace Hotel</div><div class="font-body-sm text-body-sm text-on-surface-variant truncate">Restaurant · Bettiah, Bihar</div><div class="pt-space-xs flex items-center justify-between"><a class="font-label-md text-label-md text-primary hover:text-on-primary-fixed-variant transition-colors flex items-center gap-1.5 font-medium" data-path="help-support" href="#"><svg class="w-4 h-4 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" x2="12.01" y1="17" y2="17"></line></svg>Quick Support</a><svg class="w-4 h-4 text-tertiary stroke-[2]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-space-lg"><div class="flex items-center gap-space-md flex-1 max-w-md"><div class="relative w-full flex items-center"><svg class="w-5 h-5 absolute left-3 text-outline stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" x2="16.65" y1="21" y2="16.65"></line></svg><input class="w-full h-10 pl-10 pr-4 rounded-xl bg-surface-container-low font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest transition-all" placeholder="Search QR codes, reviews, or templates..." type="text"/></div></div><div class="flex items-center gap-space-md"><div class="hidden md:flex items-center p-1 rounded-xl bg-surface-container-low"><a class="px-3 py-1.5 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-primary shadow-[0_1px_2px_rgba(0,0,0,0.04)] font-semibold" data-path="overview" href="#">Business Dashboard</a><a class="px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="customer-mobile" href="#">Customer Mobile</a></div><button aria-label="Notifications" class="relative p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all"><svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error"></span></button><a aria-label="Help Documentation" class="p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all flex items-center justify-center" data-path="documentation" href="#"><svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" x2="12.01" y1="17" y2="17"></line></svg></a><div class="flex items-center gap-space-sm pl-space-xs cursor-pointer"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="font-label-lg text-label-lg text-on-primary font-bold leading-none">RP</span></div><div class="hidden lg:flex flex-col text-left"><span class="font-label-lg text-label-lg text-on-surface leading-tight truncate max-w-[130px] font-semibold">Royal Palace Hotel</span><span class="font-body-sm text-body-sm text-on-surface-variant leading-tight">Manager</span></div><svg class="w-4 h-4 text-on-surface-variant stroke-[2]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg></div></div></header><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<div class="px-space-lg py-space-xl max-w-7xl mx-auto w-full">
+<!-- Header Title Bar -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md mb-space-xl">
+<div>
+<div class="flex items-center gap-space-xs mb-1">
+<span class="font-label-caps text-label-caps uppercase text-primary font-bold tracking-wider">Account Settings</span>
+<span class="text-on-surface-variant font-label-caps text-[10px]">•</span>
+<span class="font-label-caps text-label-caps uppercase text-tertiary font-bold tracking-wider flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Profile Active
+          </span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Business Profile</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1 max-w-2xl">
+          Manage the business information and branding used to generate your review QR codes and customer assistant pages.
+        </p>
+</div>
+<!-- Quick Sync Status Pill -->
+<div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-container-low shadow-sm">
+<span class="flex h-2.5 w-2.5 relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-tertiary"></span>
+</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">4 Live Posters Synced</span>
+<span class="text-outline text-xs">•</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Auto-updating</span>
+</div>
+</div>
+<!-- Main Dual-Column Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+<!-- LEFT COLUMN: Form Controls & Details (7 cols) -->
+<div class="lg:col-span-7 flex flex-col gap-space-xl">
+<!-- CARD 1: Business Information -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-lg">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[19px]">storefront</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Business Information</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Public identifiers used across your customer review workflows.</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-caps text-label-caps">Section 1</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<!-- Business Name (Required) -->
+<div class="md:col-span-2 flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface flex items-center justify-between">
+<span>Business Name <span class="text-error">*</span></span>
+<span class="font-body-sm text-body-sm text-tertiary flex items-center gap-1 font-medium">
+<span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                  Google Place Match
+                </span>
+</label>
+<div class="relative flex items-center">
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary shadow-sm transition-all" id="input-business-name" type="text" value="Royal Palace Hotel"/>
+<span class="absolute right-3 px-2 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-[10px] font-bold">VERIFIED</span>
+</div>
+</div>
+<!-- Business Category (Required) -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface">Category <span class="text-error">*</span></label>
+<div class="relative">
+<select class="w-full h-11 px-3.5 pr-8 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary shadow-sm transition-all appearance-none cursor-pointer" id="select-category">
+<option selected="" value="Restaurant &amp; Lounge">Restaurant &amp; Lounge</option>
+<option value="Hotel &amp; Lodging">Hotel &amp; Lodging</option>
+<option value="Cafe &amp; Bakery">Cafe &amp; Bakery</option>
+<option value="Salon &amp; Spa">Salon &amp; Spa</option>
+<option value="Retail Store">Retail Store</option>
+<option value="Healthcare &amp; Wellness">Healthcare &amp; Wellness</option>
+<option value="Other">Other Business</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-3 text-on-surface-variant pointer-events-none text-[18px]">expand_more</span>
+</div>
+</div>
+<!-- City / Location (Required) -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface">City / Locality <span class="text-error">*</span></label>
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary shadow-sm transition-all" id="input-locality" type="text" value="Bettiah, Bihar"/>
+</div>
+<!-- Phone Number (Optional) -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface">Phone Number <span class="text-on-surface-variant font-normal">(Optional)</span></label>
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary shadow-sm transition-all" type="tel" value="+91 98765 43210"/>
+</div>
+<!-- Email Address (Optional) -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface">Email Address <span class="text-on-surface-variant font-normal">(Optional)</span></label>
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary shadow-sm transition-all" type="email" value="manager@royalpalacehotel.in"/>
+</div>
+<!-- Full Business Address -->
+<div class="md:col-span-2 flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface">Full Business Address <span class="text-on-surface-variant font-normal">(Printed on receipts &amp; table tents)</span></label>
+<textarea class="w-full p-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary shadow-sm transition-all resize-none" rows="2">Station Road, Near Super Market, Bettiah, Bihar - 845438</textarea>
+</div>
+</div>
+</section>
+<!-- CARD 2: Google Review URL & Verification (High Priority) -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md relative overflow-hidden">
+<!-- Top subtle accent bar reflecting Google palette -->
+<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-error to-tertiary"></div>
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-primary-fixed text-on-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Google Review Link</h2>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+                    1-Click Active
+                  </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                  This direct link opens automatically when customers tap “Copy &amp; Go to Google Review” in the Review Assistant.
+                </p>
+</div>
+</div>
+</div>
+<!-- URL Input and Action -->
+<div class="flex flex-col gap-2 pt-1">
+<div class="flex flex-col sm:flex-row gap-2">
+<div class="relative flex-1">
+<span class="absolute left-3 top-3 material-symbols-outlined text-outline text-[18px]">link</span>
+<input class="w-full h-11 pl-9 pr-3 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary shadow-sm font-mono text-xs transition-all" id="google-review-input" type="url" value="https://g.page/r/Cbll2345abc992eEBM/review"/>
+</div>
+<button class="h-11 px-4 rounded-lg bg-primary text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-2 hover:bg-on-primary-fixed-variant transition-all shadow-sm flex-shrink-0" id="verify-link-btn">
+<span class="material-symbols-outlined text-[18px]">sync</span>
+<span>Verify Review Link</span>
+</button>
+</div>
+<!-- Validation Feedback Banner -->
+<div class="p-3 rounded-lg bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+<div class="flex items-center gap-2 min-w-0">
+<div class="w-6 h-6 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="truncate">
+<div class="font-label-md text-label-md text-on-surface font-semibold truncate">Direct URL verified — 1-click review dialog ready</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant font-mono text-[11px] truncate">
+                    Place ID: <span class="text-primary font-semibold">ChIJ2345abc0198_RPHTL</span> • Royal Palace Hotel
+                  </div>
+</div>
+</div>
+<a class="font-label-md text-label-md text-primary hover:text-on-primary-fixed-variant flex items-center gap-1 font-semibold flex-shrink-0 self-end sm:self-center" href="https://g.page/r/Cbll2345abc992eEBM/review" rel="noopener" target="_blank">
+<span>Test Link</span>
+<span class="material-symbols-outlined text-[15px]">open_in_new</span>
+</a>
+</div>
+<!-- Helpful Tooltip & Guide Link -->
+<div class="flex items-center justify-between text-on-surface-variant pt-1 px-1">
+<button class="font-body-sm text-body-sm text-primary hover:underline flex items-center gap-1 text-left">
+<span class="material-symbols-outlined text-[16px]">help_outline</span>
+<span>Need help finding your Place ID or Google review shortcut?</span>
+</button>
+<span class="font-body-sm text-[11px] text-outline">Latency: 180ms</span>
+</div>
+</div>
+</section>
+<!-- CARD 3: Branding & Customization -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-lg">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[19px]">palette</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Branding &amp; Customization</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Personalize the styling across both acrylic table stands and digital pages.</p>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-caps text-label-caps">Section 3</span>
+</div>
+<!-- Logo Management -->
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface">Business Logo / Emblem</label>
+<div class="p-4 rounded-xl bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="flex items-center gap-3.5">
+<!-- SVG Crest Simulation Box -->
+<div class="w-14 h-14 rounded-xl bg-on-surface text-surface flex items-center justify-center shadow-md flex-shrink-0 relative overflow-hidden">
+<span class="material-symbols-outlined text-[28px] text-surface-tint">hotel_class</span>
+<div class="absolute bottom-0 inset-x-0 h-1 bg-primary"></div>
+</div>
+<div>
+<div class="font-label-lg text-label-lg text-on-surface font-semibold">royal_crest_dark.svg</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">SVG Vector • 48 KB • High-res scalable</div>
+<div class="font-body-sm text-[11px] text-tertiary flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[12px]">fit_screen</span> Optimized for 300 DPI acrylic printing
+                  </div>
+</div>
+</div>
+<div class="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-end">
+<button class="px-3 py-2 rounded-lg bg-surface-container-lowest text-on-surface font-label-md text-label-md hover:bg-surface-container-high transition-colors shadow-sm flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">file_upload</span>
+<span>Replace Logo</span>
+</button>
+<button class="p-2 rounded-lg text-error hover:bg-error-container/40 transition-colors" title="Remove Logo">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Primary Brand Accent Color -->
+<div class="flex flex-col gap-2.5">
+<label class="font-label-md text-label-md text-on-surface flex items-center justify-between">
+<span>Primary Brand Accent Color</span>
+<span class="text-on-surface-variant font-body-sm text-body-sm">Used for QR stands &amp; primary buttons</span>
+</label>
+<div class="flex flex-wrap items-center gap-3">
+<!-- Swatch 1: Royal Blue (Selected) -->
+<button class="relative w-10 h-10 rounded-full bg-[#1A73E8] flex items-center justify-center shadow-sm ring-2 ring-primary ring-offset-2 transition-transform hover:scale-105" title="Royal Blue (Current)">
+<span class="material-symbols-outlined text-white text-[18px]">check</span>
+</button>
+<!-- Swatch 2: Amber -->
+<button class="w-10 h-10 rounded-full bg-[#FBBC04] flex items-center justify-center shadow-sm hover:scale-105 transition-transform" title="Google Amber"></button>
+<!-- Swatch 3: Crimson -->
+<button class="w-10 h-10 rounded-full bg-[#EA4335] flex items-center justify-center shadow-sm hover:scale-105 transition-transform" title="Google Red"></button>
+<!-- Swatch 4: Green -->
+<button class="w-10 h-10 rounded-full bg-[#34A853] flex items-center justify-center shadow-sm hover:scale-105 transition-transform" title="Google Green"></button>
+<!-- Swatch 5: Slate Neutral -->
+<button class="w-10 h-10 rounded-full bg-[#0F172A] flex items-center justify-center shadow-sm hover:scale-105 transition-transform" title="Midnight Navy"></button>
+<!-- Custom Hex Input -->
+<div class="flex items-center ml-auto gap-2">
+<span class="font-label-md text-label-md text-on-surface-variant">HEX</span>
+<div class="flex items-center rounded-lg bg-surface-container-low px-2.5 py-1.5 shadow-sm">
+<span class="w-3.5 h-3.5 rounded-full bg-[#1A73E8] mr-2"></span>
+<input class="w-20 font-mono text-body-sm text-body-sm bg-transparent text-on-surface font-semibold focus:outline-none uppercase" type="text" value="#1A73E8"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Tagline / Hospitality Prompt -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-on-surface">Short Tagline / Hospitality Note</label>
+<span class="text-on-surface-variant font-body-sm text-body-sm">62 / 100 chars</span>
+</div>
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-low text-on-surface font-body-md text-body-md focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary shadow-sm transition-all" id="input-tagline" type="text" value="Your honest feedback helps our culinary staff serve you better."/>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Displays at the top of the mobile screen when a guest scans your table QR.</p>
+</div>
+</section>
+<!-- Save Actions Footer -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md flex flex-col sm:flex-row items-center justify-between gap-space-md">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px] text-tertiary">cloud_done</span>
+<span class="font-body-sm text-body-sm">Changes auto-sync with <strong>4 active physical QR posters</strong>.</span>
+</div>
+<div class="flex items-center gap-space-sm w-full sm:w-auto justify-end">
+<button class="px-4 py-2.5 rounded-lg bg-surface-container-high text-on-surface font-label-lg text-label-lg hover:bg-surface-container transition-colors">
+              Cancel Changes
+            </button>
+<button class="px-5 py-2.5 rounded-lg bg-primary-container text-on-primary-container font-label-lg text-label-lg hover:bg-primary transition-all shadow-md flex items-center gap-2" id="save-profile-btn">
+<span class="material-symbols-outlined text-[18px]">save</span>
+<span>Save Business Profile</span>
+</button>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Real-Time Live Stand & Mobile Sync Preview (5 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-space-lg sticky top-20">
+<!-- Live Preview Header Block -->
+<div class="flex items-center justify-between px-1">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Live Brand Preview</h3>
+</div>
+<span class="font-label-caps text-label-caps uppercase text-outline font-semibold">Real-Time Sync</span>
+</div>
+<!-- PREVIEW CONTAINER 1: Physical A5 Stand Mockup -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-lg p-space-lg flex flex-col relative overflow-hidden">
+<div class="flex items-center justify-between pb-space-sm mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">print</span>
+<span class="font-label-lg text-label-lg text-on-surface font-bold">Physical Stand (A5 Table Tent)</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-caps text-[10px]">Print Output</span>
+</div>
+<!-- Stand Preview Visual Box -->
+<div class="bg-surface-container-low rounded-xl p-5 flex flex-col items-center justify-center relative shadow-inner">
+<!-- Table Tent Visual Card -->
+<div class="w-full max-w-[280px] bg-white rounded-xl shadow-xl p-5 flex flex-col items-center text-center relative overflow-hidden">
+<!-- Stand Header Strip -->
+<div class="w-full py-1.5 px-3 rounded-lg bg-[#1A73E8] text-white flex items-center justify-center gap-1.5 mb-3 shadow-sm">
+<span class="font-label-caps text-[10px] uppercase font-bold tracking-widest">Share Your Experience</span>
+</div>
+<!-- Mini Logo & Name -->
+<div class="w-9 h-9 rounded-lg bg-on-surface text-surface flex items-center justify-center mb-1.5 shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-surface-tint">hotel_class</span>
+</div>
+<h4 class="font-headline-sm text-[16px] text-on-surface leading-tight font-bold" id="preview-stand-name">Royal Palace Hotel</h4>
+<p class="font-body-sm text-[11px] text-on-surface-variant mb-3" id="preview-stand-category">Restaurant • Bettiah, Bihar</p>
+<!-- Central QR Code Visual Element -->
+<div class="p-3 bg-white rounded-xl shadow-md flex flex-col items-center relative mb-3">
+<svg class="w-28 h-28" fill="none" viewbox="0 0 100 100">
+<!-- QR Finder Top Left -->
+<rect fill="#0B1C30" height="26" rx="4" width="26" x="5" y="5"></rect>
+<rect fill="white" height="18" rx="2" width="18" x="9" y="9"></rect>
+<rect fill="#0B1C30" height="10" rx="1" width="10" x="13" y="13"></rect>
+<!-- QR Finder Top Right -->
+<rect fill="#0B1C30" height="26" rx="4" width="26" x="69" y="5"></rect>
+<rect fill="white" height="18" rx="2" width="18" x="73" y="9"></rect>
+<rect fill="#0B1C30" height="10" rx="1" width="10" x="77" y="13"></rect>
+<!-- QR Finder Bottom Left -->
+<rect fill="#0B1C30" height="26" rx="4" width="26" x="5" y="69"></rect>
+<rect fill="white" height="18" rx="2" width="18" x="9" y="73"></rect>
+<rect fill="#0B1C30" height="10" rx="1" width="10" x="13" y="77"></rect>
+<!-- QR Data Modules Matrix -->
+<rect fill="#0B1C30" height="5" width="5" x="36" y="8"></rect>
+<rect fill="#0B1C30" height="5" width="5" x="45" y="8"></rect>
+<rect fill="#0B1C30" height="5" width="5" x="54" y="8"></rect>
+<rect fill="#0B1C30" height="5" width="5" x="36" y="18"></rect>
+<rect fill="#0B1C30" height="6" width="6" x="49" y="22"></rect>
+<rect fill="#0B1C30" height="5" width="5" x="58" y="18"></rect>
+<rect fill="#0B1C30" height="5" width="5" x="8" y="36"></rect>
+<rect fill="#0B1C30" height="5" width="5" x="8" y="47"></rect>
+<rect fill="#0B1C30" height="5" width="5" x="8" y="56"></rect>
+<rect fill="#0B1C30" height="5" width="5" x="18" y="40"></rect>
+<rect fill="#0B1C30" height="5" width="5" x="24" y="50"></rect>
+<!-- Center Google Logo Accent in QR -->
+<circle cx="50" cy="50" fill="white" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.15))" r="11"></circle>
+<path d="M50 43.5C53.6 43.5 56.1 45.1 57.5 46.4L55.3 48.6C54.6 47.9 53.1 46.8 50 46.8C46.8 46.8 44.1 49.5 44.1 52.8C44.1 56.1 46.8 58.8 50 58.8C53.7 58.8 55.3 56.2 55.5 54.7H50V51.7H58.8C58.9 52.3 59 53 59 53.8C59 57.3 56.5 62 50 62C44.5 62 40 57.5 40 52C40 46.5 44.5 42 50 42V43.5Z" fill="#1A73E8"></path>
+<!-- Bottom & Right Modules -->
+<rect fill="#0B1C30" height="6" width="6" x="68" y="38"></rect>
+<rect fill="#0B1C30" height="5" width="5" x="79" y="45"></rect>
+<rect fill="#0B1C30" height="5" width="5" x="88" y="38"></rect>
+<rect fill="#0B1C30" height="6" width="6" x="68" y="54"></rect>
+<rect fill="#0B1C30" height="6" width="6" x="82" y="58"></rect>
+<rect fill="#0B1C30" height="6" width="6" x="38" y="68"></rect>
+<rect fill="#0B1C30" height="6" width="6" x="48" y="74"></rect>
+<rect fill="#0B1C30" height="5" width="5" x="58" y="68"></rect>
+<rect fill="#0B1C30" height="6" width="6" x="42" y="86"></rect>
+<rect fill="#0B1C30" height="6" width="6" x="56" y="84"></rect>
+<rect fill="#0B1C30" height="6" width="6" x="68" y="78"></rect>
+<rect fill="#0B1C30" height="6" width="6" x="78" y="86"></rect>
+<rect fill="#0B1C30" height="5" width="5" x="88" y="74"></rect>
+</svg>
+</div>
+<!-- 5 Stars Bar -->
+<div class="flex items-center gap-1 text-[#FBBC04] mb-1">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-wider font-semibold">Scan with camera to review</p>
+</div>
+<div class="mt-3 text-center">
+<span class="font-body-sm text-[11px] text-on-surface-variant">Matches <strong>A5 Acrylic Table Stand Template 02</strong></span>
+</div>
+</div>
+</div>
+<!-- PREVIEW CONTAINER 2: Mobile Review Assistant Header Preview -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-lg p-space-lg flex flex-col gap-space-sm">
+<div class="flex items-center justify-between pb-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">smartphone</span>
+<span class="font-label-lg text-label-lg text-on-surface font-bold">Mobile Assistant Header Preview</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-caps text-[10px]">Guest Screen</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">How customers see your brand when the QR code opens in their mobile browser:</p>
+<!-- Simulated Mobile Card Top -->
+<div class="p-4 rounded-xl bg-surface-container-low shadow-sm flex flex-col gap-3">
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-lg bg-on-surface text-surface flex items-center justify-center shadow flex-shrink-0">
+<span class="material-symbols-outlined text-[20px] text-surface-tint">hotel_class</span>
+</div>
+<div class="min-w-0 flex-1">
+<div class="flex items-center gap-1.5">
+<h5 class="font-headline-sm text-headline-sm text-on-surface font-bold truncate" id="preview-mobile-name">Royal Palace Hotel</h5>
+<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant" id="preview-mobile-meta">Restaurant • Bettiah, Bihar</div>
+</div>
+</div>
+<!-- Mobile Tagline Callout -->
+<div class="p-2.5 rounded-lg bg-surface-container-lowest text-on-surface font-body-sm text-body-sm italic flex items-start gap-2 shadow-xs">
+<span class="material-symbols-outlined text-primary text-[16px] not-italic flex-shrink-0 mt-0.5">format_quote</span>
+<span id="preview-mobile-tagline">Your honest feedback helps our culinary staff serve you better.</span>
+</div>
+</div>
+</div>
+<!-- PREVIEW CONTAINER 3: Google Place Real-Time Telemetry -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-lg p-space-md flex items-center justify-between gap-space-md">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-surface-container-low flex items-center justify-center flex-shrink-0">
+<svg class="w-5 h-5" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"></path>
+</svg>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-[16px] text-on-surface font-bold">4.8</span>
+<div class="flex text-[#FBBC04]">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star_half</span>
+</div>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">412 Google reviews synced</div>
+</div>
+</div>
+<button class="px-3 py-1.5 rounded-lg bg-surface-container-low text-primary font-label-md text-label-md font-semibold hover:bg-surface-container transition-colors">
+            Sync Now
+          </button>
+</div>
+</div>
+</div>
+</div>
+<script>
+    (function initBusinessProfileSync() {
+      const nameInput = document.getElementById('input-business-name');
+      const localityInput = document.getElementById('input-locality');
+      const categorySelect = document.getElementById('select-category');
+      const taglineInput = document.getElementById('input-tagline');
+
+      const standName = document.getElementById('preview-stand-name');
+      const standCategory = document.getElementById('preview-stand-category');
+      const mobileName = document.getElementById('preview-mobile-name');
+      const mobileMeta = document.getElementById('preview-mobile-meta');
+      const mobileTagline = document.getElementById('preview-mobile-tagline');
+
+      function updatePreviews() {
+        const name = nameInput.value.trim() || 'Royal Palace Hotel';
+        const locality = localityInput.value.trim() || 'Bettiah, Bihar';
+        const category = categorySelect.value || 'Restaurant';
+        const tagline = taglineInput.value.trim() || 'Your feedback helps us serve you better.';
+
+        if (standName) standName.textContent = name;
+        if (standCategory) standCategory.textContent = category + ' • ' + locality;
+        if (mobileName) mobileName.textContent = name;
+        if (mobileMeta) mobileMeta.textContent = category + ' • ' + locality;
+        if (mobileTagline) mobileTagline.textContent = tagline;
+      }
+
+      if (nameInput) nameInput.addEventListener('input', updatePreviews);
+      if (localityInput) localityInput.addEventListener('input', updatePreviews);
+      if (categorySelect) categorySelect.addEventListener('change', updatePreviews);
+      if (taglineInput) taglineInput.addEventListener('input', updatePreviews);
+
+      // Verify button interactive feedback
+      const verifyBtn = document.getElementById('verify-link-btn');
+      if (verifyBtn) {
+        verifyBtn.addEventListener('click', function() {
+          const originalText = verifyBtn.innerHTML;
+          verifyBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span><span>Verifying...</span>';
+          setTimeout(function() {
+            verifyBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">verified</span><span>Verified!</span>';
+            setTimeout(function() {
+              verifyBtn.innerHTML = originalText;
+            }, 2500);
+          }, 800);
+        });
+      }
+
+      // Save profile button feedback
+      const saveBtn = document.getElementById('save-profile-btn');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', function() {
+          const originalText = saveBtn.innerHTML;
+          saveBtn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">sync</span><span>Syncing...</span>';
+          setTimeout(function() {
+            saveBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check</span><span>Saved &amp; Synced!</span>';
+            setTimeout(function() {
+              saveBtn.innerHTML = originalText;
+            }, 2500);
+          }, 600);
+        });
+      }
+    })();
+  </script>
+</div></main></div></body></html>

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"on-surface":"#0b1c30","surface-container-lowest":"#ffffff","on-primary-fixed":"#001a41","on-background":"#0b1c30","surface":"#f8f9ff","tertiary-fixed":"#89fa9b","outline":"#727785","surface-tint":"#005bc0","error":"#ba1a1a","on-tertiary-fixed-variant":"#005320","primary-fixed":"#d8e2ff","secondary-fixed-dim":"#bec6e0","surface-variant":"#d3e4fe","surface-container-high":"#dce9ff","primary":"#005bbf","background":"#f8f9ff","on-primary-container":"#ffffff","inverse-on-surface":"#eaf1ff","surface-container":"#e5eeff","error-container":"#ffdad6","primary-fixed-dim":"#adc7ff","surface-container-low":"#eff4ff","surface-dim":"#cbdbf5","on-tertiary-fixed":"#002108","surface-bright":"#f8f9ff","on-surface-variant":"#414754","on-primary":"#ffffff","primary-container":"#1a73e8","inverse-primary":"#adc7ff","on-secondary-fixed":"#131b2e","tertiary":"#006d2c","on-error-container":"#93000a","secondary":"#565e74","tertiary-fixed-dim":"#6ddd81","inverse-surface":"#213145","outline-variant":"#c1c6d6","secondary-container":"#dae2fd","tertiary-container":"#008939","on-error":"#ffffff","on-secondary-fixed-variant":"#3f465c","on-secondary":"#ffffff","on-secondary-container":"#5c647a","on-primary-fixed-variant":"#004493","secondary-fixed":"#dae2fd","surface-container-highest":"#d3e4fe","on-tertiary":"#ffffff","on-tertiary-container":"#ffffff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-2xl":"3rem","gutter":"1.5rem","margin-mobile":"1rem","space-xs":"0.25rem","space-sm":"0.5rem","space-2xs":"0.125rem","space-xl":"2rem","margin":"2rem","space-md":"1rem","space-lg":"1.5rem","gutter-mobile":"0.75rem"},"fontFamily":{"headline-lg":["Plus Jakarta Sans"],"display-hero-mobile":["Plus Jakarta Sans"],"headline-md":["Plus Jakarta Sans"],"label-lg":["Inter"],"body-sm":["Inter"],"headline-sm":["Plus Jakarta Sans"],"body-lg":["Inter"],"label-caps":["Inter"],"display-hero":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"],"label-md":["Inter"],"body-md":["Inter"]},"fontSize":{"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.02em","fontWeight":"700"}],"display-hero-mobile":["28px",{"lineHeight":"34px","letterSpacing":"-0.02em","fontWeight":"800"}],"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-sm":["18px",{"lineHeight":"24px","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"label-caps":["11px",{"lineHeight":"14px","letterSpacing":"0.06em","fontWeight":"700"}],"display-hero":["40px",{"lineHeight":"48px","letterSpacing":"-0.03em","fontWeight":"800"}],"headline-lg-mobile":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased min-h-screen"><aside class="fixed left-0 top-0 bottom-0 w-64 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col"><div class="h-16 px-space-lg flex items-center gap-space-sm"><div class="w-9 h-9 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center shadow-sm"><svg class="w-5 h-5 stroke-[2.2]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><rect height="7" rx="1.5" width="7" x="3" y="3"></rect><rect height="7" rx="1.5" width="7" x="14" y="3"></rect><rect height="7" rx="1.5" width="7" x="3" y="14"></rect><path d="M14 14h3v3h-3z"></path><path d="M20 14v3"></path><path d="M14 20h3"></path><path d="M20 20v.01"></path></svg></div><div class="flex items-center gap-1.5"><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">ReviewQR</span><span class="px-1.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-caps text-[10px] uppercase font-bold tracking-wider">SaaS</span></div></div><nav class="px-space-md py-space-sm space-y-space-2xs flex flex-col" data-active-classes="bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-xl shadow-[0_1px_3px_0_rgba(15,23,42,0.05)]"><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="overview" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><rect height="7" rx="1" width="7" x="3" y="3"></rect><rect height="7" rx="1" width="7" x="14" y="3"></rect><rect height="7" rx="1" width="7" x="14" y="14"></rect><rect height="7" rx="1" width="7" x="3" y="14"></rect></svg><span>Overview</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="create-qr" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path></svg><span>Create Review QR</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="my-qr-codes" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><rect height="5" rx="1" width="5" x="3" y="3"></rect><rect height="5" rx="1" width="5" x="16" y="3"></rect><rect height="5" rx="1" width="5" x="3" y="16"></rect><path d="M21 16h-3a2 2 0 0 0-2 2v3"></path><path d="M21 21v.01"></path><path d="M12 7v3a2 2 0 0 1-2 2H7"></path><path d="M3 12h.01"></path><path d="M12 3h.01"></path><path d="M12 16v.01"></path><path d="M16 12h1"></path><path d="M21 12v.01"></path><path d="M12 21v-1"></path></svg><span>My QR Codes</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="business-profile" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg><span>Business Profile</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="analytics" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18 20V10"></path><path d="M12 20V4"></path><path d="M6 20v-6"></path></svg><span>Analytics</span></a><a aria-current="page" class="flex items-center gap-space-sm px-space-md py-2.5 transition-all bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-xl shadow-[0_1px_3px_0_rgba(15,23,42,0.05)]" data-path="settings" href="#"><svg class="w-5 h-5 flex-shrink-0 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg><span>Settings</span></a></nav></div><div class="p-space-md m-space-md rounded-xl bg-surface-container-low flex flex-col gap-space-xs"><div class="flex items-center justify-between"><span class="font-label-caps text-label-caps uppercase text-primary font-bold">Pro Plan</span><span class="text-[10px] font-label-caps uppercase bg-tertiary-fixed text-on-tertiary-fixed px-1.5 py-0.5 rounded-full font-semibold">Active</span></div><div class="font-label-lg text-label-lg text-on-surface truncate font-semibold">Royal Palace Hotel</div><div class="font-body-sm text-body-sm text-on-surface-variant truncate">Restaurant · Bettiah, Bihar</div><div class="pt-space-xs flex items-center justify-between"><a class="font-label-md text-label-md text-primary hover:text-on-primary-fixed-variant transition-colors flex items-center gap-1.5 font-medium" data-path="help-support" href="#"><svg class="w-4 h-4 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" x2="12.01" y1="17" y2="17"></line></svg>Quick Support</a><svg class="w-4 h-4 text-tertiary stroke-[2]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-space-lg"><div class="flex items-center gap-space-md flex-1 max-w-md"><div class="relative w-full flex items-center"><svg class="w-5 h-5 absolute left-3 text-outline stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" x2="16.65" y1="21" y2="16.65"></line></svg><input class="w-full h-10 pl-10 pr-4 rounded-xl bg-surface-container-low font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest transition-all" placeholder="Search QR codes, reviews, or templates..." type="text"/></div></div><div class="flex items-center gap-space-md"><div class="hidden md:flex items-center p-1 rounded-xl bg-surface-container-low"><a class="px-3 py-1.5 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-primary shadow-[0_1px_2px_rgba(0,0,0,0.04)] font-semibold" data-path="overview" href="#">Business Dashboard</a><a class="px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="customer-mobile" href="#">Customer Mobile</a></div><button aria-label="Notifications" class="relative p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all"><svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error"></span></button><a aria-label="Help Documentation" class="p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all flex items-center justify-center" data-path="documentation" href="#"><svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" x2="12.01" y1="17" y2="17"></line></svg></a><div class="flex items-center gap-space-sm pl-space-xs cursor-pointer"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="font-label-lg text-label-lg text-on-primary font-bold leading-none">RP</span></div><div class="hidden lg:flex flex-col text-left"><span class="font-label-lg text-label-lg text-on-surface leading-tight truncate max-w-[130px] font-semibold">Royal Palace Hotel</span><span class="font-body-sm text-body-sm text-on-surface-variant leading-tight">Manager</span></div><svg class="w-4 h-4 text-on-surface-variant stroke-[2]" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg></div></div></header><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<div class="px-space-lg py-space-xl max-w-7xl mx-auto w-full">
+<!-- Header Area with Live Auto-Save Notification Banner -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md mb-space-xl pb-space-lg">
+<div class="space-y-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-caps text-label-caps text-primary tracking-widest uppercase bg-primary-fixed text-on-primary-fixed px-2.5 py-1 rounded-full">System &amp; Workspace</span>
+<span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span>
+<span class="font-label-md text-label-md text-on-surface-variant">v3.4 Enterprise</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Settings</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+          Manage your account credentials, business defaults, notification preferences, and print specifications.
+        </p>
+</div>
+<!-- Cloud Sync Notification Indicator -->
+<div class="flex items-center gap-3 bg-surface-container-lowest px-4 py-2.5 rounded-xl shadow-sm self-start lg:self-auto" id="save-indicator">
+<div class="relative flex items-center justify-center w-5 h-5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary-fixed-dim opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-tertiary"></span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1.5">
+            Cloud Workspace Sync Active
+          </span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Changes persist instantly to cloud servers</span>
+</div>
+</div>
+</div>
+<!-- Main Settings Bento/Split Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
+<!-- Left Sub-navigation Sticky Panel -->
+<div class="lg:col-span-3 sticky top-24 space-y-space-md">
+<nav class="bg-surface-container-lowest rounded-xl p-space-sm shadow-sm space-y-1" id="settings-tabs">
+<button class="tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg bg-surface-container-high text-primary font-label-lg text-label-lg transition-all text-left" onclick="scrollToSection('section-profile')">
+<span class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-primary text-xl">manage_accounts</span>
+              Account Profile
+            </span>
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+</button>
+<button class="tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-label-lg text-label-lg transition-all text-left" onclick="scrollToSection('section-defaults')">
+<span class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-xl">qr_code_2</span>
+              Business &amp; QR Defaults
+            </span>
+</button>
+<button class="tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-label-lg text-label-lg transition-all text-left" onclick="scrollToSection('section-notifications')">
+<span class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-xl">notifications_active</span>
+              Notifications
+            </span>
+</button>
+<button class="tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface font-label-lg text-label-lg transition-all text-left" onclick="scrollToSection('section-security')">
+<span class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-xl">shield</span>
+              Security &amp; Password
+            </span>
+</button>
+<button class="tab-btn w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-error hover:bg-error-container/40 font-label-lg text-label-lg transition-all text-left" onclick="scrollToSection('section-danger')">
+<span class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-xl text-error">warning</span>
+              Danger Zone
+            </span>
+</button>
+</nav>
+<!-- Quick Spec Callout Card -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-sm space-y-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Plan Tier</span>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-label-caps px-2 py-0.5 rounded-full font-bold">ACTIVE PRO</span>
+</div>
+<p class="font-label-lg text-label-lg text-on-surface font-semibold pt-1">Commercial Review Hub</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Includes 300 DPI vector exports, dynamic redirects, and real-time review interception.</p>
+<div class="pt-2 flex items-center gap-2">
+<div class="w-full bg-surface-container-highest rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 40%"></div>
+</div>
+<span class="font-label-md text-label-md text-primary font-bold">4/10 QRs</span>
+</div>
+</div>
+</div>
+<!-- Right Form Stacks -->
+<div class="lg:col-span-9 space-y-space-xl">
+<!-- SECTION 1: ACCOUNT PROFILE -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-lg" id="section-profile">
+<div class="flex items-center justify-between pb-space-sm border-b-0">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-primary-fixed text-on-primary-fixed font-label-md text-label-md flex items-center justify-center font-bold">1</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Account Profile</h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 pl-8">Your manager credentials and display identity across generated reports.</p>
+</div>
+<span class="px-2.5 py-1 bg-surface-container rounded-lg font-label-caps text-label-caps text-on-surface-variant uppercase">Identity</span>
+</div>
+<!-- Avatar & Image actions -->
+<div class="flex flex-col sm:flex-row items-center gap-space-lg bg-surface-container-low p-space-md rounded-xl">
+<div class="relative group">
+<div class="w-20 h-20 rounded-full bg-primary text-on-primary font-display-hero text-[28px] font-bold flex items-center justify-center shadow-md ring-4 ring-surface-container-lowest">
+                RP
+              </div>
+<div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center shadow">
+<span class="material-symbols-outlined text-xs">verified</span>
+</div>
+</div>
+<div class="flex-1 text-center sm:text-left space-y-1">
+<div class="font-headline-sm text-headline-sm text-on-surface">Rajesh Kumar</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Hotel Operations &amp; Guest Experience Lead · Royal Palace Bettiah</p>
+<div class="pt-2 flex flex-wrap gap-space-xs justify-center sm:justify-start">
+<button class="px-3.5 py-1.5 rounded-lg bg-surface-container-highest hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center gap-1.5 shadow-sm transition-all" type="button">
+<span class="material-symbols-outlined text-base">upload_file</span>
+                  Change Photo
+                </button>
+<button class="px-3.5 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-error-container hover:text-on-error-container text-on-surface-variant font-label-md text-label-md transition-all" type="button">
+                  Remove
+                </button>
+</div>
+</div>
+<div class="hidden md:block">
+<img class="w-16 h-16 rounded-xl object-cover shadow-sm bg-surface-container" data-alt="Warm welcoming hospitality manager Rajesh Kumar in smart executive attire at front reception desk of Royal Palace Hotel Bettiah, modern indoor architecture, soft ambient natural illumination." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5U4p1NkiomagKt6myToaCtIBCJZu4f8Em86_O2-KTAAi6DYDi0DIucfDrhXiWizHjUTOHqi8PxC4_oSe2so0kzmHytbbcnfd6Wi6gTATjVsNsZPUB0xoBV_pmLdXCIEf7P54_dIU1gRGeBcmWHsruvRBHfIAyfCGWOCeJm1tEFr-nQ1ci8jC-1SaPi_dTMa6QuqrcD79LHaoNENtvnV_RAewS5Fde5KRR_8ly7wM"/>
+</div>
+</div>
+<!-- Profile Input Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<div class="space-y-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
+                Full Name <span class="text-error">*</span>
+</label>
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest transition-all" type="text" value="Rajesh Kumar"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
+                Role / Title
+              </label>
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest transition-all" type="text" value="General Manager"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
+                Email Address <span class="text-error">*</span>
+</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-lg">mail</span>
+<input class="w-full h-11 pl-10 pr-3.5 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest transition-all" type="email" value="manager@royalpalacehotel.in"/>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1">
+                Direct Contact Phone
+              </label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-lg">call</span>
+<input class="w-full h-11 pl-10 pr-3.5 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest transition-all" type="tel" value="+91 98765 43210"/>
+</div>
+</div>
+</div>
+<!-- Language Preference Switcher -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between p-space-md rounded-xl bg-surface-container-low gap-space-sm">
+<div class="space-y-0.5">
+<div class="font-label-lg text-label-lg text-on-surface font-semibold">Dashboard Interface Language</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Sets language for portal menus, PDF analytics headers, and SMS templates.</p>
+</div>
+<div class="flex items-center p-1 bg-surface-container-lowest rounded-xl shadow-sm self-start sm:self-auto">
+<button class="px-4 py-1.5 rounded-lg bg-primary-container text-on-primary-container font-label-md text-label-md font-semibold transition-all" type="button">
+                English (US)
+              </button>
+<button class="px-4 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface font-label-md text-label-md transition-colors" type="button">
+                हिन्दी (Hindi)
+              </button>
+</div>
+</div>
+<div class="flex justify-end pt-space-xs">
+<button class="h-11 px-6 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg shadow-md hover:bg-on-primary-fixed-variant transition-all flex items-center gap-2 active:scale-95" onclick="triggerToast('Account profile successfully updated.')" type="button">
+<span class="material-symbols-outlined text-lg">check_circle</span>
+              Update Profile
+            </button>
+</div>
+</section>
+<!-- SECTION 2: BUSINESS & QR DEFAULTS -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-lg" id="section-defaults">
+<div class="flex items-center justify-between pb-space-sm">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-primary-fixed text-on-primary-fixed font-label-md text-label-md flex items-center justify-center font-bold">2</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Business &amp; QR Defaults</h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 pl-8">Configure template presets, default output resolutions, and print shop bleed guides.</p>
+</div>
+<span class="px-2.5 py-1 bg-surface-container rounded-lg font-label-caps text-label-caps text-on-surface-variant uppercase">Export &amp; Print</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<!-- Default Location / Business Entity -->
+<div class="space-y-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Primary Business Entity</label>
+<div class="relative">
+<select class="w-full h-11 px-3.5 pr-10 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface appearance-none focus:outline-none focus:bg-surface-container-lowest">
+<option selected="">Royal Palace Hotel (Bettiah, Bihar)</option>
+<option>Royal Palace Grand Banquet (Main Town)</option>
+<option>Royal Cafe &amp; Lounge (Station Road)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3.5 top-3 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Default entity assigned to new QR generators.</span>
+</div>
+<!-- Default Poster Theme -->
+<div class="space-y-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Default Poster Template</label>
+<div class="relative">
+<select class="w-full h-11 px-3.5 pr-10 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface appearance-none focus:outline-none focus:bg-surface-container-lowest">
+<option>Minimal White</option>
+<option selected="">Google Classic (High Conversion)</option>
+<option>Royal Gold (Luxury Hotel Theme)</option>
+<option>Modern Navy</option>
+</select>
+<span class="material-symbols-outlined absolute right-3.5 top-3 text-on-surface-variant pointer-events-none">palette</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Auto-applied when starting a new tabletop flyer.</span>
+</div>
+</div>
+<!-- Color & Poster Copy Default Fields -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-space-md items-center bg-surface-container-low p-space-md rounded-xl">
+<div class="md:col-span-5 space-y-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Default Brand Accent Color</label>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary-container shadow-inner flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-sm">colorize</span>
+</div>
+<input class="flex-1 h-10 px-3 rounded-lg bg-surface-container-lowest font-body-md text-body-md text-on-surface focus:outline-none" type="text" value="#1a73e8"/>
+<span class="font-label-caps text-label-caps text-primary font-bold px-2 py-1 rounded bg-primary-fixed">BLUE-600</span>
+</div>
+</div>
+<div class="md:col-span-7 space-y-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Default Callout Headline</label>
+<input class="w-full h-10 px-3.5 rounded-lg bg-surface-container-lowest font-body-md text-body-md text-on-surface focus:outline-none" type="text" value="Review us on Google"/>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Top-level display heading rendered across acrylic table-stands.</p>
+</div>
+</div>
+<!-- Download Format Radio Selector Cards -->
+<div class="space-y-space-xs">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Preferred Download Format &amp; Quality Preset</label>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<label class="flex items-start gap-3.5 p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-all cursor-pointer">
+<input class="mt-1 w-4 h-4 text-primary focus:ring-0" name="format_pref" type="radio"/>
+<div class="space-y-1">
+<div class="font-label-lg text-label-lg text-on-surface font-semibold flex items-center gap-2">
+<span>PNG (High-Res 300 DPI)</span>
+<span class="text-xs bg-secondary-fixed text-on-secondary-fixed px-2 py-0.5 rounded font-mono">RGB</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Best for in-house laminators, digital signage, TV menu displays, and social sharing.</p>
+</div>
+</label>
+<label class="flex items-start gap-3.5 p-space-md rounded-xl bg-surface-container-high transition-all cursor-pointer">
+<input checked="" class="mt-1 w-4 h-4 text-primary focus:ring-0" name="format_pref" type="radio"/>
+<div class="space-y-1">
+<div class="font-label-lg text-label-lg text-primary font-semibold flex items-center gap-2">
+<span>Print-Ready PDF with Bleeds</span>
+<span class="text-xs bg-tertiary-fixed text-on-tertiary-fixed px-2 py-0.5 rounded font-mono">CMYK 100%</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Commercial grade PDF/X-1a with cut marks, vectorized vectors, and zero artifacting.</p>
+</div>
+</label>
+</div>
+</div>
+<!-- Print Specification Checkboxes -->
+<div class="space-y-3 pt-space-xs">
+<label class="flex items-center gap-3 p-3 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<input checked="" class="w-5 h-5 rounded text-primary focus:ring-0" type="checkbox"/>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">Show 5-Star Recommendation Bar by default</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Displays vivid Google golden star graphics above the QR matrix on all prints.</span>
+</div>
+</label>
+<label class="flex items-center gap-3 p-3 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<input checked="" class="w-5 h-5 rounded text-primary focus:ring-0" type="checkbox"/>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">Include Commercial Crop Marks &amp; 3mm Bleed</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Essential for acrylic tent cutters and professional offset press alignment.</span>
+</div>
+</label>
+</div>
+</section>
+<!-- SECTION 3: NOTIFICATIONS -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-lg" id="section-notifications">
+<div class="flex items-center justify-between pb-space-sm">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-primary-fixed text-on-primary-fixed font-label-md text-label-md flex items-center justify-center font-bold">3</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Notifications</h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 pl-8">Control alerts, weekly scan digests, and surge notifications delivered to manager@royalpalacehotel.in</p>
+</div>
+<span class="px-2.5 py-1 bg-surface-container rounded-lg font-label-caps text-label-caps text-on-surface-variant uppercase">Email Dispatch</span>
+</div>
+<div class="space-y-space-sm divide-y-0">
+<!-- Toggle 1: Weekly summary -->
+<div class="flex items-center justify-between p-space-md rounded-xl bg-surface-container-low">
+<div class="flex items-start gap-3.5 max-w-xl">
+<span class="material-symbols-outlined text-primary text-2xl mt-0.5">query_stats</span>
+<div class="space-y-0.5">
+<div class="font-label-lg text-label-lg text-on-surface font-semibold">Weekly Scan &amp; Performance Summary</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Aggregated scan tallies, customer conversion velocity, and star feedback changes every Monday at 08:00 IST.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Toggle 2: Milestone Alerts -->
+<div class="flex items-center justify-between p-space-md rounded-xl bg-surface-container-low">
+<div class="flex items-start gap-3.5 max-w-xl">
+<span class="material-symbols-outlined text-tertiary text-2xl mt-0.5">emoji_events</span>
+<div class="space-y-0.5">
+<div class="font-label-lg text-label-lg text-on-surface font-semibold">Milestone Scan Alerts</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Instant celebration emails when your QR stands cross scan milestones (e.g. 100th, 500th, or 1,000th customer review).</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Toggle 3: Product updates -->
+<div class="flex items-center justify-between p-space-md rounded-xl bg-surface-container-low">
+<div class="flex items-start gap-3.5 max-w-xl">
+<span class="material-symbols-outlined text-secondary text-2xl mt-0.5">new_releases</span>
+<div class="space-y-0.5">
+<div class="font-label-lg text-label-lg text-on-surface font-semibold">ReviewQR Product Updates &amp; Templates</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Early access to newly released festive flyers, tabletop layouts, and Google Algorithm updates.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Toggle 4: Surge alerts (disabled) -->
+<div class="flex items-center justify-between p-space-md rounded-xl bg-surface-container-low">
+<div class="flex items-start gap-3.5 max-w-xl">
+<span class="material-symbols-outlined text-outline text-2xl mt-0.5">speed</span>
+<div class="space-y-0.5">
+<div class="font-label-lg text-label-lg text-on-surface font-semibold">Instant Scan Surge Alerts</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Push notifications when tabletop scans spike over 300% within a 2-hour window during peak dining service.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</section>
+<!-- SECTION 4: SECURITY & PASSWORD -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-lg" id="section-security">
+<div class="flex items-center justify-between pb-space-sm">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-primary-fixed text-on-primary-fixed font-label-md text-label-md flex items-center justify-center font-bold">4</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Security &amp; Password</h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1 pl-8">Safeguard guest records, QR redirect destinations, and administrative tokens.</p>
+</div>
+<span class="px-2.5 py-1 bg-surface-container rounded-lg font-label-caps text-label-caps text-on-surface-variant uppercase">Protection</span>
+</div>
+<!-- Password change fields -->
+<div class="space-y-space-md bg-surface-container-low p-space-md rounded-xl">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Change Password</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+<div class="space-y-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Current Password</label>
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-lowest font-body-md text-body-md text-on-surface focus:outline-none" placeholder="••••••••••••" type="password"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold">New Password</label>
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-lowest font-body-md text-body-md text-on-surface focus:outline-none" id="pwd-field" oninput="updateStrength(this.value)" placeholder="Enter new password" type="password"/>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Confirm Password</label>
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-lowest font-body-md text-body-md text-on-surface focus:outline-none" placeholder="Confirm new password" type="password"/>
+</div>
+</div>
+<!-- Password Strength Meter -->
+<div class="pt-2 space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Password Strength</span>
+<span class="font-label-md text-label-md text-tertiary font-bold" id="strength-label">Strong</span>
+</div>
+<div class="grid grid-cols-4 gap-2 h-1.5">
+<div class="bg-tertiary rounded-full h-full"></div>
+<div class="bg-tertiary rounded-full h-full"></div>
+<div class="bg-tertiary rounded-full h-full"></div>
+<div class="bg-tertiary rounded-full h-full" id="bar-4"></div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Minimum 10 characters with upper/lowercase letters, numerals, and special punctuation.</p>
+</div>
+<div class="flex justify-end pt-2">
+<button class="h-10 px-5 rounded-lg bg-surface-container-highest hover:bg-surface-variant text-on-surface font-label-md text-label-md font-semibold transition-all" onclick="triggerToast('Security credentials updated.')" type="button">
+                Update Password
+              </button>
+</div>
+</div>
+<!-- Two-Factor Authentication Status Card -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between p-space-md rounded-xl bg-surface-container-low gap-space-md">
+<div class="flex items-start gap-3.5">
+<div class="w-10 h-10 rounded-xl bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">phonelink_lock</span>
+</div>
+<div class="space-y-0.5">
+<div class="font-label-lg text-label-lg text-on-surface font-semibold flex items-center gap-2">
+<span>Two-Factor Authentication (2FA)</span>
+<span class="bg-tertiary text-on-tertiary text-[10px] font-label-caps px-2 py-0.5 rounded-full font-bold">PROTECTED</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Enabled via Authenticator App (Google Authenticator / TOTP Key). Codes required at login.</p>
+</div>
+</div>
+<button class="px-4 py-2 rounded-lg bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-label-md transition-all self-start sm:self-auto shadow-sm" type="button">
+              Manage 2FA
+            </button>
+</div>
+<!-- Active Sessions List -->
+<div class="space-y-space-sm">
+<div class="font-label-lg text-label-lg text-on-surface font-semibold">Active Login Sessions</div>
+<div class="p-space-md rounded-xl bg-surface-container-low flex flex-col md:flex-row md:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-3.5">
+<div class="w-10 h-10 rounded-xl bg-surface-container-lowest flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-xl">laptop_mac</span>
+</div>
+<div class="space-y-0.5">
+<div class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-2">
+<span>Chrome on macOS 14.2</span>
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="font-label-caps text-label-caps text-tertiary uppercase">Current Active Session</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Bettiah, Bihar, India · IP 103.142.18.22 · Session initiated today</div>
+</div>
+</div>
+<button class="h-9 px-4 rounded-lg bg-surface-container-lowest hover:bg-error-container hover:text-on-error-container text-on-surface-variant font-label-md text-label-md transition-all self-start md:self-auto shadow-sm" onclick="triggerToast('All other sessions signed out.')" type="button">
+                Sign Out All Other Devices
+              </button>
+</div>
+</div>
+</section>
+<!-- SECTION 5: DANGER ZONE -->
+<section class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md" id="section-danger">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-2">
+<span class="w-6 h-6 rounded-full bg-error-container text-on-error-container font-label-md text-label-md flex items-center justify-center font-bold">5</span>
+<h2 class="font-headline-md text-headline-md text-error">Danger Zone</h2>
+</div>
+<span class="px-2.5 py-1 bg-error-container text-on-error-container rounded-lg font-label-caps text-label-caps font-bold uppercase">Irreversible</span>
+</div>
+<!-- Danger Callout Block -->
+<div class="p-space-lg rounded-xl bg-error-container/30 space-y-space-md">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-error text-on-error flex items-center justify-center shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-2xl">delete_forever</span>
+</div>
+<div class="space-y-1">
+<div class="font-headline-sm text-headline-sm text-on-error-container">Delete Account &amp; Purge QR Data</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                  Permanently delete your ReviewQR account, 4 active QR codes, scan analytics, and custom poster configurations. This action cannot be undone and printed QR codes on physical hotel tables will immediately cease redirecting customers to Google Maps.
+                </p>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md pt-2 border-t-0">
+<div class="flex items-center gap-2 text-error font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-base">info</span>
+                Requires secondary 2FA verification to confirm purge.
+              </div>
+<button class="h-11 px-5 rounded-xl bg-surface-container-lowest text-error hover:bg-error hover:text-on-error transition-all font-label-lg text-label-lg font-semibold shadow-sm flex items-center justify-center gap-2" onclick="openDeleteModal()" type="button">
+<span class="material-symbols-outlined text-lg">delete</span>
+                Delete Account
+              </button>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+<!-- Interactive Modal for Danger Zone Confirmation -->
+<div class="fixed inset-0 z-50 bg-inverse-surface/60 backdrop-blur-sm hidden items-center justify-center p-4" id="delete-modal">
+<div class="bg-surface-container-lowest max-w-lg w-full rounded-2xl p-space-lg shadow-2xl space-y-space-md transform transition-all scale-100">
+<div class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-2xl bg-error-container text-on-error-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-2xl">warning</span>
+</div>
+<div class="space-y-1">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Confirm Irreversible Account Deletion</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Please enter your business title <span class="font-bold text-on-surface">"Royal Palace Hotel"</span> to confirm permanent deletion of all 4 active review codes.
+          </p>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="font-label-md text-label-md text-on-surface font-semibold">Type confirmation phrase</label>
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface focus:outline-none focus:bg-surface-container-lowest" id="confirm-input" placeholder="Royal Palace Hotel" type="text"/>
+</div>
+<div class="flex items-center justify-end gap-space-xs pt-2">
+<button class="h-10 px-5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md" onclick="closeDeleteModal()" type="button">
+          Cancel
+        </button>
+<button class="h-10 px-5 rounded-lg bg-error text-on-error font-label-md text-label-md font-semibold hover:bg-on-error-container transition-colors shadow" onclick="executePurge()" type="button">
+          Permanently Purge Workspace
+        </button>
+</div>
+</div>
+</div>
+<!-- Floating Toast Notification Component -->
+<div class="fixed bottom-6 right-6 z-50 bg-inverse-surface text-inverse-on-surface px-5 py-3 rounded-xl shadow-xl flex items-center gap-3 transition-opacity duration-300 opacity-0 pointer-events-none" id="toast">
+<span class="material-symbols-outlined text-tertiary-fixed text-xl">check_circle</span>
+<span class="font-label-md text-label-md font-semibold" id="toast-text">Settings updated</span>
+</div>
+<!-- Client-side Micro-Interactions Script -->
+<script>
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      
+      const buttons = document.querySelectorAll('#settings-tabs button');
+      buttons.forEach(btn => {
+        btn.classList.remove('bg-surface-container-high', 'text-primary');
+        btn.classList.add('text-on-surface-variant');
+      });
+      event.currentTarget.classList.add('bg-surface-container-high', 'text-primary');
+      event.currentTarget.classList.remove('text-on-surface-variant');
+    }
+
+    function triggerToast(message) {
+      const toast = document.getElementById('toast');
+      const text = document.getElementById('toast-text');
+      text.textContent = message;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+      
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 3200);
+    }
+
+    function openDeleteModal() {
+      const modal = document.getElementById('delete-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeDeleteModal() {
+      const modal = document.getElementById('delete-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function executePurge() {
+      const input = document.getElementById('confirm-input').value;
+      if (input.trim().toLowerCase() === 'royal palace hotel') {
+        closeDeleteModal();
+        triggerToast('Workspace purge initiated.');
+      } else {
+        alert('Please match the confirmation title "Royal Palace Hotel" exactly.');
+      }
+    }
+
+    function updateStrength(val) {
+      const label = document.getElementById('strength-label');
+      const bar4 = document.getElementById('bar-4');
+      if (val.length < 6) {
+        label.textContent = 'Weak';
+        label.className = 'font-label-md text-label-md text-error font-bold';
+        bar4.className = 'bg-surface-variant rounded-full h-full';
+      } else if (val.length < 10) {
+        label.textContent = 'Moderate';
+        label.className = 'font-label-md text-label-md text-secondary font-bold';
+        bar4.className = 'bg-surface-variant rounded-full h-full';
+      } else {
+        label.textContent = 'Strong';
+        label.className = 'font-label-md text-label-md text-tertiary font-bold';
+        bar4.className = 'bg-tertiary rounded-full h-full';
+      }
+    }
+  </script>
+</div></main></div></body></html>

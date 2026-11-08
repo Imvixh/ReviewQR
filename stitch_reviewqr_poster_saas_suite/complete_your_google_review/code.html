@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_blank" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-secondary-container": "#5c647a", "primary-fixed-dim": "#adc7ff", "inverse-on-surface": "#eaf1ff", "on-primary": "#ffffff", "on-primary-container": "#ffffff", "on-tertiary-fixed": "#002108", "on-secondary-fixed-variant": "#3f465c", "tertiary": "#006d2c", "on-secondary": "#ffffff", "inverse-surface": "#213145", "surface-bright": "#f8f9ff", "on-tertiary-fixed-variant": "#005320", "secondary-container": "#dae2fd", "primary-container": "#1a73e8", "tertiary-fixed": "#89fa9b", "error-container": "#ffdad6", "on-error": "#ffffff", "surface-container": "#e5eeff", "on-surface-variant": "#414754", "on-secondary-fixed": "#131b2e", "surface-tint": "#005bc0", "secondary-fixed-dim": "#bec6e0", "surface": "#f8f9ff", "on-background": "#0b1c30", "on-tertiary": "#ffffff", "outline-variant": "#c1c6d6", "outline": "#727785", "surface-variant": "#d3e4fe", "on-error-container": "#93000a", "background": "#f8f9ff", "on-primary-fixed-variant": "#004493", "surface-dim": "#cbdbf5", "error": "#ba1a1a", "tertiary-container": "#008939", "inverse-primary": "#adc7ff", "surface-container-lowest": "#ffffff", "secondary": "#565e74", "secondary-fixed": "#dae2fd", "primary": "#005bbf", "on-surface": "#0b1c30", "primary-fixed": "#d8e2ff", "on-tertiary-container": "#ffffff", "tertiary-fixed-dim": "#6ddd81", "surface-container-low": "#eff4ff", "on-primary-fixed": "#001a41", "surface-container-highest": "#d3e4fe", "surface-container-high": "#dce9ff" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-2xl": "3rem", "gutter": "1.5rem", "margin": "2rem", "space-md": "1rem", "space-lg": "1.5rem", "space-xl": "2rem", "space-sm": "0.5rem", "gutter-mobile": "0.75rem", "space-2xs": "0.125rem", "space-xs": "0.25rem", "margin-mobile": "1rem" }, fontFamily: { "headline-lg": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "body-lg": ["Inter"], "body-sm": ["Inter"], "label-lg": ["Inter"], "display-hero": ["Plus Jakarta Sans"], "body-md": ["Inter"], "label-caps": ["Inter"], "headline-sm": ["Plus Jakarta Sans"], "display-hero-mobile": ["Plus Jakarta Sans"], "label-md": ["Inter"] }, fontSize: { "headline-lg": ["30px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700" }], "headline-lg-mobile": ["22px", { lineHeight: "28px", letterSpacing: "-0.01em", fontWeight: "700" }], "headline-md": ["22px", { lineHeight: "28px", letterSpacing: "-0.01em", fontWeight: "700" }], "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }], "body-sm": ["12px", { lineHeight: "16px", fontWeight: "400" }], "label-lg": ["14px", { lineHeight: "20px", letterSpacing: "0.01em", fontWeight: "600" }], "display-hero": ["40px", { lineHeight: "48px", letterSpacing: "-0.03em", fontWeight: "800" }], "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }], "label-caps": ["11px", { lineHeight: "14px", letterSpacing: "0.06em", fontWeight: "700" }], "headline-sm": ["18px", { lineHeight: "24px", fontWeight: "600" }], "display-hero-mobile": ["28px", { lineHeight: "34px", letterSpacing: "-0.02em", fontWeight: "800" }], "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "600" }] } } } }</script><style>@layer base{html,body{width:100%;margin:0;padding:0;min-height:100%;}body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface flex flex-col min-h-screen selection:bg-secondary-container"><main class="flex-1 flex flex-col relative w-full pt-safe pb-safe bg-surface max-w-md mx-auto"><div class="flex flex-col w-full pb-6 space-y-4">
+<!-- Status & Handoff Simulation Bar -->
+<div class="flex items-center justify-between px-4 py-2 bg-surface-container rounded-xl shadow-sm">
+<div class="flex items-center space-x-2">
+<span class="flex h-2 w-2 rounded-full bg-tertiary"></span>
+<span class="font-label-md text-label-md text-on-surface-variant">Redirected to Google Maps Web</span>
+</div>
+<div class="flex items-center space-x-1.5 bg-primary-fixed px-2.5 py-1 rounded-full text-on-primary-fixed">
+<span class="material-symbols-outlined text-[16px]">content_paste_go</span>
+<span class="font-label-caps text-label-caps uppercase">Auto-Copied</span>
+</div>
+</div>
+<!-- Native Google Review Modal / Sheet Container -->
+<div class="flex flex-col w-full bg-surface-container-lowest rounded-2xl shadow-xl overflow-hidden">
+<!-- Top Modal Handle -->
+<div class="w-full flex justify-center pt-3 pb-1">
+<div class="w-10 h-1 bg-outline-variant rounded-full opacity-60"></div>
+</div>
+<!-- Google Sheet Header -->
+<div class="flex items-center justify-between px-4 py-2.5 bg-surface-container-lowest">
+<button aria-label="Close" class="w-9 h-9 rounded-full flex items-center justify-center bg-surface-container hover:bg-surface-variant text-on-surface transition-transform active:scale-95" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+<!-- Multi-color style Google Header Wordmark representation -->
+<div aria-label="Google" class="flex items-center space-x-0.5 select-none">
+<span class="font-headline-sm text-headline-sm text-primary font-bold">G</span>
+<span class="font-headline-sm text-headline-sm text-error font-bold">o</span>
+<span class="font-headline-sm text-headline-sm text-[#FBBC04] font-bold">o</span>
+<span class="font-headline-sm text-headline-sm text-primary font-bold">g</span>
+<span class="font-headline-sm text-headline-sm text-tertiary font-bold">l</span>
+<span class="font-headline-sm text-headline-sm text-error font-bold">e</span>
+</div>
+<!-- Top Primary CTA "Post" -->
+<button class="px-5 py-2 rounded-full bg-primary-container text-on-primary-container font-label-lg text-label-lg shadow-sm hover:opacity-95 active:scale-95 transition-all" id="postReviewBtn">
+        Post
+      </button>
+</div>
+<!-- Business Entity Summary Card -->
+<div class="px-5 pt-3 pb-4 space-y-3">
+<div class="flex items-start space-x-3.5">
+<!-- Business Thumbnail Placeholdered -->
+<div class="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Warm facade and ambient interior lobby of the Royal Palace Hotel in Bettiah Bihar, featuring welcoming warm ambient evening architectural lighting, grand arched entryway, and lush entrance plants." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMhrILZ6HfSzHzaIIj9lUizOq0NLFnCT8-zZqIBQn_MLZwApIYSfSus8-KhUJBhC_ezaMnfh8mGMG5u1-OwIrLAz1NKbxYEdjKNCXqGvCtN138zVuTiB9TL0-8u-SxPgg_wGi6NGeXn94CfdXDEDmWOskLVH0CzJu91vX5A76TpNLZLO4wqqnvGi39OvLrRaAze74hYHjBGRH6727VuL-txMP6T3ybMAevOIr8Hxo"/>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center space-x-1">
+<h1 class="font-headline-sm text-headline-sm text-on-surface truncate">Royal Palace Hotel</h1>
+<span class="material-symbols-outlined text-primary text-[18px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">Restaurant &amp; Hotel · Bettiah, Bihar</p>
+<div class="flex items-center space-x-1 mt-0.5">
+<span class="material-symbols-outlined text-outline text-[14px]">public</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Posting publicly across Google</span>
+</div>
+</div>
+</div>
+<!-- Customer Account Identity Card -->
+<div class="flex items-center space-x-3 px-3 py-2 bg-surface-container-low rounded-xl">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary font-headline-sm text-headline-sm flex items-center justify-center font-bold text-xs">
+          DM
+        </div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface truncate">Deepak M.</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Your name &amp; photo are visible publicly</span>
+</div>
+</div>
+</div>
+<!-- Rating Section: 5 Amber Stars -->
+<div class="px-5 py-3 flex flex-col items-center justify-center bg-surface-container-lowest">
+<div class="flex items-center space-x-2 py-1" id="starContainer">
+<button aria-label="1 star" class="text-[#FBBC04] transition-transform active:scale-125 focus:outline-none" type="button">
+<span class="material-symbols-outlined text-[36px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</button>
+<button aria-label="2 stars" class="text-[#FBBC04] transition-transform active:scale-125 focus:outline-none" type="button">
+<span class="material-symbols-outlined text-[36px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</button>
+<button aria-label="3 stars" class="text-[#FBBC04] transition-transform active:scale-125 focus:outline-none" type="button">
+<span class="material-symbols-outlined text-[36px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</button>
+<button aria-label="4 stars" class="text-[#FBBC04] transition-transform active:scale-125 focus:outline-none" type="button">
+<span class="material-symbols-outlined text-[36px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</button>
+<button aria-label="5 stars" class="text-[#FBBC04] transition-transform active:scale-125 focus:outline-none animate-pulse" type="button">
+<span class="material-symbols-outlined text-[36px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</button>
+</div>
+<div class="flex items-center space-x-1.5 mt-1">
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">Excellent</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">(5 out of 5 stars)</span>
+</div>
+</div>
+<!-- Native Text Input Area with pre-pasted draft -->
+<div class="px-5 py-2">
+<div class="relative bg-surface-container-low rounded-xl p-3 shadow-inner">
+<div class="flex justify-between items-center mb-1.5">
+<label class="font-label-md text-label-md text-on-surface-variant flex items-center space-x-1" for="reviewContent">
+<span>Share details of your experience</span>
+</label>
+<span class="font-body-sm text-body-sm text-tertiary flex items-center space-x-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span>Draft Ready</span>
+</span>
+</div>
+<textarea class="w-full bg-surface-container-lowest text-on-surface font-body-md text-body-md rounded-lg p-3 outline-none resize-none shadow-sm focus:bg-surface-container-lowest" id="reviewContent" placeholder="Share details of your own experience at this place" rows="4">The service was excellent, and the staff were welcoming and professional.</textarea>
+<div class="flex items-center justify-between mt-2 pt-1 text-on-surface-variant">
+<span class="font-body-sm text-body-sm">You can freely edit or add your own words</span>
+<span class="font-body-sm text-body-sm font-mono text-outline">70 chars</span>
+</div>
+</div>
+</div>
+<!-- Optional Media Upload Action -->
+<div class="px-5 py-3">
+<button class="w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-surface-container hover:bg-surface-variant text-primary font-label-lg text-label-lg active:scale-98 transition-all" type="button">
+<span class="material-symbols-outlined text-[20px]">add_a_photo</span>
+<span>Add photos &amp; videos (optional)</span>
+</button>
+</div>
+<!-- Secondary Google Experience Survey Chips -->
+<div class="px-5 py-2 space-y-3">
+<span class="font-label-md text-label-md text-on-surface font-semibold block">Helpful details for others</span>
+<!-- Dining Type Chips -->
+<div class="space-y-1.5">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Did you dine in, take out, or get delivery?</span>
+<div class="flex flex-wrap gap-2">
+<button class="px-3.5 py-1.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-md text-label-md flex items-center space-x-1 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">check</span>
+<span>Dine in</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-full bg-surface-container hover:bg-surface-variant text-on-surface-variant font-label-md text-label-md" type="button">
+            Take out
+          </button>
+<button class="px-3.5 py-1.5 rounded-full bg-surface-container hover:bg-surface-variant text-on-surface-variant font-label-md text-label-md" type="button">
+            Delivery
+          </button>
+</div>
+</div>
+<!-- Meal Selection Chips -->
+<div class="space-y-1.5">
+<span class="font-body-sm text-body-sm text-on-surface-variant">What meal did you have?</span>
+<div class="flex flex-wrap gap-2">
+<button class="px-3.5 py-1.5 rounded-full bg-surface-container hover:bg-surface-variant text-on-surface-variant font-label-md text-label-md" type="button">
+            Lunch
+          </button>
+<button class="px-3.5 py-1.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-md text-label-md flex items-center space-x-1 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">check</span>
+<span>Dinner</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-full bg-surface-container hover:bg-surface-variant text-on-surface-variant font-label-md text-label-md" type="button">
+            Breakfast
+          </button>
+</div>
+</div>
+<!-- Price Range Chips -->
+<div class="space-y-1.5">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Approximate spend per person?</span>
+<div class="flex flex-wrap gap-2">
+<button class="px-3.5 py-1.5 rounded-full bg-surface-container hover:bg-surface-variant text-on-surface-variant font-label-md text-label-md" type="button">
+            ₹200–500
+          </button>
+<button class="px-3.5 py-1.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-md text-label-md flex items-center space-x-1 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">check</span>
+<span>₹500–1,000</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-full bg-surface-container hover:bg-surface-variant text-on-surface-variant font-label-md text-label-md" type="button">
+            ₹1,000+
+          </button>
+</div>
+</div>
+</div>
+<!-- Visual Location Context Image Card -->
+<div class="px-5 py-3">
+<div class="w-full h-28 rounded-xl overflow-hidden relative shadow-sm">
+<div class="w-full h-full bg-cover bg-center" data-location="Royal Palace Hotel, Bettiah, Bihar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBswTs7F2p18pkVr_erImHDpoFMyK5ceAr0Uj-L-xMiekhALupNMX92sEXrUm2htqiugDmiGayhcZi8N0TZ6vhk06nfkq5QB4RR6_M1ylmHs0hi8kplq2jfhUZUy47KfISHLvJgo_TxXDZFquz7L91RnwmhA6RA3Cx5SzUcdfXq5JYdR-obXGNeDRhyoLnyL4yI32bWViDAqixaA0UQ0T5jirtHNDgjHMOM-oE43rg')">
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-inverse-surface/20 to-transparent flex items-end p-3">
+<div class="flex items-center space-x-2 text-inverse-on-surface">
+<span class="material-symbols-outlined text-[20px] text-error">location_on</span>
+<span class="font-label-md text-label-md">Station Road, Bettiah, Bihar 845438</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Sticky Sticky Bar for Quick Confirmation -->
+<div class="p-4 bg-surface-container-low flex items-center justify-between shadow-md">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-tertiary text-[20px]">lock</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Direct Google Maps API Handoff</span>
+</div>
+<button class="px-6 py-2.5 rounded-full bg-primary text-on-primary font-label-lg text-label-lg shadow-md hover:bg-surface-tint active:scale-95 transition-all" id="postReviewBottomBtn">
+        Post Review
+      </button>
+</div>
+</div>
+<!-- Developer Specification & Handoff Clarification Card -->
+<div class="p-4 bg-surface-container rounded-2xl shadow-sm space-y-2">
+<div class="flex items-center space-x-2 text-primary">
+<span class="material-symbols-outlined text-[20px]">info</span>
+<h2 class="font-headline-sm text-headline-sm">ReviewQR Handoff Reference</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface">
+      Demonstrates customer pasting copied text and confirming 5 stars on Google's native dialog. Customer retains 100% control over final submission.
+    </p>
+<div class="flex items-center space-x-3 pt-1 text-on-surface-variant font-label-md text-label-md">
+<span class="flex items-center space-x-1">
+<span class="material-symbols-outlined text-tertiary text-[16px]">verified</span>
+<span>Google Policy Compliant</span>
+</span>
+<span>•</span>
+<span class="flex items-center space-x-1">
+<span class="material-symbols-outlined text-primary text-[16px]">touch_app</span>
+<span>Customer Consented</span>
+</span>
+</div>
+</div>
+</div>
+<script>
+  // Simple interactive feedback simulation
+  const postBtn = document.getElementById('postReviewBtn');
+  const postBottomBtn = document.getElementById('postReviewBottomBtn');
+  const reviewText = document.getElementById('reviewContent');
+
+  function handlePost() {
+    const originalText = postBtn.textContent;
+    postBtn.textContent = 'Posting...';
+    postBottomBtn.textContent = 'Posting...';
+    postBtn.classList.add('opacity-75');
+    postBottomBtn.classList.add('opacity-75');
+
+    setTimeout(() => {
+      postBtn.textContent = 'Published!';
+      postBottomBtn.textContent = 'Published!';
+      postBtn.classList.remove('bg-primary-container', 'opacity-75');
+      postBtn.classList.add('bg-tertiary-container');
+      postBottomBtn.classList.remove('bg-primary', 'opacity-75');
+      postBottomBtn.classList.add('bg-tertiary');
+    }, 700);
+  }
+
+  if (postBtn) postBtn.addEventListener('click', handlePost);
+  if (postBottomBtn) postBottomBtn.addEventListener('click', handlePost);
+</script></main></body></html>

@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"on-surface":"#0b1c30","surface-container-lowest":"#ffffff","on-primary-fixed":"#001a41","on-background":"#0b1c30","surface":"#f8f9ff","tertiary-fixed":"#89fa9b","outline":"#727785","surface-tint":"#005bc0","error":"#ba1a1a","on-tertiary-fixed-variant":"#005320","primary-fixed":"#d8e2ff","secondary-fixed-dim":"#bec6e0","surface-variant":"#d3e4fe","surface-container-high":"#dce9ff","primary":"#005bbf","background":"#f8f9ff","on-primary-container":"#ffffff","inverse-on-surface":"#eaf1ff","surface-container":"#e5eeff","error-container":"#ffdad6","primary-fixed-dim":"#adc7ff","surface-container-low":"#eff4ff","surface-dim":"#cbdbf5","on-tertiary-fixed":"#002108","surface-bright":"#f8f9ff","on-surface-variant":"#414754","on-primary":"#ffffff","primary-container":"#1a73e8","inverse-primary":"#adc7ff","on-secondary-fixed":"#131b2e","tertiary":"#006d2c","on-error-container":"#93000a","secondary":"#565e74","tertiary-fixed-dim":"#6ddd81","inverse-surface":"#213145","outline-variant":"#c1c6d6","secondary-container":"#dae2fd","tertiary-container":"#008939","on-error":"#ffffff","on-secondary-fixed-variant":"#3f465c","on-secondary":"#ffffff","on-secondary-container":"#5c647a","on-primary-fixed-variant":"#004493","secondary-fixed":"#dae2fd","surface-container-highest":"#d3e4fe","on-tertiary":"#ffffff","on-tertiary-container":"#ffffff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-2xl":"3rem","gutter":"1.5rem","margin-mobile":"1rem","space-xs":"0.25rem","space-sm":"0.5rem","space-2xs":"0.125rem","space-xl":"2rem","margin":"2rem","space-md":"1rem","space-lg":"1.5rem","gutter-mobile":"0.75rem"},"fontFamily":{"headline-lg":["Plus Jakarta Sans"],"display-hero-mobile":["Plus Jakarta Sans"],"headline-md":["Plus Jakarta Sans"],"label-lg":["Inter"],"body-sm":["Inter"],"headline-sm":["Plus Jakarta Sans"],"body-lg":["Inter"],"label-caps":["Inter"],"display-hero":["Plus Jakarta Sans"],"headline-lg-mobile":["Plus Jakarta Sans"],"label-md":["Inter"],"body-md":["Inter"]},"fontSize":{"headline-lg":["30px",{"lineHeight":"38px","letterSpacing":"-0.02em","fontWeight":"700"}],"display-hero-mobile":["28px",{"lineHeight":"34px","letterSpacing":"-0.02em","fontWeight":"800"}],"headline-md":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"600"}],"body-sm":["12px",{"lineHeight":"16px","fontWeight":"400"}],"headline-sm":["18px",{"lineHeight":"24px","fontWeight":"600"}],"body-lg":["16px",{"lineHeight":"24px","fontWeight":"400"}],"label-caps":["11px",{"lineHeight":"14px","letterSpacing":"0.06em","fontWeight":"700"}],"display-hero":["40px",{"lineHeight":"48px","letterSpacing":"-0.03em","fontWeight":"800"}],"headline-lg-mobile":["22px",{"lineHeight":"28px","letterSpacing":"-0.01em","fontWeight":"700"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0.02em","fontWeight":"600"}],"body-md":["14px",{"lineHeight":"20px","fontWeight":"400"}]}}}}</script></head><body class="bg-surface font-body-md text-on-surface antialiased min-h-screen"><aside class="fixed left-0 top-0 bottom-0 w-64 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between overflow-y-auto"><div class="flex flex-col"><div class="h-16 px-space-lg flex items-center gap-space-sm"><img alt="ReviewQR Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1WgE2-y3RJ4XNRbRovE7ot3hleJ-FiOWvkX4zLaOejN5Rs1CsIFm-adeOhL98Wt3xPVnLAT3tBFDdcSRIwKiXGorBX_OhsHhXPwQgKsXfIU_EmBZOelQlNHLjXUeNB3CvXDNKLIJbS34sjY9h4RyEPCbwf39N4JjF2sQWgEcMp9GG_rEt3nOGKbFDZjKHkBg4G0mJy5gFG3IO1IHFjF1k850N0yA7UnB7rElDFeJ6vj"/><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">ReviewQR</span></div><nav class="px-space-md py-space-sm space-y-space-2xs flex flex-col" data-active-classes="bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-xl shadow-[0_1px_3px_0_rgba(15,23,42,0.05)]"><a aria-current="page" class="flex items-center gap-space-sm px-space-md py-2.5 transition-all bg-primary-container text-on-primary-container font-label-lg text-label-lg rounded-xl shadow-[0_1px_3px_0_rgba(15,23,42,0.05)]" data-path="overview" href="#"><span class="material-symbols-outlined text-[20px]">grid_view</span><span>Overview</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="create-review-qr" href="#"><span class="material-symbols-outlined text-[20px]">add_circle</span><span>Create Review QR</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="my-qr-codes" href="#"><span class="material-symbols-outlined text-[20px]">qr_code_2</span><span>My QR Codes</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="business-profile" href="#"><span class="material-symbols-outlined text-[20px]">storefront</span><span>Business Profile</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="design-templates" href="#"><span class="material-symbols-outlined text-[20px]">palette</span><span>Design Templates</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="analytics" href="#"><span class="material-symbols-outlined text-[20px]">insights</span><span>Analytics</span></a><a class="flex items-center gap-space-sm px-space-md py-2.5 rounded-xl text-on-surface-variant font-label-lg text-label-lg hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="settings" href="#"><span class="material-symbols-outlined text-[20px]">settings</span><span>Settings</span></a></nav></div><div class="p-space-md m-space-md rounded-xl bg-surface-container-low flex flex-col gap-space-xs"><div class="flex items-center justify-between"><span class="font-label-caps text-label-caps uppercase text-primary font-bold">Pro Plan</span><span class="material-symbols-outlined text-tertiary text-[18px]">verified</span></div><div class="font-label-lg text-label-lg text-on-surface truncate">Royal Palace Hotel</div><div class="font-body-sm text-body-sm text-on-surface-variant truncate">Restaurant · Bettiah, Bihar</div><div class="pt-space-xs flex items-center justify-between"><a class="font-label-md text-label-md text-primary hover:text-on-primary-fixed-variant transition-colors flex items-center gap-space-2xs" data-path="help-support" href="#"><span class="material-symbols-outlined text-[16px]">support_agent</span>Quick Support</a><span class="text-[10px] font-label-caps uppercase bg-tertiary-fixed text-on-tertiary-fixed px-1.5 py-0.5 rounded-full font-semibold">Active</span></div></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-space-lg"><div class="flex items-center gap-space-md flex-1 max-w-md"><div class="relative w-full flex items-center"><span class="material-symbols-outlined absolute left-3 text-outline text-[20px]">search</span><input class="w-full h-10 pl-10 pr-4 rounded-xl bg-surface-container-low font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest transition-all" placeholder="Search QR codes, reviews, or templates..." type="text"/></div></div><div class="flex items-center gap-space-md"><div class="hidden md:flex items-center p-1 rounded-xl bg-surface-container-low"><a class="px-3 py-1.5 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-primary shadow-[0_1px_2px_rgba(0,0,0,0.04)]" data-path="overview" href="#">Business Dashboard</a><a class="px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="mobile-preview" href="#">Customer Mobile</a></div><button aria-label="Notifications" class="relative p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all"><span class="material-symbols-outlined text-[22px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error"></span></button><a aria-label="Help Documentation" class="p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all flex items-center justify-center" data-path="documentation" href="#"><span class="material-symbols-outlined text-[22px]">help_outline</span></a><div class="flex items-center gap-space-sm pl-space-xs cursor-pointer"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div><div class="hidden lg:flex flex-col text-left"><span class="font-label-lg text-label-lg text-on-surface leading-tight truncate max-w-[130px]">Royal Palace</span><span class="font-body-sm text-body-sm text-on-surface-variant leading-tight">Manager</span></div><span class="material-symbols-outlined text-on-surface-variant text-[18px]">arrow_drop_down</span></div></div></header><main class="w-full pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full">
+<div class="p-space-lg lg:p-space-xl flex flex-col gap-space-xl">
+<!-- Welcome Header Banner with Fluid Hierarchy & Quick Actions -->
+<section class="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-space-lg bg-surface-container-lowest p-space-xl rounded-xl shadow-sm">
+<div class="flex flex-col gap-space-xs max-w-2xl">
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-caps uppercase tracking-wider">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+            Stands Live &amp; Collecting Reviews
+          </span>
+<span class="text-secondary font-body-sm">· Bettiah, Bihar</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+          Welcome back, Rajesh Kumar 👋
+        </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+          Your Google Review stands are active. You received <span class="font-label-lg text-tertiary font-bold">42 new 5-star reviews</span> this week across all 4 dining zones!
+        </p>
+</div>
+<div class="flex flex-wrap items-center gap-space-sm w-full xl:w-auto">
+<a class="inline-flex items-center justify-center gap-space-xs h-11 px-5 rounded-lg bg-primary-container text-on-primary font-label-lg text-label-lg shadow-sm hover:opacity-95 transition-all" data-path="create-review-qr" href="#">
+<span class="material-symbols-outlined text-[20px]">add_circle</span>
+          Create Review QR
+        </a>
+<button class="inline-flex items-center justify-center gap-space-xs h-11 px-4 rounded-lg bg-surface-container-high text-on-surface font-label-lg text-label-lg hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-[19px]">picture_as_pdf</span>
+          Download Poster PDF
+        </button>
+<a class="inline-flex items-center justify-center gap-space-xs h-11 px-4 rounded-lg bg-surface-container-low text-primary font-label-lg text-label-lg hover:bg-surface-container-high transition-all" data-path="mobile-preview" href="#">
+<span class="material-symbols-outlined text-[19px]">smartphone</span>
+          Live Mobile Page
+        </a>
+</div>
+</section>
+<!-- KPI Metric Cards Grid -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<!-- KPI 1: Scans -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Total Scans</span>
+<div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">qr_code_scanner</span>
+</div>
+</div>
+<div class="flex flex-col gap-space-2xs">
+<div class="font-display-hero text-display-hero text-on-surface tracking-tight leading-none">1,428</div>
+<div class="flex items-center gap-1.5 pt-1">
+<span class="inline-flex items-center text-tertiary font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-[18px]">trending_up</span>
+              +18.4%
+            </span>
+<span class="font-body-sm text-body-sm text-secondary">vs last month</span>
+</div>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary-container h-full rounded-full w-[78%]"></div>
+</div>
+</div>
+<!-- KPI 2: 5-Star Reviews -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">5-Star Reviews</span>
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<div class="flex flex-col gap-space-2xs">
+<div class="font-display-hero text-display-hero text-on-surface tracking-tight leading-none">386</div>
+<div class="flex items-center gap-1.5 pt-1">
+<span class="inline-flex items-center text-tertiary font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-[18px]">trending_up</span>
+              +24%
+            </span>
+<span class="font-body-sm text-body-sm text-secondary">new reviews</span>
+</div>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-tertiary h-full rounded-full w-[84%]"></div>
+</div>
+</div>
+<!-- KPI 3: Active Stands -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Active QR Stands</span>
+<div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined text-[22px]">storefront</span>
+</div>
+</div>
+<div class="flex flex-col gap-space-2xs">
+<div class="font-display-hero text-display-hero text-on-surface tracking-tight leading-none">4</div>
+<div class="flex items-center gap-1.5 pt-1">
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">Reception, Dining 1, Roof, Cashier</span>
+</div>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-secondary h-full rounded-full w-full"></div>
+</div>
+</div>
+<!-- KPI 4: Conversion Rate -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Conversion Rate</span>
+<div class="w-10 h-10 rounded-lg bg-surface-variant flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">conversion_path</span>
+</div>
+</div>
+<div class="flex flex-col gap-space-2xs">
+<div class="font-display-hero text-display-hero text-on-surface tracking-tight leading-none">72.4%</div>
+<div class="flex items-center gap-1.5 pt-1">
+<span class="inline-flex items-center text-tertiary font-label-md text-label-md font-semibold">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+              High Trust
+            </span>
+<span class="font-body-sm text-body-sm text-secondary">scans to Google</span>
+</div>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full rounded-full w-[72%]"></div>
+</div>
+</div>
+</section>
+<!-- Main Content Split Grid: 8 Cols / 4 Cols -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
+<!-- Left Column (8 Columns) -->
+<div class="lg:col-span-8 flex flex-col gap-space-xl">
+<!-- 6-Step Visual Journey Banner -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm overflow-hidden flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant tracking-wider font-bold">ReviewQR Workflow</span>
+</div>
+<span class="font-body-sm text-body-sm text-secondary">Turn Table Guests Into 5-Star Google Reviews</span>
+</div>
+<!-- Step Progression Flow -->
+<div class="grid grid-cols-2 md:grid-cols-6 gap-space-sm pt-space-xs">
+<!-- Step 1 -->
+<div class="flex flex-col gap-1 p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-1.5">
+<span class="w-5 h-5 rounded-full bg-primary-container text-on-primary text-[11px] font-bold flex items-center justify-center">1</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">Setup</span>
+</div>
+<span class="text-[11px] text-on-surface-variant leading-tight">Details &amp; logo configured</span>
+</div>
+<!-- Step 2 -->
+<div class="flex flex-col gap-1 p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-1.5">
+<span class="w-5 h-5 rounded-full bg-tertiary text-on-tertiary text-[11px] font-bold flex items-center justify-center">2</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">Print QR</span>
+</div>
+<span class="text-[11px] text-on-surface-variant leading-tight">Stand table flyers</span>
+</div>
+<!-- Step 3 -->
+<div class="flex flex-col gap-1 p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-1.5">
+<span class="w-5 h-5 rounded-full bg-secondary-container text-on-secondary-container text-[11px] font-bold flex items-center justify-center">3</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">Guest Scan</span>
+</div>
+<span class="text-[11px] text-on-surface-variant leading-tight">Instant mobile open</span>
+</div>
+<!-- Step 4 -->
+<div class="flex flex-col gap-1 p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-1.5">
+<span class="w-5 h-5 rounded-full bg-primary-fixed text-on-primary-fixed text-[11px] font-bold flex items-center justify-center">4</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">Assistant</span>
+</div>
+<span class="text-[11px] text-on-surface-variant leading-tight">1-tap ready phrase</span>
+</div>
+<!-- Step 5 -->
+<div class="flex flex-col gap-1 p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-1.5">
+<span class="w-5 h-5 rounded-full bg-surface-variant text-primary text-[11px] font-bold flex items-center justify-center">5</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">Auto Copy</span>
+</div>
+<span class="text-[11px] text-on-surface-variant leading-tight">Clipboard ready</span>
+</div>
+<!-- Step 6 -->
+<div class="flex flex-col gap-1 p-2.5 rounded-lg bg-surface-container-low">
+<div class="flex items-center gap-1.5">
+<span class="w-5 h-5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed text-[11px] font-bold flex items-center justify-center">6</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold truncate">Google Post</span>
+</div>
+<span class="text-[11px] text-on-surface-variant leading-tight">5-Star verified</span>
+</div>
+</div>
+</div>
+<!-- Section: Active QR Stands -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Active Review Stands &amp; Table Tents</h2>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Real-time scan tracking per table location</span>
+</div>
+<a class="font-label-md text-label-md text-primary hover:underline flex items-center gap-1" data-path="my-qr-codes" href="#">
+              View All 4 Stands
+              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+<div class="flex flex-col gap-space-sm">
+<!-- Stand 1 -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors gap-space-md">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-12 h-12 rounded-xl bg-surface-container-lowest flex items-center justify-center shadow-sm shrink-0">
+<span class="material-symbols-outlined text-primary text-[28px]">qr_code_2</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-label-lg text-label-lg text-on-surface font-bold truncate">Front Reception &amp; Counter</span>
+<span class="px-2 py-0.5 rounded-full text-[11px] font-label-caps uppercase bg-tertiary-fixed text-on-tertiary-fixed font-semibold">Active</span>
+</div>
+<span class="font-body-sm text-body-sm text-secondary truncate">Location ID: RP-REC-01 · Acrylic Stand A6</span>
+</div>
+</div>
+<div class="flex items-center justify-between w-full sm:w-auto gap-space-lg shrink-0">
+<div class="flex flex-col items-end">
+<span class="font-headline-sm text-headline-sm text-on-surface">642</span>
+<span class="font-body-sm text-body-sm text-secondary">total scans</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="p-2 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Quick Download PDF">
+<span class="material-symbols-outlined text-[20px]">download</span>
+</button>
+<button class="p-2 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Print Stand">
+<span class="material-symbols-outlined text-[20px]">print</span>
+</button>
+<button class="p-2 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Options">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Stand 2 -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors gap-space-md">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-12 h-12 rounded-xl bg-surface-container-lowest flex items-center justify-center shadow-sm shrink-0">
+<span class="material-symbols-outlined text-primary text-[28px]">restaurant</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-label-lg text-label-lg text-on-surface font-bold truncate">Dining Hall 1 (Tables 1-12)</span>
+<span class="px-2 py-0.5 rounded-full text-[11px] font-label-caps uppercase bg-tertiary-fixed text-on-tertiary-fixed font-semibold">Active</span>
+</div>
+<span class="font-body-sm text-body-sm text-secondary truncate">Location ID: RP-DIN-01 · Wood Block Stand</span>
+</div>
+</div>
+<div class="flex items-center justify-between w-full sm:w-auto gap-space-lg shrink-0">
+<div class="flex flex-col items-end">
+<span class="font-headline-sm text-headline-sm text-on-surface">514</span>
+<span class="font-body-sm text-body-sm text-secondary">total scans</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="p-2 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Quick Download PDF">
+<span class="material-symbols-outlined text-[20px]">download</span>
+</button>
+<button class="p-2 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Print Stand">
+<span class="material-symbols-outlined text-[20px]">print</span>
+</button>
+<button class="p-2 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Options">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Stand 3 -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors gap-space-md">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-12 h-12 rounded-xl bg-surface-container-lowest flex items-center justify-center shadow-sm shrink-0">
+<span class="material-symbols-outlined text-primary text-[28px]">deck</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-label-lg text-label-lg text-on-surface font-bold truncate">Rooftop Sky Lounge</span>
+<span class="px-2 py-0.5 rounded-full text-[11px] font-label-caps uppercase bg-tertiary-fixed text-on-tertiary-fixed font-semibold">Active</span>
+</div>
+<span class="font-body-sm text-body-sm text-secondary truncate">Location ID: RP-ROOF-03 · Triangular Table Tent</span>
+</div>
+</div>
+<div class="flex items-center justify-between w-full sm:w-auto gap-space-lg shrink-0">
+<div class="flex flex-col items-end">
+<span class="font-headline-sm text-headline-sm text-on-surface">192</span>
+<span class="font-body-sm text-body-sm text-secondary">total scans</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="p-2 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Quick Download PDF">
+<span class="material-symbols-outlined text-[20px]">download</span>
+</button>
+<button class="p-2 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Print Stand">
+<span class="material-symbols-outlined text-[20px]">print</span>
+</button>
+<button class="p-2 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors" title="Options">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section: Recent Customer Submissions & Activity Feed -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Recent Google Reviews via ReviewQR</h2>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Live verified customer feedback flow</span>
+</div>
+<span class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface font-label-caps uppercase text-[11px]">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+              Google Synced
+            </span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<!-- Review Item 1 -->
+<div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary font-bold text-xs flex items-center justify-center">
+                    DM
+                  </div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">Deepak M.</span>
+<span class="text-[11px] text-secondary font-body-sm">Dining Hall 1 · Scanned via Android Camera</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex text-amber-500">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="text-[12px] text-secondary">22 min ago</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant pl-10">
+                “Friendly and polite staff with great service. The Paneer Butter Masala was fresh and delivered promptly to our table.”
+              </p>
+</div>
+<!-- Review Item 2 -->
+<div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-tertiary-container text-on-tertiary-container font-bold text-xs flex items-center justify-center">
+                    AS
+                  </div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">Ananya S.</span>
+<span class="text-[11px] text-secondary font-body-sm">Rooftop Sky Lounge · Scanned via iPhone</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex text-amber-500">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="text-[12px] text-secondary">1 hour ago</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant pl-10">
+                “Delicious food and pleasant atmosphere. Best restaurant in Bettiah for family dining. The Assistant made leaving a review completely effortless!”
+              </p>
+</div>
+<!-- Review Item 3 -->
+<div class="p-space-md rounded-xl bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-secondary text-on-secondary font-bold text-xs flex items-center justify-center">
+                    RK
+                  </div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">Rohit Kushwaha</span>
+<span class="text-[11px] text-secondary font-body-sm">Reception &amp; Counter · Scanned via Android</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex text-amber-500">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="text-[12px] text-secondary">3 hours ago</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant pl-10">
+                “Clean and well maintained dining area. Fast billing and courteous managers. Will definitely visit again.”
+              </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column (4 Columns): Poster Mockup & Setup Score -->
+<div class="lg:col-span-4 flex flex-col gap-space-xl">
+<!-- Interactive Live Stand Preview Frame -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-headline-sm text-on-surface">Live Stand Poster</span>
+<span class="px-2 py-0.5 rounded-full text-[11px] font-label-caps uppercase bg-primary-fixed text-on-primary-fixed font-bold">Standard A5</span>
+</div>
+<!-- Realistic Table Tent Poster Mockup Card -->
+<div class="relative bg-surface-container-lowest rounded-xl p-6 shadow-xl flex flex-col items-center text-center overflow-hidden">
+<!-- Decorative Accent Waves at Top -->
+<div class="absolute -top-12 -right-12 w-32 h-32 bg-primary/10 rounded-full blur-xl"></div>
+<div class="absolute -bottom-10 -left-10 w-28 h-28 bg-amber-400/10 rounded-full blur-xl"></div>
+<!-- Business Emblem & Header -->
+<div class="flex flex-col items-center gap-1 mb-4 z-10">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center shadow-sm mb-1 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Golden crown hotel logo for Royal Palace Hotel Bettiah restaurant, minimalist premium hospitality badge, high-end warm gold tones on cream background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTanfqnRDVdz0RGqUyQAZ_j83M7CczVpHrPMtkE2FkCp2DUG_O0iFJyKjpNBJNK3K4a98hHcgKsFaJza-BpBcdMO3fHc1Zh-4opXnZIiqYQRmD_DlsY4hf04atr-qQAI1LjQZwqxa3w8wyPRPJWxFCrgYtawqcZ7Ct__amIyUENNeGZktFpDUASJU9fydhKJy0W80Z0SQSYgCHxvwxEKnmEmxGU-Gr_SV7a9nfYz0"/>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-extrabold tracking-tight uppercase leading-tight">
+                Royal Palace Hotel
+              </h3>
+<p class="text-[10px] font-label-caps uppercase tracking-widest text-on-surface-variant font-bold">
+                Restaurant · Bettiah
+              </p>
+</div>
+<!-- High-Contrast Centered QR Box -->
+<div class="p-3 bg-surface-container-lowest rounded-2xl shadow-md mb-4 z-10">
+<div class="relative w-44 h-44 bg-surface-container-lowest flex items-center justify-center">
+<!-- Authentic SVG QR Matrix -->
+<svg class="w-full h-full text-on-surface" fill="currentColor" viewbox="0 0 100 100">
+<!-- QR Finder Pattern: Top-Left -->
+<rect height="26" rx="3" width="26" x="5" y="5"></rect>
+<rect fill="#ffffff" height="18" rx="1.5" width="18" x="9" y="9"></rect>
+<rect height="10" rx="1" width="10" x="13" y="13"></rect>
+<!-- QR Finder Pattern: Top-Right -->
+<rect height="26" rx="3" width="26" x="69" y="5"></rect>
+<rect fill="#ffffff" height="18" rx="1.5" width="18" x="73" y="9"></rect>
+<rect height="10" rx="1" width="10" x="77" y="13"></rect>
+<!-- QR Finder Pattern: Bottom-Left -->
+<rect height="26" rx="3" width="26" x="5" y="69"></rect>
+<rect fill="#ffffff" height="18" rx="1.5" width="18" x="9" y="73"></rect>
+<rect height="10" rx="1" width="10" x="13" y="77"></rect>
+<!-- Sample Data Nodes -->
+<rect height="5" width="5" x="36" y="8"></rect>
+<rect height="5" width="5" x="46" y="8"></rect>
+<rect height="5" width="5" x="56" y="8"></rect>
+<rect height="5" width="5" x="36" y="18"></rect>
+<rect height="5" width="5" x="46" y="18"></rect>
+<rect height="5" width="5" x="56" y="18"></rect>
+<rect height="5" width="5" x="8" y="36"></rect>
+<rect height="5" width="5" x="18" y="36"></rect>
+<rect height="5" width="5" x="8" y="46"></rect>
+<rect height="5" width="5" x="18" y="56"></rect>
+<rect height="6" width="6" x="36" y="36"></rect>
+<rect height="6" width="6" x="58" y="36"></rect>
+<rect height="6" width="6" x="36" y="58"></rect>
+<rect height="6" width="6" x="58" y="58"></rect>
+<rect height="6" width="6" x="69" y="69"></rect>
+<rect height="6" width="6" x="81" y="69"></rect>
+<rect height="6" width="6" x="69" y="81"></rect>
+<rect height="8" width="8" x="85" y="85"></rect>
+<rect height="6" width="6" x="36" y="76"></rect>
+<rect height="6" width="6" x="48" y="76"></rect>
+<rect height="6" width="6" x="48" y="88"></rect>
+</svg>
+<!-- Centered Google Icon Badge -->
+<div class="absolute inset-0 m-auto w-10 h-10 bg-surface-container-lowest rounded-full shadow-md flex items-center justify-center">
+<span class="font-headline-sm text-headline-sm font-black text-primary leading-none">G</span>
+</div>
+</div>
+</div>
+<!-- "Review us on Google" Callout -->
+<div class="flex flex-col items-center gap-1 z-10 w-full">
+<span class="text-[13px] font-label-lg font-bold text-on-surface">Review us on</span>
+<div class="flex items-center gap-1">
+<span class="text-[20px] font-extrabold tracking-tight text-primary">G</span>
+<span class="text-[20px] font-extrabold tracking-tight text-error">o</span>
+<span class="text-[20px] font-extrabold tracking-tight text-amber-500">o</span>
+<span class="text-[20px] font-extrabold tracking-tight text-primary">g</span>
+<span class="text-[20px] font-extrabold tracking-tight text-tertiary">l</span>
+<span class="text-[20px] font-extrabold tracking-tight text-error">e</span>
+</div>
+<!-- 5 Stars Row -->
+<div class="flex text-amber-500 py-1">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<!-- Stand Footer Banner -->
+<div class="w-full mt-4 py-2 px-3 rounded-lg bg-primary text-on-primary flex items-center justify-center gap-1.5 z-10">
+<span class="material-symbols-outlined text-[16px]">photo_camera</span>
+<span class="font-label-md text-label-md font-semibold">Scan to share your experience</span>
+</div>
+</div>
+<!-- Stand Quick Actions -->
+<div class="grid grid-cols-2 gap-space-sm">
+<button class="h-10 px-3 rounded-lg bg-primary text-on-primary font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm hover:opacity-95 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">download</span>
+              Download PNG
+            </button>
+<button class="h-10 px-3 rounded-lg bg-surface-container-high text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+              Download PDF
+            </button>
+<a class="col-span-2 h-10 px-3 rounded-lg bg-surface-container-low text-primary font-label-md text-label-md flex items-center justify-center gap-1.5 hover:bg-surface-container-high transition-colors" data-path="design-templates" href="#">
+<span class="material-symbols-outlined text-[18px]">palette</span>
+              Customize Stand Colors &amp; Layout
+            </a>
+</div>
+</div>
+<!-- Setup Checklist Card -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary text-[22px]">verified</span>
+<span class="font-label-lg text-label-lg text-on-surface font-bold">Setup Checklist</span>
+</div>
+<span class="px-2 py-0.5 rounded-full text-[11px] font-label-caps uppercase bg-tertiary-fixed text-on-tertiary-fixed font-bold">100% Ready</span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-tertiary text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Business name &amp; category set</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-tertiary text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Google Place Review URL linked</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-tertiary text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Pre-built suggestions configured</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-tertiary text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">4 physical table stands printed</span>
+</div>
+</div>
+<div class="pt-2">
+<div class="w-full bg-surface-container rounded-full h-2 overflow-hidden">
+<div class="bg-tertiary h-full rounded-full w-full"></div>
+</div>
+<span class="text-[11px] text-secondary font-body-sm pt-1 block text-right">4 of 4 completed</span>
+</div>
+</div>
+<!-- Pro Feature Tip / Acrylic Stand Ordering Callout -->
+<div class="bg-surface-container-low p-space-lg rounded-xl flex items-start gap-space-md">
+<div class="w-10 h-10 rounded-xl bg-primary text-on-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">local_shipping</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="font-label-lg text-label-lg text-on-surface font-bold leading-tight">Need Hard Acrylic Stands?</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-normal">
+              Order laser-cut, waterproof table tents with your custom QR code printed directly on acrylic. Delivered across Bihar in 3 days.
+            </p>
+<a class="font-label-md text-label-md text-primary font-semibold hover:underline inline-flex items-center gap-1 pt-1" href="#">
+              Order Physical Stands
+              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Notice: Compliance & Google Native Screen Disclaimer -->
+<div class="p-space-md rounded-xl bg-surface-container-low text-secondary flex items-center justify-between text-body-sm">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">info</span>
+<span>
+<strong>100% Google Policy Compliant:</strong> Customer freely chooses their rating. Google's native review submission is handled directly on Google Maps without gating or restrictions.
+        </span>
+</div>
+<span class="hidden md:inline-block font-label-caps uppercase text-[10px] tracking-wider">ReviewQR Engine v2.4</span>
+</div>
+</div>
+</div></main></div></body></html>

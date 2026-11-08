@@ -1,0 +1,7 @@
+/* Tailwind directives. Adjust the content paths if your project uses other frameworks. */
+@import "tailwindcss";
+
+/* Custom component styles that override or extend Tailwind classes */
+@layer components {
+  /* Reusable component patterns that match DESIGN.md */
+}
