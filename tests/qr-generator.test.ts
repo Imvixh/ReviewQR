@@ -4,7 +4,7 @@ import { generateQrSvg } from '../src/lib/qr-geometry';
 
 describe('QR Code Generation', () => {
   it('generates a valid scannable Data URL for Google review destination', async () => {
-    const destination = 'https://g.page/r/Cbll2345abc992eEBM/review';
+    const destination = 'https://www.google.com/maps/place/example-business/reviews';
     const dataUrl = await QRCodeLib.toDataURL(destination, {
       errorCorrectionLevel: 'H',
       margin: 1,
@@ -17,7 +17,7 @@ describe('QR Code Generation', () => {
   });
 
   it('generates a valid SVG string for vector exports', async () => {
-    const destination = 'https://g.page/r/Cbll2345abc992eEBM/review';
+    const destination = 'https://www.google.com/maps/place/example-business/reviews';
     const svg = await QRCodeLib.toString(destination, {
       type: 'svg',
       errorCorrectionLevel: 'H',
@@ -41,12 +41,32 @@ describe('QR Code Generation', () => {
     const rounded = dataUrl('rounded');
     const dots = dataUrl('dots');
     const premiumEye = dataUrl('premium-eye');
+    const matrixSize = QRCodeLib.create('https://reviewqr.app', {
+      errorCorrectionLevel: 'H',
+    }).modules.size;
 
+    expect(classic).toMatch(/^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" width="320"/);
+    expect(classic).toContain(`viewBox="0 0 ${matrixSize + 8} ${matrixSize + 8}"`);
+    expect(classic).toContain('shape-rendering="crispEdges">');
+    expect(classic).toContain('<g transform="translate(4 4)">');
     expect(classic).toContain('<rect');
     expect(rounded).toContain('rx="0.3"');
     expect(dots).toContain('<circle');
     expect(premiumEye.match(/r="3\.5"/g)).toHaveLength(3);
     expect(premiumEye.match(/r="2\.5"/g)).toHaveLength(3);
     expect(premiumEye.match(/r="1\.5"/g)).toHaveLength(3);
+  });
+
+  it('generates different QR data for the confirmed destination URL', () => {
+    const savedDestination = 'https://www.google.com/maps/place/example-business/reviews';
+    const qrForSavedDestination = generateQrSvg(savedDestination, 'classic', '#1A73E8');
+    const qrForDifferentDestination = generateQrSvg(
+      'https://reviews.example.org/other-business',
+      'classic',
+      '#1A73E8'
+    );
+
+    expect(qrForSavedDestination.startsWith('data:image/svg+xml;utf8,')).toBe(true);
+    expect(qrForSavedDestination).not.toBe(qrForDifferentDestination);
   });
 });

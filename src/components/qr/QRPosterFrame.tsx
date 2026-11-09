@@ -11,7 +11,6 @@ export interface QRPosterFrameProps {
   headline?: string;
   tagline?: string;
   destinationUrl?: string;
-  showStarBar?: boolean;
   emblemText?: string;
   logoUrl?: string;
   preset?: 'google-classic' | 'minimal-white' | 'royal-gold' | 'modern-navy' | 'bistro-green' | 'dark-luxury' | string;
@@ -22,14 +21,13 @@ export interface QRPosterFrameProps {
 }
 
 export const QRPosterFrame: React.FC<QRPosterFrameProps> = ({
-  businessName = 'Royal Palace Hotel',
-  category = 'Restaurant & Lounge',
-  locality = 'Bettiah, Bihar',
+  businessName = 'Your business',
+  category = '',
+  locality = '',
   accentColor = '#1A73E8',
   headline = 'Review us on Google',
   tagline = 'Scan to share your experience',
-  destinationUrl = 'https://g.page/r/Cbll2345abc992eEBM/review',
-  showStarBar = true,
+  destinationUrl = '',
   logoUrl,
   preset = 'google-classic',
   geometry = 'rounded',
@@ -42,9 +40,13 @@ export const QRPosterFrame: React.FC<QRPosterFrameProps> = ({
   useEffect(() => {
     let isMounted = true;
     const generateQR = async () => {
+      if (!destinationUrl) {
+        setQrDataUrl('');
+        return;
+      }
+
       try {
-        const urlToEncode = destinationUrl || 'https://reviewqr.app';
-        const dataUrl = await QRCodeLib.toDataURL(urlToEncode, {
+        const dataUrl = await QRCodeLib.toDataURL(destinationUrl, {
           errorCorrectionLevel: 'H',
           margin: 1,
           width: 320,
@@ -127,7 +129,7 @@ export const QRPosterFrame: React.FC<QRPosterFrameProps> = ({
           {businessName}
         </h3>
         <p className={`text-[10px] font-bold uppercase tracking-wider ${textSecondaryClass}`}>
-          {category} • {locality}
+          {[category, locality].filter(Boolean).join(' · ') || 'Business details not set'}
         </p>
       </div>
 
@@ -142,8 +144,8 @@ export const QRPosterFrame: React.FC<QRPosterFrameProps> = ({
             }`}
           />
         ) : (
-          <div className="w-44 h-44 bg-slate-50 flex items-center justify-center text-slate-400">
-            <span className="material-symbols-outlined animate-spin text-3xl">sync</span>
+          <div className="w-44 h-44 bg-slate-50 flex items-center justify-center px-4 text-center text-xs text-[#565E74]">
+            Choose a saved review destination to generate this QR code.
           </div>
         )}
 
@@ -179,20 +181,6 @@ export const QRPosterFrame: React.FC<QRPosterFrameProps> = ({
       {/* Headline Callout */}
       <div className="flex flex-col items-center gap-1 z-10 w-full mb-3">
         <p className={`font-bold text-sm tracking-tight ${textPrimaryClass}`}>{headline}</p>
-
-        {showStarBar && (
-          <div className="flex items-center justify-center gap-1 text-amber-500 py-0.5">
-            {[1, 2, 3, 4, 5].map((s) => (
-              <span
-                key={s}
-                className="material-symbols-outlined text-[19px]"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                star
-              </span>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Call-to-Action Footer Banner */}

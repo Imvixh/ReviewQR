@@ -3,22 +3,23 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { setStoredOrg, setStoredUser } from '@/lib/data-store';
+import { setStoredUser } from '@/lib/data-store';
 import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
 
 export default function SignUpPage() {
   const router = useRouter();
-  const [fullName, setFullName] = useState('Rajesh Kumar');
-  const [businessName, setBusinessName] = useState('Royal Palace Hotel');
-  const [email, setEmail] = useState('manager@royalpalacehotel.in');
-  const [password, setPassword] = useState('RoyalReview#2026');
+  const [fullName, setFullName] = useState('');
+  const [businessName, setBusinessName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [agreeTerms, setAgreeTerms] = useState(true);
+  const [acknowledgedLimitations, setAcknowledgedLimitations] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   // Security requirements checks
-  const hasMinLength = password.length >= 8;
+  const hasMinLength = password.length >= 10;
   const hasUppercase = /[A-Z]/.test(password);
   const hasNumber = /[0-9]/.test(password);
   const hasSpecial = /[^A-Za-z0-9\s]/.test(password);
@@ -41,9 +42,10 @@ export default function SignUpPage() {
   const handleSignUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setNotice(null);
 
-    if (!agreeTerms) {
-      setError('Please agree to the Terms of Service & Privacy Policy.');
+    if (!acknowledgedLimitations) {
+      setError('Please acknowledge the current prototype limitations.');
       return;
     }
 
@@ -55,69 +57,67 @@ export default function SignUpPage() {
     setIsLoading(true);
 
     try {
-      if (isSupabaseConfigured) {
-        const supabase = createClient();
-        const { data, error: authError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: fullName,
-              business_name: businessName,
-            },
+      if (!isSupabaseConfigured) {
+        throw new Error('Account creation is unavailable because Supabase is not configured.');
+      }
+
+      const supabase = createClient();
+      const { data, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            business_name: businessName,
           },
-        });
+        },
+      });
 
-        if (authError) {
-          throw authError;
-        }
+      if (authError) {
+        throw authError;
+      }
 
-        if (data.user) {
-          setStoredUser({
-            id: data.user.id,
-            email: data.user.email || email,
-            displayName: fullName,
-            orgId: 'org_royal_palace',
-            role: 'admin',
-          });
-        }
-      } else {
-        // Local mode fallback
+      if (!data.session) {
+        setNotice('If registration succeeded, check your email to confirm the address before logging in.');
+        return;
+      }
+
+      if (data.user) {
         setStoredUser({
-          id: 'usr_' + Date.now(),
-          email,
+          id: data.user.id,
+          email: data.user.email || email,
           displayName: fullName,
-          orgId: 'org_' + Date.now(),
           role: 'admin',
         });
       }
 
-      setStoredOrg({
-        name: businessName,
-      });
-
       router.push('/dashboard');
-    } catch (err: any) {
-      setError(err?.message || 'Failed to create account. Please try again.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create account. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGoogleSignup = () => {
+  const handleGoogleSignup = async () => {
+    if (!isSupabaseConfigured) {
+      setError('Google sign-up is unavailable because Supabase is not configured.');
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
-      setStoredUser({
-        id: 'usr_google_' + Date.now(),
-        email: 'rajesh.kumar@gmail.com',
-        displayName: 'Rajesh Kumar (Google)',
-        orgId: 'org_royal_palace',
-        role: 'admin',
+    setError(null);
+    try {
+      const supabase = createClient();
+      const { error: authError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: `${window.location.origin}/dashboard` },
       });
-      setStoredOrg({ name: businessName });
+      if (authError) throw authError;
+    } catch (authError) {
+      setError(authError instanceof Error ? authError.message : 'Could not start Google sign-up.');
       setIsLoading(false);
-      router.push('/dashboard');
-    }, 500);
+    }
   };
 
   return (
@@ -150,14 +150,14 @@ export default function SignUpPage() {
               <div className="relative z-10 space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white text-[#005BBF] text-xs font-bold tracking-wider uppercase shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-[#1A73E8] animate-pulse"></span>
-                  Start in 60 seconds • Zero hardware lock-in
+                  Manual setup • No Google Maps API key required
                 </div>
                 <div className="space-y-2 max-w-xl">
                   <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0B1C30] tracking-tight">
-                    Turn Physical Visits Into <span className="text-[#005BBF]">5-Star Google Reviews.</span>
+                    Help customers find your review destination.
                   </h1>
                   <p className="text-base text-[#414754] leading-relaxed">
-                    Generate custom branded tabletop QR stands, eliminate customer review friction, and automate your venue reputation.
+                    Create a QR poster for a destination you confirm yourself. Customers continue to that saved destination from the public QR page.
                   </p>
                 </div>
               </div>
@@ -176,21 +176,15 @@ export default function SignUpPage() {
                       <div className="p-2 bg-slate-50 rounded-xl my-2 flex justify-center">
                         <span className="material-symbols-outlined text-5xl text-[#0B1C30]">qr_code_2</span>
                       </div>
-                      <div className="flex items-center justify-center gap-0.5 text-[#FBBC04]">
-                        {[1, 2, 3, 4, 5].map((s) => (
-                          <span key={s} className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
-                            star
-                          </span>
-                        ))}
-                      </div>
+                      <p className="text-[10px] text-slate-500">Customers share their own feedback</p>
                     </div>
                   </div>
 
                   {/* Telemetry Card */}
                   <div className="absolute right-2 bottom-2 w-72 bg-white rounded-2xl p-5 shadow-2xl border border-slate-100 rotate-2 z-10">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold text-[#0B1C30]">Live Telemetry</span>
-                      <span className="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Active</span>
+                      <span className="text-xs font-bold text-[#0B1C30]">Analytics preview</span>
+                      <span className="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">Persisted data only</span>
                     </div>
                     <div className="space-y-2 text-xs">
                       <div className="flex justify-between py-1 border-b border-slate-100">
@@ -213,16 +207,16 @@ export default function SignUpPage() {
               {/* Lower Trust Strip */}
               <div className="relative z-10 pt-4 flex flex-wrap items-center justify-between gap-3 bg-white/70 backdrop-blur-sm p-4 rounded-2xl border border-white text-xs text-[#0B1C30]">
                 <div className="flex items-center gap-1.5 font-semibold">
-                  <span className="material-symbols-outlined text-green-600 text-lg">verified</span>
-                  <span>Google destination is not verified</span>
+                  <span className="material-symbols-outlined text-slate-500 text-lg">info</span>
+                  <span>Owner-confirmed destination; not independently verified</span>
                 </div>
                 <div className="flex items-center gap-1.5 font-semibold">
                   <span className="material-symbols-outlined text-[#1A73E8] text-lg">lock</span>
-                  <span>Bank-Grade SSL Encryption</span>
+                  <span>Authentication provided by Supabase</span>
                 </div>
                 <div className="flex items-center gap-1.5 font-semibold">
-                  <span className="material-symbols-outlined text-amber-500 text-lg">policy</span>
-                  <span>Anti-Gating Policy Compliant</span>
+                  <span className="material-symbols-outlined text-slate-500 text-lg">open_in_new</span>
+                  <span>Customers choose whether to continue</span>
                 </div>
               </div>
             </div>
@@ -233,7 +227,7 @@ export default function SignUpPage() {
                 <div>
                   <h2 className="text-2xl font-bold text-[#0B1C30] tracking-tight">Create your account</h2>
                   <p className="text-xs text-[#414754] mt-1">
-                    Get started with ReviewQR in just a few steps. Free 14-day trial, no credit card required.
+                    Create an account to manage your business destination and QR designs. Supabase configuration is required.
                   </p>
                 </div>
 
@@ -265,6 +259,12 @@ export default function SignUpPage() {
                   <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2">
                     <span className="material-symbols-outlined text-base">error</span>
                     <span>{error}</span>
+                  </div>
+                )}
+
+                {notice && (
+                  <div className="p-3 bg-blue-50 border border-blue-200 text-blue-800 text-xs rounded-xl" role="status">
+                    {notice}
                   </div>
                 )}
 
@@ -301,24 +301,18 @@ export default function SignUpPage() {
                           required
                           value={businessName}
                           onChange={(e) => setBusinessName(e.target.value)}
-                          placeholder="Royal Palace Hotel"
+                          placeholder="e.g. Riverside Cafe"
                           className="w-full h-10 pl-9 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-[#0B1C30] focus:outline-none focus:bg-white focus:border-[#1A73E8]"
                         />
                       </div>
                     </div>
                   </div>
 
-                  {/* Work Email */}
+                  {/* Account Email */}
                   <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-semibold text-[#0B1C30]" htmlFor="email">
-                        Work Email Address
-                      </label>
-                      <span className="inline-flex items-center gap-1 text-[11px] text-green-700 font-semibold">
-                        <span className="material-symbols-outlined text-[13px]">check_circle</span>
-                        <span>Corporate email</span>
-                      </span>
-                    </div>
+                    <label className="block text-xs font-semibold text-[#0B1C30] mb-1" htmlFor="email">
+                      Email Address
+                    </label>
                     <div className="relative flex items-center">
                       <span className="material-symbols-outlined absolute left-3 text-slate-400 text-lg">mail</span>
                       <input
@@ -327,10 +321,9 @@ export default function SignUpPage() {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="manager@company.com"
-                        className="w-full h-10 pl-9 pr-9 rounded-xl bg-slate-50 border border-slate-200 text-xs text-[#0B1C30] focus:outline-none focus:bg-white focus:border-[#1A73E8]"
+                        placeholder="you@example.com"
+                        className="w-full h-10 pl-9 pr-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-[#0B1C30] focus:outline-none focus:bg-white focus:border-[#1A73E8]"
                       />
-                      <span className="material-symbols-outlined absolute right-3 text-green-600 text-lg">check</span>
                     </div>
                   </div>
 
@@ -389,7 +382,7 @@ export default function SignUpPage() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs">
                         <div className={`flex items-center gap-1.5 ${hasMinLength ? 'text-green-700 font-medium' : 'text-slate-400'}`}>
                           <span className="material-symbols-outlined text-sm">{hasMinLength ? 'check_circle' : 'radio_button_unchecked'}</span>
-                          <span>At least 8 characters</span>
+                          <span>At least 10 characters</span>
                         </div>
                         <div className={`flex items-center gap-1.5 ${hasUppercase ? 'text-green-700 font-medium' : 'text-slate-400'}`}>
                           <span className="material-symbols-outlined text-sm">{hasUppercase ? 'check_circle' : 'radio_button_unchecked'}</span>
@@ -410,16 +403,14 @@ export default function SignUpPage() {
                   {/* Terms Checkbox */}
                   <div className="flex items-start gap-2 pt-1">
                     <input
-                      id="terms"
+                      id="prototype-limitations"
                       type="checkbox"
-                      checked={agreeTerms}
-                      onChange={(e) => setAgreeTerms(e.target.checked)}
+                      checked={acknowledgedLimitations}
+                      onChange={(e) => setAcknowledgedLimitations(e.target.checked)}
                       className="w-4 h-4 mt-0.5 rounded text-[#1A73E8] focus:ring-0 cursor-pointer"
                     />
-                    <label htmlFor="terms" className="text-xs text-[#565E74] leading-snug cursor-pointer select-none">
-                      I agree to the ReviewQR{' '}
-                      <span className="text-[#1A73E8] font-semibold hover:underline">Terms of Service</span> and{' '}
-                      <span className="text-[#1A73E8] font-semibold hover:underline">Privacy Policy</span>.
+                    <label htmlFor="prototype-limitations" className="text-xs text-[#565E74] leading-snug cursor-pointer select-none">
+                      I understand Supabase must be configured and the secure QR migration applied before hosted QR features are available. Terms of Service and Privacy Policy are not published.
                     </label>
                   </div>
 
@@ -433,7 +424,7 @@ export default function SignUpPage() {
                       <span>Creating Account...</span>
                     ) : (
                       <>
-                        <span>Start Free 14-Day Trial</span>
+                        <span>Create Account</span>
                         <span className="material-symbols-outlined text-base">arrow_forward</span>
                       </>
                     )}

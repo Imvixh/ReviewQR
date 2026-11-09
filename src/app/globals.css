@@ -153,6 +153,43 @@
     letter-spacing: -0.03em;
     font-weight: 800;
   }
+
+  @media print {
+    @page {
+      size: A5 portrait;
+      margin: 0;
+    }
+
+    html,
+    body {
+      width: 148mm !important;
+      min-height: 210mm !important;
+      background: #fff !important;
+    }
+
+    body * {
+      visibility: hidden !important;
+    }
+
+    .qr-poster-print-art,
+    .qr-poster-print-art * {
+      visibility: visible !important;
+    }
+
+    .qr-poster-print-art {
+      position: fixed !important;
+      top: 12mm !important;
+      left: 24mm !important;
+      width: 100mm !important;
+      max-width: 100mm !important;
+      margin: 0 !important;
+      transform: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      print-color-adjust: exact !important;
+      -webkit-print-color-adjust: exact !important;
+    }
+  }
   .font-display-hero-mobile {
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 28px;

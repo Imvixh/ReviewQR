@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'ReviewQR — Turn Every Happy Customer Into Your Next Great Review',
+  title: 'ReviewQR — QR Poster Design for Customer Feedback',
   description:
-    'ReviewQR helps local businesses turn physical table QR codes into frictionless, Google-direct customer reviews.',
+    'ReviewQR is a prototype for designing QR posters that direct customers to a business-selected feedback destination.',
 };
 
 export default function RootLayout({

@@ -3,6 +3,20 @@
  * Applied server-side before any persistence.
  */
 import { z } from 'zod';
+import { BUSINESS_CATEGORIES } from './business-category';
+
+const businessCategorySchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(80)
+  .refine((value) => !/[\u0000-\u001f\u007f]/.test(value), 'Category contains invalid characters')
+  .refine((value) => value.toLowerCase() !== 'other', 'Enter a custom category for Other')
+  .transform((value) =>
+    BUSINESS_CATEGORIES.find(
+      (category) => category !== 'Other' && category.toLowerCase() === value.toLowerCase()
+    ) || value
+  );
 
 export const signupSchema = z.object({
   email: z.string().email('Enter a valid email address'),
@@ -22,6 +36,20 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
+export const safeHttpsUrlSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(2048)
+  .refine((value) => {
+    try {
+      const url = new URL(value);
+      return url.protocol === 'https:' && Boolean(url.hostname) && !url.username && !url.password;
+    } catch {
+      return false;
+    }
+  }, 'Enter a safe HTTPS URL');
+
 export const orgPatchSchema = z.object({
   name: z.string().min(1).optional(),
   category: z.string().min(1).optional(),
@@ -37,7 +65,7 @@ export const qrCreateSchema = z.object({
   businessName: z.string().min(1),
   category: z.string().min(1),
   city: z.string().min(1),
-  destinationUrl: z.string().url().regex(/g\.page\/r\/|google\.com\/maps/, 'Valid Google review link required'),
+  destinationUrl: safeHttpsUrlSchema,
   placementType: z.string().min(1),
   headline: z.string().min(1),
   tagline: z.string().max(100).optional(),
@@ -47,11 +75,51 @@ export const qrCreateSchema = z.object({
 
 export const qrPatchSchema = z.object({
   status: z.enum(['draft', 'active', 'archived']).optional(),
-  headline: z.string().min(1).optional(),
-  tagline: z.string().max(100).optional(),
+  placementName: z.string().trim().min(1).max(120).optional(),
+  headline: z.string().trim().min(1).max(100).optional(),
+  tagline: z.string().trim().max(120).optional(),
+  supportingText: z.string().trim().max(180).optional(),
   accentColor: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
-  destinationUrl: z.string().url().optional(),
-  template: z.string().min(1).optional(),
+  preset: z.string().regex(/^[a-z0-9-]{1,60}$/).optional(),
+  geometry: z.enum(['classic', 'rounded', 'dots', 'premium-eye']).optional(),
+  centerEmblem: z.enum(['google-g', 'business-logo']).optional(),
+  destinationMode: z.enum(['direct', 'guided']).optional(),
+}).refine((value) => Object.keys(value).length > 0, 'At least one QR field is required');
+
+export const qrDesignSchema = z.object({
+  placementName: z.string().trim().min(1).max(120),
+  headline: z.string().trim().min(1).max(100),
+  tagline: z.string().trim().max(120).default('Scan to share your experience'),
+  supportingText: z.string().trim().max(180).default(''),
+  accentColor: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+  preset: z.string().regex(/^[a-z0-9-]{1,60}$/),
+  geometry: z.enum(['classic', 'rounded', 'dots', 'premium-eye']),
+  centerEmblem: z.enum(['google-g', 'business-logo']),
+  destinationMode: z.enum(['direct', 'guided']).default('guided'),
+});
+
+export const reviewDestinationSchema = z.object({
+  destinationUrl: safeHttpsUrlSchema,
+  confirmed: z.literal(true, { error: 'Confirm that this is the correct business review destination' }),
+  businessName: z.string().trim().max(120).optional().default(''),
+  city: z.string().trim().max(120).optional().default(''),
+  category: businessCategorySchema.optional(),
+  subcategory: z.enum(['Accommodation', 'Dining', 'Banquet Services']).or(z.literal('')).optional(),
+}).superRefine((value, context) => {
+  if (value.subcategory && value.category && value.category !== 'Hotel') {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['subcategory'],
+      message: 'Hotel subcategories can only be used with the Hotel category.',
+    });
+  }
+});
+
+export const reviewSuggestionsSchema = z.object({
+  token: z.string().trim().min(20).max(128).regex(/^[A-Za-z0-9_-]+$/),
+  rating: z.number().int().min(1).max(5),
+  language: z.enum(['en', 'hi']),
+  experience: z.string().trim().min(1).max(300),
 });
 
 export const settingsProfileSchema = z.object({
@@ -78,19 +146,23 @@ export const deleteAccountSchema = z.object({
 });
 
 export const scanSchema = z.object({
-  token: z.string().min(1),
+  token: z.string().trim().min(20).max(128).regex(/^[A-Za-z0-9_-]+$/),
 });
 
 export const clickSchema = z.object({
-  token: z.string().min(1),
-  dest: z.enum(['google']),
+  token: z.string().trim().min(20).max(128).regex(/^[A-Za-z0-9_-]+$/),
 });
+
+export const publicQrTokenSchema = scanSchema;
 
 export type SignupInput = z.infer<typeof signupSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type OrgPatchInput = z.infer<typeof orgPatchSchema>;
 export type QrCreateInput = z.infer<typeof qrCreateSchema>;
 export type QrPatchInput = z.infer<typeof qrPatchSchema>;
+export type QrDesignInput = z.infer<typeof qrDesignSchema>;
+export type ReviewDestinationInput = z.infer<typeof reviewDestinationSchema>;
+export type ReviewSuggestionsInput = z.infer<typeof reviewSuggestionsSchema>;
 export type SettingsProfileInput = z.infer<typeof settingsProfileSchema>;
 export type SettingsPasswordInput = z.infer<typeof settingsPasswordSchema>;
 export type DeleteAccountInput = z.infer<typeof deleteAccountSchema>;

@@ -3,8 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { DashboardShell } from '@/components/layout/DashboardShell';
-import { getAnalyticsStats, getStoredQRCodes, deleteQRCode } from '@/lib/data-store';
+import { getStoredQRCodes, deleteQRCode } from '@/lib/data-store';
 import { QRCode } from '@/lib/types';
+import { isSupabaseConfigured } from '@/lib/supabase/env';
+import { validateReviewDestination } from '@/lib/review-destination';
 
 export default function MyQRCodesPage() {
   const [qrs, setQrs] = useState<QRCode[]>([]);
@@ -12,28 +14,57 @@ export default function MyQRCodesPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [stats, setStats] = useState({
-    totalScans: 0,
-    uniqueVisitors: null as number | null,
-    googleClicks: 0,
-    ctr: null as string | null,
-  });
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setQrs(getStoredQRCodes());
-    setStats(getAnalyticsStats());
+    let cancelled = false;
+    if (!isSupabaseConfigured) {
+      setQrs(getStoredQRCodes());
+      setIsLoading(false);
+      return;
+    }
+
+    void fetch('/api/qr')
+      .then(async (response) => {
+        const result = await response.json();
+        if (!response.ok || !Array.isArray(result.qrs)) {
+          throw new Error(result.message || result.code || 'Could not load your QR designs.');
+        }
+        return result.qrs as QRCode[];
+      })
+      .then((result) => {
+        if (!cancelled) setQrs(result);
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setLoadError(error instanceof Error ? error.message : 'Could not load your QR designs.');
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const handleDelete = (id: string, name: string) => {
-    if (confirm(`Are you sure you want to delete touchpoint "${name}"?`)) {
-      deleteQRCode(id);
-      setQrs(getStoredQRCodes());
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete touchpoint "${name}"?`)) return;
+    try {
+      if (isSupabaseConfigured) {
+        const response = await fetch(`/api/qr/${encodeURIComponent(id)}`, { method: 'DELETE' });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || result.code || 'QR deletion failed.');
+      } else {
+        deleteQRCode(id);
+      }
+      setQrs((current) => current.filter((qr) => qr.id !== id));
       showToast(`Deleted "${name}".`);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'QR deletion failed.');
     }
-  };
-
-  const handleDownload = (name: string, format: string) => {
-    showToast(`Downloading high-resolution ${format.toUpperCase()} for "${name}"...`);
   };
 
   const showToast = (msg: string) => {
@@ -76,18 +107,13 @@ export default function MyQRCodesPage() {
               My QR Codes
             </h1>
             <p className="text-sm text-[#414754] mt-1">
-              Manage, customize, and export your physical & counter review QR touchpoints.
+              {isSupabaseConfigured
+                ? 'Review QR designs saved to your authenticated account.'
+                : 'Review QR designs saved in this browser only.'}
             </p>
           </div>
 
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => showToast('Batch exporting all 6 stands as zip...')}
-              className="h-11 px-4 rounded-xl bg-white border border-slate-200 text-[#0B1C30] font-semibold text-xs shadow-sm hover:bg-slate-50 transition-all flex items-center gap-2"
-            >
-              <span className="material-symbols-outlined text-lg text-slate-500">archive</span>
-              <span>Batch Export</span>
-            </button>
             <Link
               href="/create-qr"
               className="h-11 px-5 rounded-xl bg-[#1A73E8] hover:bg-[#1557B0] text-white font-semibold text-xs shadow-md transition-all flex items-center gap-2 active:scale-95"
@@ -111,12 +137,12 @@ export default function MyQRCodesPage() {
             <div className="mt-4 flex items-baseline gap-2">
               <span className="text-3xl font-bold text-[#0B1C30]">{qrs.length}</span>
               <span className="text-xs text-slate-500 font-semibold flex items-center">
-                Saved in this browser
+                {isSupabaseConfigured ? 'Saved to your account' : 'Saved in this browser only'}
               </span>
             </div>
-            <div className="w-full bg-slate-100 h-1.5 rounded-full mt-4 overflow-hidden">
-              <div className="bg-[#1A73E8] h-full rounded-full" style={{ width: '86%' }}></div>
-            </div>
+            <p className="mt-4 text-xs text-slate-500">
+              {isSupabaseConfigured ? 'Owner-scoped Supabase persistence.' : 'QR design persistence is browser-local.'}
+            </p>
           </div>
 
           {/* Bento 2 */}
@@ -124,34 +150,33 @@ export default function MyQRCodesPage() {
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase text-[#565E74]">Active QR Codes</span>
               <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold">
-                Local only
+                {isSupabaseConfigured ? 'Account' : 'Local only'}
               </span>
             </div>
             <div className="mt-4 flex items-baseline gap-2">
               <span className="text-3xl font-bold text-[#0B1C30]">{activeCount}</span>
-              <span className="text-xs text-[#565E74]">of {qrs.length} deployed</span>
+              <span className="text-xs text-[#565E74]">of {qrs.length} saved</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs text-green-700 font-semibold mt-4">
               <span className="w-2 h-2 rounded-full bg-green-500"></span>
-              <span>Not synced to a database</span>
+              <span>{isSupabaseConfigured ? 'Stored in your account' : 'Not synced to a database'}</span>
             </div>
           </div>
 
           {/* Bento 3 */}
           <div className="p-6 rounded-2xl bg-white shadow-sm border border-slate-100 flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase text-[#565E74]">Total Scans</span>
+              <span className="text-xs font-bold uppercase text-[#565E74]">Scan analytics</span>
               <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#1A73E8] flex items-center justify-center">
                 <span className="material-symbols-outlined text-lg">visibility</span>
               </div>
             </div>
             <div className="mt-4 flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-[#0B1C30]">{stats.totalScans}</span>
-              <span className="text-xs text-slate-500 font-semibold">This browser only</span>
+              <span className="text-3xl font-bold text-[#0B1C30]">—</span>
+              <span className="text-xs text-slate-500 font-semibold">Unavailable</span>
             </div>
             <div className="flex items-center justify-between text-xs text-slate-500 mt-4">
-              <span>Conversion: <strong className="text-[#0B1C30]">{stats.ctr === null ? '—' : `${stats.ctr}%`}</strong></span>
-              <span className="text-slate-500 font-bold">Not synced</span>
+              <span>Owner-scoped totals are shown in Analytics.</span>
             </div>
           </div>
 
@@ -164,12 +189,13 @@ export default function MyQRCodesPage() {
               </div>
             </div>
             <div className="mt-3">
-              <div className="font-bold text-sm text-[#0B1C30] truncate">{qrs[0]?.placementName || 'Dining Stand'}</div>
-              <div className="text-xs text-slate-500 mt-0.5">Created 2 days ago • Table Tent</div>
+              <div className="font-bold text-sm text-[#0B1C30] truncate">{qrs[0]?.placementName || '—'}</div>
+              <div className="text-xs text-slate-500 mt-0.5">
+                {qrs[0]?.createdAt ? `Created ${new Date(qrs[0].createdAt).toLocaleDateString()}` : 'No QR codes created yet'}
+              </div>
             </div>
             <div className="pt-3 flex items-center justify-between text-xs text-[#1A73E8] font-semibold">
-              <span>Auto-sync connected</span>
-              <span className="material-symbols-outlined text-green-600 text-base">check_circle</span>
+              <span>{isSupabaseConfigured ? 'Stored in Supabase' : 'Cloud sync unavailable'}</span>
             </div>
           </div>
         </div>
@@ -218,6 +244,16 @@ export default function MyQRCodesPage() {
         </div>
 
         {/* QR Codes Grid */}
+        {loadError && (
+          <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+            {loadError}
+          </div>
+        )}
+        {isLoading ? (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-600">
+            Loading your QR designs…
+          </div>
+        ) : !loadError && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredQrs.map((qr) => (
             <div
@@ -253,38 +289,47 @@ export default function MyQRCodesPage() {
                 <div className="grid grid-cols-3 gap-2 py-3 px-3 bg-slate-50 rounded-xl mb-4 text-center">
                   <div>
                     <span className="text-[10px] text-slate-400 block font-semibold">SCANS</span>
-                    <span className="text-xs font-bold text-[#0B1C30]">384</span>
+                    <span className="text-xs font-bold text-[#0B1C30]">—</span>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 block font-semibold">CLICKS</span>
-                    <span className="text-xs font-bold text-[#1A73E8]">276</span>
+                    <span className="text-xs font-bold text-[#1A73E8]">—</span>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-400 block font-semibold">RATE</span>
-                    <span className="text-xs font-bold text-green-700">71.8%</span>
+                    <span className="text-xs font-bold text-slate-500">—</span>
                   </div>
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs font-semibold">
-                <Link
-                  href={`/qr/${qr.slug}`}
+                {(() => {
+                  const isDirect = qr.destinationMode === 'direct';
+                  const directUrl = isDirect && validateReviewDestination(qr.destinationUrl || '').valid
+                    ? qr.destinationUrl
+                    : undefined;
+                  const href = isDirect
+                    ? directUrl
+                    : qr.publicToken
+                    ? `/qr/${encodeURIComponent(qr.publicToken)}`
+                    : undefined;
+                  return (
+                <a
+                  href={href}
                   target="_blank"
-                  className="text-[#1A73E8] hover:underline flex items-center gap-1"
+                  rel="noopener noreferrer"
+                  aria-disabled={!href}
+                  className={`text-xs ${href ? 'text-[#005BBF] hover:underline' : 'text-slate-500'}`}
                 >
-                  <span>Test Mobile</span>
-                  <span className="material-symbols-outlined text-xs">open_in_new</span>
-                </Link>
+                  {isDirect
+                    ? href ? 'Open direct review destination' : 'Review destination unavailable'
+                    : href ? 'Open guided customer page' : 'Guided QR unavailable'}
+                </a>
+                  );
+                })()}
 
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleDownload(qr.placementName || qr.placementType || 'Stand Artwork', 'png')}
-                    className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800"
-                    title="Download PNG"
-                  >
-                    <span className="material-symbols-outlined text-base">download</span>
-                  </button>
                   <Link
                     href="/qr-studio"
                     className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800"
@@ -304,6 +349,29 @@ export default function MyQRCodesPage() {
             </div>
           ))}
         </div>
+        )}
+        {!isLoading && !loadError && filteredQrs.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
+            <h2 className="text-lg font-bold text-[#0B1C30]">
+              {qrs.length === 0 ? 'No QR codes created yet' : 'No QR codes match these filters'}
+            </h2>
+            <p className="mt-2 text-sm text-[#565E74]">
+              {qrs.length === 0
+                ? isSupabaseConfigured
+                  ? 'Create a QR design in QR Studio. It will be saved to your authenticated account.'
+                  : 'QR designs are saved in this browser and are not synced to Supabase.'
+                : 'Try a different search or status filter.'}
+            </p>
+            {qrs.length === 0 && (
+              <Link
+                href="/qr-studio"
+                className="mt-5 inline-flex h-10 items-center rounded-xl bg-[#1A73E8] px-4 text-xs font-semibold text-white"
+              >
+                Create a QR design
+              </Link>
+            )}
+          </div>
+        )}
       </div>
     </DashboardShell>
   );

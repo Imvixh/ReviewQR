@@ -6,6 +6,7 @@ export interface Organization {
   name: string;
   slug: string;
   category?: string;
+  subcategory?: string;
   city?: string;
   phone?: string;
   email?: string;
@@ -27,8 +28,10 @@ export interface QRCode {
   id: string;
   orgId: string;
   slug: string;
+  publicToken?: string;
   businessName: string;
-  destinationUrl: string;
+  destinationUrl?: string;
+  destinationMode?: 'direct' | 'guided';
   destinationPlaceId?: string;
   placementType?: string;
   placementName?: string;
@@ -41,8 +44,8 @@ export interface QRCode {
   centerEmblem?: 'google-g' | 'business-logo';
   logoUrl?: string;
   thumbnailUrl?: string;
+  supportingText?: string;
   status: 'draft' | 'active' | 'archived';
-  showStarBar?: boolean;
   emblemText?: string;
   createdAt?: string;
   updatedAt?: string;

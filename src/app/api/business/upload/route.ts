@@ -1,100 +1,117 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { isSupabaseConfigured } from '@/lib/supabase/env';
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-const ALLOWED_MIME_TYPES = [
-  'image/png',
-  'image/jpeg',
-  'image/webp',
-  'image/svg+xml',
-];
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const FILE_TYPES = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/webp': 'webp',
+} as const;
+const BUSINESS_ID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-export async function POST(req: NextRequest) {
-  try {
-    const formData = await req.formData();
-    const file = formData.get('file') as File | null;
-    const type = (formData.get('type') as string) || 'logo';
-    const orgId = (formData.get('orgId') as string) || 'org_royal_palace';
-
-    if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided in form data' },
-        { status: 400 }
-      );
-    }
-
-    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
-      return NextResponse.json(
-        {
-          error: `Invalid file format: ${file.type}. Allowed formats are PNG, JPEG, WebP, and SVG.`,
-        },
-        { status: 400 }
-      );
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        {
-          error: `File size (${(file.size / (1024 * 1024)).toFixed(2)} MB) exceeds 5 MB limit.`,
-        },
-        { status: 400 }
-      );
-    }
-
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const fileExt = file.name.split('.').pop() || (type === 'logo' ? 'png' : 'jpg');
-    const fileName = `${orgId}/${type}_${Date.now()}.${fileExt}`;
-
-    // Check if Supabase storage is accessible
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey =
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-    if (supabaseUrl && supabaseKey) {
-      try {
-        const { createClient } = await import('@supabase/supabase-js');
-        const supabase = createClient(supabaseUrl, supabaseKey);
-
-        const { error: uploadError } = await supabase.storage
-          .from('business-assets')
-          .upload(fileName, buffer, {
-            contentType: file.type,
-            upsert: true,
-          });
-
-        if (!uploadError) {
-          const { data: publicUrlData } = supabase.storage
-            .from('business-assets')
-            .getPublicUrl(fileName);
-
-          return NextResponse.json({
-            success: true,
-            url: publicUrlData.publicUrl,
-            path: fileName,
-            type,
-            storage: 'supabase',
-          });
-        }
-      } catch (storageErr) {
-        console.warn('Supabase upload attempt failed, falling back to data URL:', storageErr);
-      }
-    }
-
-    // Fallback: Return Base64 Data URL for immediate responsive preview and local storage
-    const base64Data = buffer.toString('base64');
-    const dataUrl = `data:${file.type};base64,${base64Data}`;
-
-    return NextResponse.json({
-      success: true,
-      url: dataUrl,
-      path: `local/${fileName}`,
-      type,
-      storage: 'local',
-    });
-  } catch (err: any) {
-    return NextResponse.json(
-      { error: err?.message || 'Failed to process file upload' },
-      { status: 500 }
-    );
+export async function POST(request: NextRequest) {
+  if (!isSupabaseConfigured) {
+    return NextResponse.json({ code: 'SUPABASE_NOT_CONFIGURED' }, { status: 503 });
   }
+
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return NextResponse.json({ code: 'UNAUTHENTICATED' }, { status: 401 });
+  }
+
+  let formData: FormData;
+  try {
+    formData = await request.formData();
+  } catch {
+    return NextResponse.json({ code: 'INVALID_FORM_DATA' }, { status: 400 });
+  }
+
+  const file = formData.get('file');
+  const businessId = formData.get('orgId');
+  const type = formData.get('type');
+  if (!(file instanceof File) || typeof businessId !== 'string') {
+    return NextResponse.json({ code: 'UPLOAD_FIELDS_REQUIRED' }, { status: 400 });
+  }
+  if (type !== 'logo' && type !== 'thumbnail') {
+    return NextResponse.json({ code: 'INVALID_ASSET_TYPE' }, { status: 400 });
+  }
+  if (!BUSINESS_ID_PATTERN.test(businessId)) {
+    return NextResponse.json({ code: 'INVALID_BUSINESS_ID' }, { status: 400 });
+  }
+
+  const extension = FILE_TYPES[file.type as keyof typeof FILE_TYPES];
+  if (!extension) {
+    return NextResponse.json({ code: 'UNSUPPORTED_IMAGE_TYPE' }, { status: 415 });
+  }
+  if (file.size === 0 || file.size > MAX_FILE_SIZE) {
+    return NextResponse.json({ code: 'INVALID_FILE_SIZE' }, { status: 400 });
+  }
+
+  const { data: business, error: businessError } = await supabase
+    .from('businesses')
+    .select('id')
+    .eq('id', businessId)
+    .eq('owner_id', user.id)
+    .maybeSingle();
+  if (businessError) {
+    console.error('Failed to authorize business branding upload:', businessError);
+    return NextResponse.json({ code: 'BUSINESS_LOOKUP_FAILED' }, { status: 500 });
+  }
+  if (!business) {
+    return NextResponse.json({ code: 'BUSINESS_NOT_FOUND' }, { status: 404 });
+  }
+
+  const path = `${user.id}/${business.id}/${type}-${crypto.randomUUID()}.${extension}`;
+  const { error: uploadError } = await supabase.storage
+    .from('business-assets')
+    .upload(path, await file.arrayBuffer(), {
+      contentType: file.type,
+      upsert: false,
+    });
+
+  if (uploadError) {
+    console.error('Failed to upload business branding asset:', uploadError);
+    return NextResponse.json({ code: 'ASSET_UPLOAD_FAILED' }, { status: 502 });
+  }
+
+  const { data: signedAsset, error: signedAssetError } = await supabase.storage
+    .from('business-assets')
+    .createSignedUrl(path, 60 * 60);
+  if (signedAssetError || !signedAsset) {
+    console.error('Failed to create a private business asset URL:', signedAssetError);
+    const { error: cleanupError } = await supabase.storage.from('business-assets').remove([path]);
+    if (cleanupError) {
+      console.error('Failed to clean up branding asset after URL signing failed:', cleanupError);
+    }
+    return NextResponse.json({ code: 'ASSET_URL_CREATION_FAILED' }, { status: 502 });
+  }
+
+  const update = type === 'logo'
+    ? { logo_url: null, logo_path: path }
+    : { thumbnail_url: null, thumbnail_path: path };
+  const { error: saveError } = await supabase
+    .from('businesses')
+    .update(update)
+    .eq('id', business.id)
+    .eq('owner_id', user.id);
+
+  if (saveError) {
+    console.error('Failed to save business branding asset metadata:', saveError);
+    const { error: cleanupError } = await supabase.storage.from('business-assets').remove([path]);
+    if (cleanupError) {
+      console.error('Failed to clean up branding asset after metadata persistence failed:', cleanupError);
+    }
+    return NextResponse.json({ code: 'ASSET_METADATA_SAVE_FAILED' }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    success: true,
+    url: signedAsset.signedUrl,
+    path,
+    type,
+    storage: 'supabase',
+  });
 }

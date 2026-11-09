@@ -1,31 +1,32 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { DashboardShell } from '@/components/layout/DashboardShell';
 import { getStoredOrg, getStoredUser, setStoredOrg, setStoredUser } from '@/lib/data-store';
 import { Organization, SessionUser } from '@/lib/types';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
 
 export default function SettingsPage() {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [org, setOrg] = useState<Organization | null>(null);
 
   // Profile fields
-  const [fullName, setFullName] = useState('Rajesh Kumar');
-  const [roleTitle, setRoleTitle] = useState('General Manager');
-  const [email, setEmail] = useState('rajesh.kumar@royalpalace.in');
-  const [phone, setPhone] = useState('+91 98765 43210');
+  const [fullName, setFullName] = useState('');
+  const [roleTitle, setRoleTitle] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [language, setLanguage] = useState<'en' | 'hi'>('en');
 
   // Business Profile & Branding Fields (Unified from business-profile page)
-  const [businessName, setBusinessName] = useState('Royal Palace Hotel');
-  const [category, setCategory] = useState('Restaurant & Lounge');
-  const [city, setCity] = useState('Bettiah, Bihar');
-  const [businessPhone, setBusinessPhone] = useState('+91 98765 43210');
-  const [businessEmail, setBusinessEmail] = useState('manager@royalpalacehotel.in');
-  const [businessAddress, setBusinessAddress] = useState('Station Road, Near Super Market, Bettiah, Bihar - 845438');
-  const [googleReviewUrl, setGoogleReviewUrl] = useState('https://g.page/r/Cbll2345abc992eEBM/review');
+  const [businessName, setBusinessName] = useState('');
+  const [category, setCategory] = useState('');
+  const [city, setCity] = useState('');
+  const [businessPhone, setBusinessPhone] = useState('');
+  const [businessEmail, setBusinessEmail] = useState('');
+  const [businessAddress, setBusinessAddress] = useState('');
   const [accentColor, setAccentColor] = useState('#1A73E8');
-  const [tagline, setTagline] = useState('Your honest feedback helps our culinary staff serve you better.');
+  const [tagline, setTagline] = useState('');
 
   // Asset states
   const [logoUrl, setLogoUrl] = useState<string>('');
@@ -33,22 +34,9 @@ export default function SettingsPage() {
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [isUploadingThumb, setIsUploadingThumb] = useState(false);
 
-  // Defaults
-  const [defaultFormat, setDefaultFormat] = useState('png');
-  const [show5StarDefault, setShow5StarDefault] = useState(true);
-  const [includeBleedDefault, setIncludeBleedDefault] = useState(true);
-
-  // Notifications toggles
-  const [weeklyDigest, setWeeklyDigest] = useState(true);
-  const [milestoneAlerts, setMilestoneAlerts] = useState(true);
-  const [productUpdates, setProductUpdates] = useState(true);
-  const [instantSurgeAlerts, setInstantSurgeAlerts] = useState(false);
-
   // Security
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteConfirmationPhrase, setDeleteConfirmationPhrase] = useState('');
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -69,7 +57,6 @@ export default function SettingsPage() {
     if (o.phone) setBusinessPhone(o.phone);
     if (o.email) setBusinessEmail(o.email);
     if (o.address) setBusinessAddress(o.address);
-    if (o.googleReviewUrl) setGoogleReviewUrl(o.googleReviewUrl);
     if (o.accentColor) setAccentColor(o.accentColor);
     if (o.tagline) setTagline(o.tagline);
     if (o.logoUrl) setLogoUrl(o.logoUrl);
@@ -85,12 +72,12 @@ export default function SettingsPage() {
 
   const handleUpdateProfile = (e: React.FormEvent) => {
     e.preventDefault();
-    setStoredUser({
-      ...user!,
-      displayName: fullName,
-      email,
-    });
-    showToast('Account profile successfully updated!');
+    if (!user) {
+      showToast('No authenticated profile is available to update.');
+      return;
+    }
+    setStoredUser({ ...user, displayName: fullName, email });
+    showToast('Profile changes are only stored in this browser; server profile updates are unavailable.');
   };
 
   const handleSaveBusinessProfile = (e: React.FormEvent) => {
@@ -102,22 +89,21 @@ export default function SettingsPage() {
       phone: businessPhone,
       email: businessEmail,
       address: businessAddress,
-      googleReviewUrl,
       accentColor,
       tagline,
       logoUrl,
       thumbnailUrl,
     });
     setOrg(updated);
-    showToast('Business details and branding assets saved!');
+    showToast('Business changes are only stored in this browser; server profile updates are unavailable.');
   };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      showToast('Please upload a valid image file (PNG, JPG, SVG, WebP).');
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+      showToast('Upload a PNG, JPEG, or WebP image.');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
@@ -130,53 +116,39 @@ export default function SettingsPage() {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', 'logo');
-      formData.append('orgId', org?.id || 'org_royal_palace');
+      if (!org?.id) {
+        throw new Error('Save your business review destination before uploading a logo.');
+      }
+      formData.append('orgId', org.id);
 
       const res = await fetch('/api/business/upload', {
         method: 'POST',
         body: formData,
       });
       const data = await res.json();
-      if (data.success && data.url) {
-        setLogoUrl(data.url);
-        setStoredOrg({ logoUrl: data.url, logoPath: data.path });
-        showToast('Business logo updated successfully!');
-      } else {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const val = reader.result as string;
-          setLogoUrl(val);
-          setStoredOrg({ logoUrl: val });
-          showToast('Business logo updated!');
-        };
-        reader.readAsDataURL(file);
+      if (!res.ok || !data.success || !data.url) {
+        throw new Error(data.message || data.code || 'Business logo upload failed.');
       }
-    } catch {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const val = reader.result as string;
-        setLogoUrl(val);
-        setStoredOrg({ logoUrl: val });
-        showToast('Business logo updated!');
-      };
-      reader.readAsDataURL(file);
+      setLogoUrl(data.url);
+      setStoredOrg({ logoUrl: data.url, logoPath: data.path });
+      showToast('Business logo uploaded.');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Business logo upload failed.');
     } finally {
       setIsUploadingLogo(false);
     }
   };
 
   const handleRemoveLogo = () => {
-    setLogoUrl('');
-    setStoredOrg({ logoUrl: '', logoPath: '' });
-    showToast('Business logo removed.');
+    showToast('Logo removal is unavailable. No stored logo was changed.');
   };
 
   const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      showToast('Please upload a valid image file (PNG, JPG, WebP).');
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+      showToast('Upload a PNG, JPEG, or WebP image.');
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
@@ -189,52 +161,34 @@ export default function SettingsPage() {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', 'thumbnail');
-      formData.append('orgId', org?.id || 'org_royal_palace');
+      if (!org?.id) {
+        throw new Error('Save your business review destination before uploading a cover image.');
+      }
+      formData.append('orgId', org.id);
 
       const res = await fetch('/api/business/upload', {
         method: 'POST',
         body: formData,
       });
       const data = await res.json();
-      if (data.success && data.url) {
-        setThumbnailUrl(data.url);
-        setStoredOrg({ thumbnailUrl: data.url, thumbnailPath: data.path });
-        showToast('Cover thumbnail updated successfully!');
-      } else {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const val = reader.result as string;
-          setThumbnailUrl(val);
-          setStoredOrg({ thumbnailUrl: val });
-          showToast('Cover thumbnail updated!');
-        };
-        reader.readAsDataURL(file);
+      if (!res.ok || !data.success || !data.url) {
+        throw new Error(data.message || data.code || 'Cover image upload failed.');
       }
-    } catch {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const val = reader.result as string;
-        setThumbnailUrl(val);
-        setStoredOrg({ thumbnailUrl: val });
-        showToast('Cover thumbnail updated!');
-      };
-      reader.readAsDataURL(file);
+      setThumbnailUrl(data.url);
+      setStoredOrg({ thumbnailUrl: data.url, thumbnailPath: data.path });
+      showToast('Cover thumbnail uploaded.');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Cover image upload failed.');
     } finally {
       setIsUploadingThumb(false);
     }
   };
 
   const handleRemoveThumbnail = () => {
-    setThumbnailUrl('');
-    setStoredOrg({ thumbnailUrl: '', thumbnailPath: '' });
-    showToast('Cover thumbnail removed.');
+    showToast('Cover image removal is unavailable. No stored image was changed.');
   };
 
-  const handleSaveDefaults = () => {
-    showToast('Business & QR defaults saved!');
-  };
-
-  const handleUpdatePassword = (e: React.FormEvent) => {
+  const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentPassword || !newPassword) {
       showToast('Please fill out both current and new password fields.');
@@ -244,19 +198,25 @@ export default function SettingsPage() {
       showToast('New password must be at least 8 characters.');
       return;
     }
-    setCurrentPassword('');
-    setNewPassword('');
-    showToast('Password updated successfully!');
-  };
-
-  const handleExecutePurge = () => {
-    if (deleteConfirmationPhrase !== (org?.name || 'Royal Palace Hotel')) {
-      alert(`Confirmation phrase does not match "${org?.name || 'Royal Palace Hotel'}".`);
+    if (!isSupabaseConfigured || !user?.email) {
+      showToast('Password update is unavailable without an authenticated Supabase account.');
       return;
     }
-    alert('Account and QR touchpoint data scheduled for purge.');
-    setShowDeleteModal(false);
-    window.location.href = '/';
+    try {
+      const supabase = createClient();
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      });
+      if (verifyError) throw verifyError;
+      const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
+      if (updateError) throw updateError;
+      setCurrentPassword('');
+      setNewPassword('');
+      showToast('Password updated.');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Password update failed.');
+    }
   };
 
   return (
@@ -265,7 +225,7 @@ export default function SettingsPage() {
       <input
         ref={logoInputRef}
         type="file"
-        accept="image/png,image/jpeg,image/webp,image/svg+xml"
+        accept="image/png,image/jpeg,image/webp"
         className="hidden"
         onChange={handleLogoUpload}
       />
@@ -282,45 +242,6 @@ export default function SettingsPage() {
           <div className="fixed bottom-6 right-6 z-50 bg-[#0B1C30] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-700 animate-slide-up">
             <span className="material-symbols-outlined text-green-400 text-xl">check_circle</span>
             <span className="text-xs font-semibold">{toastMessage}</span>
-          </div>
-        )}
-
-        {/* Delete Confirmation Modal */}
-        {showDeleteModal && (
-          <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-scale-up">
-              <div className="flex items-center gap-3 text-red-600">
-                <span className="material-symbols-outlined text-3xl">warning</span>
-                <h3 className="font-bold text-lg text-[#0B1C30]">Delete Account & Purge QRs</h3>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                This action is irreversible. All physical QR stands, analytics telemetry, and touchpoint associations will be permanently purged.
-              </p>
-              <div className="p-3 bg-red-50 rounded-xl border border-red-200 text-xs text-red-800">
-                To confirm, type <strong className="font-mono">{org?.name || 'Royal Palace Hotel'}</strong> below:
-              </div>
-              <input
-                type="text"
-                value={deleteConfirmationPhrase}
-                onChange={(e) => setDeleteConfirmationPhrase(e.target.value)}
-                placeholder="Type business name to confirm"
-                className="w-full h-11 px-3.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:border-red-500"
-              />
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <button
-                  onClick={() => setShowDeleteModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleExecutePurge}
-                  className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-md"
-                >
-                  Confirm Permanent Delete
-                </button>
-              </div>
-            </div>
           </div>
         )}
 
@@ -427,7 +348,7 @@ export default function SettingsPage() {
                       </div>
                     </div>
                   </div>
-                  <span className="text-[11px] text-slate-400">PNG, JPG, SVG, WebP up to 5MB</span>
+                  <span className="text-[11px] text-slate-400">PNG, JPG, or WebP up to 5MB</span>
                 </div>
 
                 {/* B. Cover Thumbnail Box */}
@@ -513,13 +434,18 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="font-semibold text-slate-700 block mb-1">Official Google Review Destination URL</label>
-                    <input
-                      type="url"
-                      value={googleReviewUrl}
-                      onChange={(e) => setGoogleReviewUrl(e.target.value)}
-                      className="w-full h-11 px-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono focus:bg-white focus:outline-none focus:border-[#1A73E8]"
-                    />
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                      <p className="font-semibold text-slate-700">Review destination</p>
+                      <p className="mt-1 text-xs leading-5 text-[#565E74]">
+                        Find, confirm, and save the review destination in the unified QR editor.
+                      </p>
+                      <Link
+                        href="/qr-studio"
+                        className="mt-3 inline-flex min-h-10 items-center rounded-lg bg-[#EFF4FF] px-3 py-2 text-xs font-bold text-[#005BBF] hover:bg-[#DCE9FF]"
+                      >
+                        Manage review destination
+                      </Link>
+                    </div>
                   </div>
                   <div className="sm:col-span-2">
                     <label className="font-semibold text-slate-700 block mb-1">Venue Address</label>
@@ -637,62 +563,15 @@ export default function SettingsPage() {
                     <span className="material-symbols-outlined text-xl">tune</span>
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm text-[#0B1C30]">QR Stand Defaults</h3>
-                    <p className="text-xs text-[#565E74]">Default settings applied when creating new physical stands</p>
+                    <h3 className="font-bold text-sm text-[#0B1C30]">QR Export Capabilities</h3>
+                    <p className="text-xs text-[#565E74]">Export preferences are not configurable yet.</p>
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Preferred Download Format</label>
-                  <select
-                    value={defaultFormat}
-                    onChange={(e) => setDefaultFormat(e.target.value)}
-                    className="w-full h-11 px-3 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none"
-                  >
-                    <option value="png">PNG RGB (Digital / Fast Print)</option>
-                    <option value="pdf">Print-Ready PDF CMYK (Commercial 300 DPI)</option>
-                    <option value="svg">Vector SVG (Unlimited Scalability)</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col justify-center gap-2 pt-2">
-                  <div className="flex items-center gap-2">
-                    <input
-                      id="defStar"
-                      type="checkbox"
-                      checked={show5StarDefault}
-                      onChange={(e) => setShow5StarDefault(e.target.checked)}
-                      className="w-4 h-4 rounded text-[#1A73E8]"
-                    />
-                    <label htmlFor="defStar" className="font-medium text-slate-700 cursor-pointer">
-                      Show Google 5-Star bar by default
-                    </label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <input
-                      id="defBleed"
-                      type="checkbox"
-                      checked={includeBleedDefault}
-                      onChange={(e) => setIncludeBleedDefault(e.target.checked)}
-                      className="w-4 h-4 rounded text-[#1A73E8]"
-                    />
-                    <label htmlFor="defBleed" className="font-medium text-slate-700 cursor-pointer">
-                      Include commercial crop marks &amp; 3mm bleed
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end pt-2">
-                <button
-                  type="button"
-                  onClick={handleSaveDefaults}
-                  className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#0B1C30] font-semibold text-xs transition-colors"
-                >
-                  Save Defaults
-                </button>
+              <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-xs text-slate-600">
+                QR Studio currently downloads PNG artwork and opens the browser print dialog. Resolution,
+                PDF output, crop marks, bleed, and export preference persistence are not verified.
               </div>
             </section>
 
@@ -705,58 +584,13 @@ export default function SettingsPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-sm text-[#0B1C30]">Notification Preferences</h3>
-                    <p className="text-xs text-[#565E74]">Email summaries and instant scan telemetry alerts</p>
+                    <p className="text-xs text-[#565E74]">Email notifications are not configured.</p>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-3 text-xs">
-                {[
-                  {
-                    title: 'Weekly Scan & Performance Summary',
-                    desc: 'A Monday morning digest summarizing scans, Google clicks, and conversion rates.',
-                    val: weeklyDigest,
-                    setter: setWeeklyDigest,
-                  },
-                  {
-                    title: 'Milestone Scan Alerts',
-                    desc: 'Celebration email when your stands reach 500, 1,000, and 5,000 customer scans.',
-                    val: milestoneAlerts,
-                    setter: setMilestoneAlerts,
-                  },
-                  {
-                    title: 'Instant Scan Surge Alerts',
-                    desc: 'Notify manager when more than 50 scans occur in a 1-hour rush window.',
-                    val: instantSurgeAlerts,
-                    setter: setInstantSurgeAlerts,
-                  },
-                  {
-                    title: 'Product Updates & Google Policy Changes',
-                    desc: 'Critical notices regarding Google Business Profile review policies and features.',
-                    val: productUpdates,
-                    setter: setProductUpdates,
-                  },
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <div>
-                      <div className="font-bold text-[#0B1C30]">{item.title}</div>
-                      <div className="text-[11px] text-slate-500 mt-0.5">{item.desc}</div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => item.setter(!item.val)}
-                      className={`w-11 h-6 flex items-center rounded-full p-1 transition-colors ${
-                        item.val ? 'bg-[#1A73E8]' : 'bg-slate-300'
-                      }`}
-                    >
-                      <div
-                        className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${
-                          item.val ? 'translate-x-5' : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
-                  </div>
-                ))}
+              <div className="rounded-xl bg-slate-50 border border-slate-200 p-4 text-xs text-slate-600">
+                ReviewQR does not currently send scan reports, milestone alerts, or product-update emails.
               </div>
             </section>
 
@@ -769,7 +603,7 @@ export default function SettingsPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-sm text-[#0B1C30]">Security &amp; Sessions</h3>
-                    <p className="text-xs text-[#565E74]">Password updates and active device session management</p>
+                    <p className="text-xs text-[#565E74]">Password updates are available for configured Supabase accounts; session management is unavailable.</p>
                   </div>
                 </div>
               </div>
@@ -814,23 +648,19 @@ export default function SettingsPage() {
                 <span className="material-symbols-outlined text-2xl">dangerous</span>
                 <div>
                   <h3 className="font-bold text-sm text-red-900">Danger Zone</h3>
-                  <p className="text-xs text-red-700">Irreversible actions that affect your venue account and QR stands</p>
+                  <p className="text-xs text-red-700">Account and data deletion controls are not implemented.</p>
                 </div>
               </div>
               <div className="p-4 bg-white rounded-xl border border-red-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                  <div className="font-bold text-xs text-[#0B1C30]">Purge Account &amp; All QR Telemetry</div>
+                  <div className="font-bold text-xs text-[#0B1C30]">Account and data deletion</div>
                   <div className="text-[11px] text-slate-500 mt-0.5">
-                    Permanently delete all touchpoints, scanned review data, and venue assets.
+                    No account, QR, analytics, or asset data will be changed from this page.
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setShowDeleteModal(true)}
-                  className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-sm transition-all shrink-0"
-                >
-                  Purge Data...
-                </button>
+                <span className="shrink-0 rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-600">
+                  Unavailable
+                </span>
               </div>
             </section>
           </div>

@@ -1,20 +1,31 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { setStoredUser } from '@/lib/data-store';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#F8F9FF]" />}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
-  const [email, setEmail] = useState('rajesh.kumar@royalpalace.in');
-  const [password, setPassword] = useState('password123');
+  const searchParams = useSearchParams();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showRecoveryBanner, setShowRecoveryBanner] = useState(false);
+  const [recoveryMessage, setRecoveryMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     if (!email || !password) {
@@ -23,33 +34,83 @@ export default function LoginPage() {
     }
 
     setIsLoading(true);
-    // Authenticate and save user session
-    setTimeout(() => {
+    try {
+      if (!isSupabaseConfigured) {
+        throw new Error('Sign-in is unavailable because Supabase is not configured.');
+      }
+
+      const supabase = createClient();
+      const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+      if (authError) throw authError;
+      if (!data.user) throw new Error('Authentication did not return a user.');
+
       setStoredUser({
-        id: 'usr_rajesh_kumar',
-        email,
-        displayName: 'Rajesh Kumar',
-        orgId: 'org_royal_palace',
+        id: data.user.id,
+        email: data.user.email || email,
+        displayName: data.user.user_metadata.full_name || '',
         role: 'admin',
       });
+
+      const requestedPath = searchParams.get('redirectTo');
+      const destination =
+        requestedPath?.startsWith('/') && !requestedPath.startsWith('//')
+          ? requestedPath
+          : '/dashboard';
+      router.push(destination);
+    } catch (authError) {
+      setError(authError instanceof Error ? authError.message : 'Could not sign in. Please try again.');
+    } finally {
       setIsLoading(false);
-      router.push('/dashboard');
-    }, 400);
+    }
   };
 
-  const handleGoogleSSO = () => {
+  const handleGoogleSSO = async () => {
+    if (!isSupabaseConfigured) {
+      setError('Google sign-in is unavailable because Supabase is not configured.');
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
-      setStoredUser({
-        id: 'usr_google_' + Date.now(),
-        email: 'rajesh.kumar@gmail.com',
-        displayName: 'Rajesh Kumar (Google)',
-        orgId: 'org_royal_palace',
-        role: 'admin',
+    setError(null);
+    try {
+      const supabase = createClient();
+      const { error: authError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: `${window.location.origin}/dashboard` },
       });
+      if (authError) throw authError;
+    } catch (authError) {
+      setError(authError instanceof Error ? authError.message : 'Could not start Google sign-in.');
       setIsLoading(false);
-      router.push('/dashboard');
-    }, 500);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    setError(null);
+    setRecoveryMessage(null);
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Enter a valid email address before requesting a password reset.');
+      return;
+    }
+    if (!isSupabaseConfigured) {
+      setError('Password reset is unavailable because Supabase is not configured.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const supabase = createClient();
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/login`,
+      });
+      if (resetError) throw resetError;
+      setShowRecoveryBanner(true);
+      setRecoveryMessage('If an account exists for this address, Supabase will send a password reset link.');
+    } catch (resetError) {
+      setError(resetError instanceof Error ? resetError.message : 'Could not request a password reset.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -95,14 +156,14 @@ export default function LoginPage() {
               <div className="relative z-10 space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white text-[#005BBF] text-xs font-bold tracking-wider uppercase shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-[#1A73E8] animate-pulse"></span>
-                  Verified SaaS Authentication
+                  ReviewQR account sign-in
                 </div>
                 <div className="space-y-2 max-w-xl">
                   <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0B1C30] tracking-tight">
                     Welcome back to <span className="text-[#005BBF]">smarter reviews.</span>
                   </h1>
                   <p className="text-base text-[#414754] leading-relaxed">
-                    Manage your QR posters, customize your brand experience, and understand customer engagement from one place.
+                    Sign in to manage your business destination. QR design cloud storage and engagement analytics are not currently available.
                   </p>
                 </div>
               </div>
@@ -126,10 +187,9 @@ export default function LoginPage() {
                         <span className="text-xl font-bold text-[#0B1C30]">—</span>
                       </div>
                       {/* SVG Sparkline */}
-                      <svg className="w-full h-8 text-[#1A73E8]" preserveAspectRatio="none" viewBox="0 0 100 24">
-                        <path d="M0,20 Q15,18 28,12 T50,8 T72,14 T100,2" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="2.5" />
-                        <path d="M0,20 Q15,18 28,12 T50,8 T72,14 T100,2 L100,24 L0,24 Z" fill="currentColor" fillOpacity="0.12" />
-                      </svg>
+                      <div className="flex h-8 items-center justify-center rounded-lg bg-slate-50 text-[10px] text-slate-500">
+                        Analytics are not available
+                      </div>
                       <div className="grid grid-cols-2 gap-2 pt-1">
                         <div className="bg-slate-50 p-2 rounded-lg">
                           <span className="text-[10px] text-slate-500 block">Active Stands</span>
@@ -149,18 +209,12 @@ export default function LoginPage() {
                       <div className="w-7 h-7 mx-auto rounded-full bg-blue-50 text-[#1A73E8] flex items-center justify-center">
                         <span className="material-symbols-outlined text-base">hotel</span>
                       </div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Royal Palace</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Your business</p>
                       <p className="text-xs font-bold text-[#0B1C30]">Review us on Google</p>
                       <div className="p-2 bg-slate-50 rounded-xl my-2 flex justify-center">
                         <span className="material-symbols-outlined text-5xl text-[#0B1C30]">qr_code_2</span>
                       </div>
-                      <div className="flex items-center justify-center gap-0.5 text-[#FBBC04]">
-                        {[1, 2, 3, 4, 5].map((s) => (
-                          <span key={s} className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
-                            star
-                          </span>
-                        ))}
-                      </div>
+                      <p className="text-[10px] text-slate-500">Customers choose what to share</p>
                     </div>
                   </div>
                 </div>
@@ -169,12 +223,12 @@ export default function LoginPage() {
               {/* Lower Trust Indicator */}
               <div className="relative z-10 pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white/70 backdrop-blur-sm p-4 rounded-2xl border border-white">
                 <div className="flex items-center gap-2 text-[#0B1C30]">
-                  <span className="material-symbols-outlined text-[#006D2C] text-xl">verified_user</span>
+                  <span className="material-symbols-outlined text-[#005BBF] text-xl">info</span>
                   <span className="text-xs font-semibold">Your review experience, beautifully organized.</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-slate-500 text-[11px] font-semibold">
                   <span className="material-symbols-outlined text-[15px] text-[#1A73E8]">lock</span>
-                  <span>SOC-2 Type II & Google API Compliant</span>
+                  <span>Service availability depends on your Supabase configuration.</span>
                 </div>
               </div>
             </div>
@@ -185,7 +239,6 @@ export default function LoginPage() {
                 <div>
                   <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-bold text-[#0B1C30] tracking-tight">Welcome back</h2>
-                    <span className="w-2.5 h-2.5 rounded-full bg-green-500" title="All Services Operational"></span>
                   </div>
                   <p className="text-sm text-[#414754] mt-1">
                     Log in to your ReviewQR account to continue.
@@ -203,8 +256,8 @@ export default function LoginPage() {
                   <div className="bg-blue-50 border border-blue-200 rounded-xl p-3.5 text-left flex items-start gap-2.5">
                     <span className="material-symbols-outlined text-[#1A73E8] text-lg mt-0.5">mark_email_read</span>
                     <div className="flex-1 text-xs">
-                      <p className="font-bold text-[#0B1C30]">Reset Link Sent</p>
-                      <p className="text-[#414754] mt-0.5">Check your inbox for a magic link to reset credentials safely.</p>
+                      <p className="font-bold text-[#0B1C30]">Password reset request submitted</p>
+                      <p className="text-[#414754] mt-0.5">{recoveryMessage}</p>
                     </div>
                     <button onClick={() => setShowRecoveryBanner(false)} className="text-slate-400 hover:text-slate-700">
                       <span className="material-symbols-outlined text-sm">close</span>
@@ -243,7 +296,8 @@ export default function LoginPage() {
                       </label>
                       <button
                         type="button"
-                        onClick={() => setShowRecoveryBanner(true)}
+                        onClick={handlePasswordReset}
+                        disabled={isLoading}
                         className="text-xs text-[#1A73E8] font-semibold hover:underline"
                       >
                         Forgot password?

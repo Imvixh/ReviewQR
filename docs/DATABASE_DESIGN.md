@@ -1,94 +1,53 @@
 # Database Design — ReviewQR
 
-Primary engine: Supabase PostgreSQL. Schemas below are assumed after `supabase db push`.
+This document describes the schema present in the checked-in Supabase migrations. On 2026-11-09, read-only schema inspection and disposable two-account integration tests were run against the Supabase project configured in `.env.local`; the user reports that the security migration was manually applied. The expected QR columns and token-scoped functions were present and exercised. The migration ledger and `pg_policies` catalog were not accessible with the configured credentials, so the exact applied migration record and policy definitions were not independently inspected. The original migration file's header records its state when authored and is not evidence of its current hosted status.
 
-## Tables
+## Migration-backed tables
 
-### organizations
-| col | type | notes |
-|---|---|---|
-| id uuid pk | | org owner |
-| name text not null | e.g., Royal Palace Hotel | business entity |
-| slug text unique | url-safe | |
-| category text | Restaurant & Lounge / Hotel & Lodging … | |
-| city text | | |
-| phone text | optional | |
-| email text unique | manager contact | |
-| address text | | |
-| accent_color text | hex | default `#1a73e8` |
-| created_at timestamptz default now() | | |
+The initial migration, `supabase/migrations/20261107000001_initial_schema.sql`, creates:
 
-### users
-| col | type | |
-|---|---|---|
-| id uuid pk | | |
-| org_id uuid fk→organizations.id | | one user per org (operator) |
-| email text unique | | |
-| display_name text | | |
-| password_hash text | | never store plaintext |
-| role text | operator/admin | |
+### `public.profiles`
 
-### qr_codes
-| col | type | |
-|---|---|---|
-| id uuid pk | | |
-| org_id fk | | |
-| slug text unique | | `slug = org_slug + '-' + nanoid(8)` |
-| business_name text | denormalized cache | |
-| destination_url text | g.page/r/… shortlink | |
-| destination_place_id text | | |
-| placement_type text | A5 Acrylic Stand / A6 Mini Table Tent / Counter Sticker … |
-| accent_color text | |
-| headline text | "Review us on Google" |
-| tagline text | |
-| current_template text | template preset key |
-| status text | draft / active / archived |
-| created_at timestamptz | |
-| updated_at timestamptz | |
+`id` references `auth.users(id)`; the row stores full name, email, role, optional phone/avatar, and timestamps. An auth-user trigger inserts a profile and default preferences.
 
-### qr_analytics
-| col | type | |
-|---|---|---|
-| id bigserial pk | | |
-| qr_code_id uuid fk | | |
-| event text enum | scan / unique_visitor / google_click | only observable events |
-| occurred_at timestamptz default now() | |
+### `public.businesses`
 
-Indexes: `qr_analytics(qr_code_id, occurred_at)`, `qr_analytics(event)`.
+Stores `owner_id`, name, unique slug, category, city, contact and address fields, `google_review_url`, optional `google_place_id`, branding fields, verification flag, and timestamps. The business-assets migration adds `logo_path`, `thumbnail_url`, and `thumbnail_path`.
 
-### reviews (record-only, not fabricated)
-Store the *intent* metadata captured during the customer flow so owners can request follow-ups later — NOT the submitted content. Always marked `status=submitted_external`.
-| col | type | |
-|---|---|---|
-| id uuid pk | | |
-| qr_code_id fk | | |
-| star int | 1..5 | |
-| suggestion_category text | Hospitality & Staff / Food & Ambience / Overall Impression | |
-| review_draft text | short pre-filled phrase from provider | |
-| email_present bool | whether customer left identity card | |
-| status text | requested / replied / completed | |
-| created_at timestamptz | |
+The free Maps workflow does not infer or persist a Place ID. The destination URL is a user-confirmed HTTPS value, not a verified Google review page.
 
-### refresh_tokens (session persistence fallback)
-| col | type | |
-|---|---|---|
-| id uuid pk | |
-| user_id fk | |
-| expires_at timestamptz | |
-| revoked bool | |
+### `public.qr_codes`
 
-## Row Level Security
-```sql
-alter table organizations enable row level security;
-alter table users  enable row level security;
-alter table qr_codes  enable row level security;
-alter table qr_analytics enable row level security;
-alter table reviews   enable row level security;
+Stores `business_id`, `owner_id`, unique public `token`, placement name, headline/tagline, accent color, poster template, status, star-bar flag, and timestamps. The security/public-flow migration adds `supporting_text`, `preset`, `geometry`, and `center_emblem`, plus geometry/emblem constraints and a composite foreign key tying the QR owner to its business. The forward migration `20261109000003_add_qr_destination_modes.sql` adds `destination_mode` (`direct` or `guided`), defaulting existing QR rows to `guided`.
 
-create policy "select org rows" on qr_codes for select using (org_id = current_setting('app.org_id')::uuid);
-create policy "insert org rows" on qr_codes for insert with check (org_id = current_setting('app.org_id')::uuid);
-create policy "update org rows" on qr_codes for update using (org_id = current_setting('app.org_id')::uuid);
-create policy "delete org rows"  on qr_codes for delete using (org_id = current_setting('app.org_id')::uuid);
--- similar for others, keyed on owner_id lookup via joined user row
-```
-Every mutation sets `SET LOCAL app.org_id = <row>` then queries. Cross-org leakage prevented.
+### Event and preference tables
+
+- `public.qr_scan_events`: QR ID, business ID, optional visitor hash, and scan timestamp.
+- `public.review_destination_clicks`: QR ID, business ID, optional legacy star/suggestion metadata, and click timestamp.
+- `public.user_preferences`: per-user language, notification, and export preference columns.
+
+Public event RPCs insert scan and click rows using IDs derived from an active QR token. Analytics aggregates the event rows by owner and QR. These are anonymous event requests, not unique visitor counts; endpoints have no rate limiting.
+
+## Persistence and public QR resolution
+
+Authenticated QR routes filter by the current Supabase user and the user's business. The QR create route derives both owner and business on the server, validates input, creates a random token, and saves design metadata including the destination mode. A `direct` QR encodes the exact confirmed `google_review_url`; a `guided` QR encodes the public `/qr/{token}` route. The public route resolves only active guided tokens through `get_public_qr_by_token`; it returns a restricted payload and reads the business's current `google_review_url`.
+
+The destination API reads and writes the existing `businesses.google_review_url` column, filters existing rows by `owner_id`, and creates the first business only when business name and city are supplied. Disposable authenticated integration tests verified login, persistence, and isolation against the configured project; app-level mocked tests remain separate from this live database evidence.
+
+## RLS and security status
+
+The initial migration contains broad public business/QR read policies and event insert policies that do not bind event `business_id` to the QR's business. The forward migration `20261109000001_secure_qr_public_flow.sql` is intended to:
+
+- remove those known broad policies and add restrictive owner/business relationship policies;
+- add a composite QR-to-business owner foreign key;
+- revoke direct anonymous event writes and expose token-scoped `SECURITY DEFINER` functions with a fixed empty search path;
+- scope analytics to `auth.uid()`;
+- make `business-assets` private and scope Storage access to the authenticated owner and business path.
+
+The configured project exposed the migration's `supporting_text`, `preset`, `geometry`, and `center_emblem` columns. Anonymous lookup, scan, and click RPCs were exercised with disposable QR data; two authenticated test users could not read, insert, update, or delete each other's tested business/QR/profile/preference data, and owner analytics returned only each user's test QR. These probes verify observed behavior, but do not replace inspection of `pg_policies`, the migration ledger, or Storage policies.
+
+An anonymous call to `get_owner_qr_analytics()` unexpectedly returned HTTP 200 with an empty result. It did not expose test or other tenant data, but anonymous execution is unnecessary and increases the callable surface. The proposed follow-up `20261109000002_revoke_anon_owner_analytics.sql` revokes that grant; it has **not** been applied. Storage policy behavior and existing Auth-user inventory were not independently inspected.
+
+## Not present in the schema
+
+There are no `organizations`, custom `users`, `qr_analytics`, `reviews`, or `refresh_tokens` tables in the checked-in migrations. Supabase Auth is the identity provider; `profiles` is the app profile table. Do not use obsolete schema or RLS snippets from earlier versions of this document.

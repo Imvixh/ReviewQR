@@ -1,11 +1,19 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { DashboardShell } from '@/components/layout/DashboardShell';
 import { getStoredOrg, getStoredQRCodes, saveQRCode, setStoredOrg } from '@/lib/data-store';
 import { Organization, QRCode } from '@/lib/types';
 import { generateQrSvg } from '@/lib/qr-geometry';
+import { buildGoogleMapsSearchUrl, validateReviewDestination } from '@/lib/review-destination';
+import { getQrDestinationMode, resolvePublicAppOrigin, resolveQrDestination } from '@/lib/qr-destination';
+import {
+  BUSINESS_CATEGORIES,
+  categorySelectionForSavedValue,
+  HOTEL_SUBCATEGORIES,
+  resolveBusinessCategory,
+} from '@/lib/business-category';
+import { isSupabaseConfigured } from '@/lib/supabase/env';
 
 interface PosterPreset {
   id: string;
@@ -26,20 +34,29 @@ export default function QRDesignStudioPage() {
   const [activeTab, setActiveTab] = useState<'branding' | 'qrstyle' | 'templates' | 'copy'>('branding');
   const [org, setOrg] = useState<Organization | null>(null);
   const [qrList, setQrList] = useState<QRCode[]>([]);
-  const [selectedTouchpoint, setSelectedTouchpoint] = useState('Table Tent — Main Dining Hall (T1-12)');
+  const [selectedQrId, setSelectedQrId] = useState('');
 
   // Touchpoint & Destination State (merged from Create QR)
-  const [placementTag, setPlacementTag] = useState('Table Tent — Main Dining Hall (T1-12)');
-  const [googleReviewUrl, setGoogleReviewUrl] = useState('https://g.page/r/Cbll2345abc992eEBM/review');
-  const [verificationState, setVerificationState] = useState<'format-valid' | 'unverified' | 'invalid'>('unverified');
+  const [placementTag, setPlacementTag] = useState('');
+  const [googleReviewUrl, setGoogleReviewUrl] = useState('');
+  const [savedDestinationUrl, setSavedDestinationUrl] = useState('');
+  const [destinationMode, setDestinationMode] = useState<'maps' | 'paste'>('maps');
+  const [qrMode, setQrMode] = useState<'direct' | 'guided'>('guided');
+  const [hasConfirmedDestination, setHasConfirmedDestination] = useState(false);
+  const [isSavingDestination, setIsSavingDestination] = useState(false);
+  const [isLoadingDestination, setIsLoadingDestination] = useState(true);
+  const [isSavingQr, setIsSavingQr] = useState(false);
+  const [destinationMessage, setDestinationMessage] = useState<{ type: 'error' | 'success' | 'info'; text: string } | null>(null);
 
   // Business Branding State
-  const [businessName, setBusinessName] = useState('Royal Palace Hotel');
-  const [category, setCategory] = useState('Restaurant & Lounge');
-  const [location, setLocation] = useState('Bettiah, Bihar');
+  const [businessName, setBusinessName] = useState('');
+  const [category, setCategory] = useState('');
+  const [customCategory, setCustomCategory] = useState('');
+  const [subcategory, setSubcategory] = useState('');
+  const [location, setLocation] = useState('');
   const [accentColor, setAccentColor] = useState('#1A73E8');
   const [logoUrl, setLogoUrl] = useState<string>('');
-  const [logoName, setLogoName] = useState('royal_crest.svg');
+  const [logoName, setLogoName] = useState('');
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
   // QR Code Architecture State (Image 3)
@@ -52,17 +69,31 @@ export default function QRDesignStudioPage() {
   // Copywriting & Content
   const [headline, setHeadline] = useState('Review us on Google');
   const [ctaText, setCtaText] = useState('Scan to share your experience');
-  const [showStarBar, setShowStarBar] = useState(true);
-  const [perksNote, setPerksNote] = useState('Your honest feedback helps our culinary staff serve you better ❤️');
+  const [supportingText, setSupportingText] = useState('');
 
   // View mode & Canvas state
   const [viewMode, setViewMode] = useState<'front' | 'mockup'>('front');
   const [zoomLevel, setZoomLevel] = useState(100);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [realQrDataUrl, setRealQrDataUrl] = useState<string>('');
+  const [generatedQrTarget, setGeneratedQrTarget] = useState<string | null>(null);
+  const [qrGenerationMessage, setQrGenerationMessage] = useState<string | null>(null);
 
   const posterRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const destinationValidation = useMemo(
+    () => validateReviewDestination(googleReviewUrl),
+    [googleReviewUrl]
+  );
+  const isDestinationSaved =
+    Boolean(savedDestinationUrl) && savedDestinationUrl === googleReviewUrl.trim();
+  const canPreviewQr =
+    hasConfirmedDestination &&
+    destinationValidation.valid &&
+    (isDestinationSaved || qrMode === 'direct');
+  const mapsSearchUrl = buildGoogleMapsSearchUrl(businessName, location);
+  const selectedQr = qrList.find((qr) => qr.id === selectedQrId);
+  const selectedQrToken = selectedQr?.publicToken || '';
 
   // Preset definitions matching Image 2
   const presets: PosterPreset[] = [
@@ -504,6 +535,13 @@ export default function QRDesignStudioPage() {
   ];
 
   const currentPresetData = presets.find((p) => p.id === selectedPreset) || presets[1];
+  const categoryResult = resolveBusinessCategory(category, customCategory);
+  const categoryValue = categoryResult.category;
+  const businessDetails = [categoryValue, location.trim()].filter(Boolean).join(' · ');
+  const isBusinessCategorySaved =
+    Boolean(categoryValue) &&
+    org?.category === categoryValue &&
+    (org.subcategory || '') === subcategory;
 
   const accentPalette = [
     { name: 'Google Blue', hex: '#1A73E8' },
@@ -517,98 +555,323 @@ export default function QRDesignStudioPage() {
   useEffect(() => {
     const loadedOrg = getStoredOrg();
     setOrg(loadedOrg);
-    if (loadedOrg.name) setBusinessName(loadedOrg.name);
-    if (loadedOrg.category) setCategory(loadedOrg.category);
-    if (loadedOrg.city) setLocation(loadedOrg.city);
+    const savedCategory = categorySelectionForSavedValue(loadedOrg.category);
+    setCategory(savedCategory.selection);
+    setCustomCategory(savedCategory.customCategory);
+    setSubcategory(loadedOrg.subcategory || '');
     if (loadedOrg.accentColor) setAccentColor(loadedOrg.accentColor);
-    if (loadedOrg.googleReviewUrl) setGoogleReviewUrl(loadedOrg.googleReviewUrl);
-    if (loadedOrg.logoUrl) setLogoUrl(loadedOrg.logoUrl);
+    if (loadedOrg.logoUrl && !isSupabaseConfigured) setLogoUrl(loadedOrg.logoUrl);
+    if (isSupabaseConfigured) setLogoUrl('');
 
-    const loadedQRs = getStoredQRCodes();
-    setQrList(loadedQRs);
-    if (loadedQRs.length > 0) {
-      const first = loadedQRs[0];
-      setSelectedTouchpoint(first.placementName || first.placementType || 'Table Tent — Main Dining Hall (T1-12)');
-      setPlacementTag(first.placementName || first.placementType || 'Table Tent — Main Dining Hall (T1-12)');
-      if (first.headline) setHeadline(first.headline);
-      if (first.tagline) setCtaText(first.tagline);
-      if (first.accentColor) setAccentColor(first.accentColor);
-      if (first.preset) setSelectedPreset(first.preset);
-      if (first.geometry) setGeometry(first.geometry);
-      if (first.centerEmblem) setCenterEmblem(first.centerEmblem);
-      if (first.destinationUrl) setGoogleReviewUrl(first.destinationUrl);
+    if (!isSupabaseConfigured) {
+      if (loadedOrg.name) setBusinessName(loadedOrg.name);
+      if (loadedOrg.city) setLocation(loadedOrg.city);
+      if (loadedOrg.googleReviewUrl) {
+        setGoogleReviewUrl(loadedOrg.googleReviewUrl);
+        setSavedDestinationUrl(loadedOrg.googleReviewUrl);
+        setHasConfirmedDestination(true);
+      }
+      const localQrs = getStoredQRCodes();
+      setQrList(localQrs);
+      if (localQrs[0]) {
+        const first = localQrs[0];
+        setSelectedQrId(first.id);
+        setQrMode(getQrDestinationMode(first));
+        setPlacementTag(first.placementName || first.placementType || '');
+        if (first.headline) setHeadline(first.headline);
+        if (first.tagline) setCtaText(first.tagline);
+        if (first.supportingText) setSupportingText(first.supportingText);
+        if (first.accentColor) setAccentColor(first.accentColor);
+        if (first.preset) setSelectedPreset(first.preset);
+        if (first.geometry) setGeometry(first.geometry);
+        if (first.centerEmblem) setCenterEmblem(first.centerEmblem);
+      }
+      setIsLoadingDestination(false);
+      return;
     }
+
+    let cancelled = false;
+    const loadSavedData = async () => {
+      try {
+        const [destinationResponse, qrResponse] = await Promise.all([
+          fetch('/api/business/review-destination'),
+          fetch('/api/qr'),
+        ]);
+        const [destinationResult, qrResult] = await Promise.all([
+          destinationResponse.json(),
+          qrResponse.json(),
+        ]);
+        if (!destinationResponse.ok) {
+          throw new Error(
+            destinationResult.message || 'Could not load the saved review destination. Sign in and try again.'
+          );
+        }
+        if (!qrResponse.ok) {
+          throw new Error(qrResult.message || 'Could not load your saved QR designs.');
+        }
+
+        if (cancelled) return;
+        const qrs = qrResult.qrs as QRCode[];
+        setQrList(qrs);
+        if (qrs[0]) {
+          const first = qrs[0];
+          setSelectedQrId(first.id);
+          setQrMode(getQrDestinationMode(first));
+          setPlacementTag(first.placementName || first.placementType || '');
+          if (first.headline) setHeadline(first.headline);
+          if (first.tagline) setCtaText(first.tagline);
+          if (first.supportingText) setSupportingText(first.supportingText);
+          if (first.accentColor) setAccentColor(first.accentColor);
+          if (first.preset) setSelectedPreset(first.preset);
+          if (first.geometry) setGeometry(first.geometry);
+          if (first.centerEmblem) setCenterEmblem(first.centerEmblem);
+        }
+
+        if (destinationResult.business) {
+          const business = destinationResult.business;
+          const savedCategory = categorySelectionForSavedValue(business.category);
+          setCategory(savedCategory.selection);
+          setCustomCategory(savedCategory.customCategory);
+          setSubcategory(business.subcategory || '');
+          setGoogleReviewUrl(business.googleReviewUrl || '');
+          setSavedDestinationUrl(business.googleReviewUrl || '');
+          setHasConfirmedDestination(Boolean(business.googleReviewUrl));
+          setBusinessName(business.name || '');
+          setLocation(business.city || '');
+          if (business.logoUrl) setLogoUrl(business.logoUrl);
+          const updatedOrg = setStoredOrg({
+            id: business.id,
+            name: business.name,
+            category: business.category,
+            subcategory: business.subcategory,
+            city: business.city,
+            googleReviewUrl: business.googleReviewUrl,
+            logoUrl: business.logoUrl,
+            thumbnailUrl: business.thumbnailUrl,
+          });
+          setOrg(updatedOrg);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setDestinationMessage({
+            type: 'error',
+            text: error instanceof Error ? error.message : 'Could not load the saved review destination.',
+          });
+        }
+      } finally {
+        if (!cancelled) setIsLoadingDestination(false);
+      }
+    };
+
+    void loadSavedData();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  // Generate the QR preview with the selected module and eye geometry.
+  // Both the preview and exports use this resolved destination.
   useEffect(() => {
+    if (qrMode === 'guided') {
+      const publicOrigin = resolvePublicAppOrigin(
+        process.env.NEXT_PUBLIC_APP_URL,
+        window.location.origin
+      );
+      if (!publicOrigin.ok) {
+        setRealQrDataUrl('');
+        setGeneratedQrTarget(null);
+        setQrGenerationMessage(publicOrigin.message);
+        return;
+      }
+    }
+
+    if (!canPreviewQr || !destinationValidation.valid) {
+      setRealQrDataUrl('');
+      setGeneratedQrTarget(null);
+      setQrGenerationMessage(null);
+      return;
+    }
+
     try {
+      const target = resolveQrDestination(
+        qrMode,
+        destinationValidation.url,
+        selectedQrToken || undefined,
+        process.env.NEXT_PUBLIC_APP_URL,
+        window.location.origin
+      );
+      if (!target.ok) {
+        setRealQrDataUrl('');
+        setGeneratedQrTarget(null);
+        setQrGenerationMessage(target.message);
+        return;
+      }
       setRealQrDataUrl(
         generateQrSvg(
-          googleReviewUrl || 'https://reviewqr.app',
+          target.url,
           geometry,
           currentPresetData.finderColor
         )
       );
-    } catch (err) {
-      console.error('Failed to generate preview QR:', err);
+      setGeneratedQrTarget(target.url);
+      setQrGenerationMessage(null);
+    } catch (error) {
+      console.error('Failed to generate preview QR:', error);
+      setRealQrDataUrl('');
+      setGeneratedQrTarget(null);
+      setQrGenerationMessage('Could not generate this QR code. Check the destination URL and try again.');
     }
-  }, [googleReviewUrl, currentPresetData.finderColor, geometry]);
+  }, [
+    destinationValidation,
+    canPreviewQr,
+    currentPresetData.finderColor,
+    geometry,
+    qrMode,
+    selectedQrToken,
+  ]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  const handleTouchpointChange = (touchpointName: string) => {
-    setSelectedTouchpoint(touchpointName);
-    setPlacementTag(touchpointName);
+  const handleTouchpointChange = (qrId: string) => {
+    setSelectedQrId(qrId);
 
-    const found = qrList.find(
-      (q) => q.placementName === touchpointName || q.placementType === touchpointName
-    );
+    const found = qrList.find((q) => q.id === qrId);
     if (found) {
+      setQrMode(getQrDestinationMode(found));
+      setPlacementTag(found.placementName || found.placementType || '');
       if (found.headline) setHeadline(found.headline);
       if (found.tagline) setCtaText(found.tagline);
+      setSupportingText(found.supportingText || '');
       if (found.accentColor) setAccentColor(found.accentColor);
-      if (found.destinationUrl) setGoogleReviewUrl(found.destinationUrl);
       if (found.preset) setSelectedPreset(found.preset);
       if (found.geometry) setGeometry(found.geometry);
       if (found.centerEmblem) setCenterEmblem(found.centerEmblem);
-      showToast(`Loaded settings for: ${touchpointName}`);
+      showToast(`Loaded settings for: ${found.placementName || found.placementType || found.slug}`);
     }
   };
 
-  const handleVerifyLink = () => {
-    let url: URL;
+  const handleConfirmDestination = async () => {
+    if (categoryResult.error) {
+      setDestinationMessage({ type: 'error', text: categoryResult.error });
+      return;
+    }
+    if (subcategory && categoryValue !== 'Hotel') {
+      setDestinationMessage({ type: 'error', text: 'Choose a hotel category before selecting a subcategory.' });
+      return;
+    }
+    if (!destinationValidation.valid) {
+      setDestinationMessage({ type: 'error', text: destinationValidation.message });
+      return;
+    }
+    if (!hasConfirmedDestination) {
+      setDestinationMessage({
+        type: 'error',
+        text: 'Confirm that you checked this link and it opens the correct business review destination.',
+      });
+      return;
+    }
+    if (!isSupabaseConfigured && qrMode !== 'direct') {
+      setDestinationMessage({
+        type: 'error',
+        text: 'Guided Review Assistant mode requires an authenticated Supabase account. Choose Direct Google Review to create a standalone QR without cloud persistence.',
+      });
+      return;
+    }
+    if (!isSupabaseConfigured) {
+      const localOrg = setStoredOrg({
+        id: org?.id || crypto.randomUUID(),
+        name: businessName.trim(),
+        category: categoryValue,
+        subcategory,
+        city: location.trim(),
+        googleReviewUrl: destinationValidation.url,
+        accentColor,
+        logoUrl,
+      });
+      setOrg(localOrg);
+      setGoogleReviewUrl(destinationValidation.url);
+      setSavedDestinationUrl(destinationValidation.url);
+      setHasConfirmedDestination(true);
+      setDestinationMessage({
+        type: 'success',
+        text: 'Review destination saved in this browser. The direct QR can be scanned from any device.',
+      });
+      setActiveTab('qrstyle');
+      return;
+    }
+    if (isDestinationSaved && isBusinessCategorySaved) {
+      setDestinationMessage({ type: 'success', text: 'Destination is saved. Continue designing your QR code.' });
+      setActiveTab('qrstyle');
+      return;
+    }
+
+    setIsSavingDestination(true);
+    setDestinationMessage(null);
     try {
-      url = new URL(googleReviewUrl);
-    } catch {
-      setVerificationState('invalid');
-      showToast('Enter a valid HTTPS Google review URL.');
-      return;
-    }
+      const response = await fetch('/api/business/review-destination', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          destinationUrl: destinationValidation.url,
+          confirmed: true,
+          businessName,
+          city: location,
+          category: categoryValue,
+          subcategory,
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(
+          result.message || 'Could not save this destination. Check your connection and try again.'
+        );
+      }
 
-    const hostname = url.hostname.toLowerCase();
-    const isGoogleHost = ['google.com', 'g.page', 'maps.app.goo.gl'].some(
-      (domain) => hostname === domain || hostname.endsWith(`.${domain}`)
-    );
-    if (url.protocol !== 'https:' || !isGoogleHost) {
-      setVerificationState('invalid');
-      showToast('Enter an HTTPS URL hosted by Google.');
-      return;
+      const business = result.business;
+      setGoogleReviewUrl(business.googleReviewUrl);
+      setSavedDestinationUrl(business.googleReviewUrl);
+      setHasConfirmedDestination(true);
+      setBusinessName(business.name);
+      setLocation(business.city);
+      const savedCategory = categorySelectionForSavedValue(business.category);
+      setCategory(savedCategory.selection);
+      setCustomCategory(savedCategory.customCategory);
+      setSubcategory(business.subcategory || '');
+      if (business.logoUrl) setLogoUrl(business.logoUrl);
+      const updatedOrg = setStoredOrg({
+        id: business.id,
+        name: business.name,
+        category: business.category,
+        subcategory: business.subcategory,
+        city: business.city,
+        googleReviewUrl: business.googleReviewUrl,
+        logoUrl: business.logoUrl,
+        thumbnailUrl: business.thumbnailUrl,
+      });
+      setOrg(updatedOrg);
+      setDestinationMessage({
+        type: 'success',
+        text: 'Destination saved. Save your QR design to create its public customer link.',
+      });
+      setActiveTab('qrstyle');
+    } catch (error) {
+      setDestinationMessage({
+        type: 'error',
+        text: error instanceof Error ? error.message : 'Could not save this destination.',
+      });
+    } finally {
+      setIsSavingDestination(false);
     }
-
-    setVerificationState('format-valid');
-    showToast('Google URL format looks valid; destination ownership was not verified.');
   };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      showToast('Please upload a valid image (PNG, JPG, SVG, WebP).');
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+      showToast('Upload a PNG, JPEG, or WebP image.');
       return;
     }
 
@@ -624,7 +887,10 @@ export default function QRDesignStudioPage() {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', 'logo');
-      formData.append('orgId', org?.id || 'org_royal_palace');
+      if (!org?.id) {
+        throw new Error('Save your business review destination before uploading a logo.');
+      }
+      formData.append('orgId', org.id);
 
       const res = await fetch('/api/business/upload', {
         method: 'POST',
@@ -632,80 +898,165 @@ export default function QRDesignStudioPage() {
       });
 
       const data = await res.json();
-      if (data.success && data.url) {
-        setLogoUrl(data.url);
-        setStoredOrg({ logoUrl: data.url, logoPath: data.path });
-        showToast('Logo uploaded and applied to all stand artwork!');
-      } else {
-        // Fallback to FileReader
-        const reader = new FileReader();
-        reader.onload = () => {
-          const result = reader.result as string;
-          setLogoUrl(result);
-          setStoredOrg({ logoUrl: result });
-          showToast('Logo applied locally.');
-        };
-        reader.readAsDataURL(file);
+      if (!res.ok || !data.success || !data.url) {
+        throw new Error(data.message || data.code || 'Logo upload failed.');
       }
-    } catch {
-      // Local fallback
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        setLogoUrl(result);
-        setStoredOrg({ logoUrl: result });
-        showToast('Logo applied locally.');
-      };
-      reader.readAsDataURL(file);
+      setLogoUrl(data.url);
+      setStoredOrg({ logoUrl: data.url, logoPath: data.path });
+      showToast('Logo uploaded and applied to stand artwork.');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Logo upload failed.');
     } finally {
       setIsUploadingLogo(false);
     }
   };
 
-  const handleSaveConfiguration = () => {
-    const slug = placementTag.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    const saved = saveQRCode({
-      orgId: org?.id || 'org_royal_palace',
-      slug,
-      businessName,
-      destinationUrl: googleReviewUrl,
-      placementName: placementTag,
-      placementType: placementTag,
-      headline,
-      tagline: ctaText,
-      accentColor,
-      currentTemplate: selectedPreset,
-      preset: selectedPreset,
-      geometry,
-      centerEmblem,
-      logoUrl,
-      showStarBar,
-      status: 'active',
-    });
+  const handleSaveConfiguration = async () => {
+    if (categoryResult.error) {
+      showToast(categoryResult.error);
+      setActiveTab('branding');
+      return;
+    }
+    if (subcategory && categoryValue !== 'Hotel') {
+      showToast('Choose a hotel category before selecting a subcategory.');
+      setActiveTab('branding');
+      return;
+    }
+    if (!isDestinationSaved || !destinationValidation.valid) {
+      showToast('Confirm and save a valid destination before saving QR design settings.');
+      setActiveTab('branding');
+      return;
+    }
+    if (!isBusinessCategorySaved) {
+      showToast('Save your business category before saving QR design settings.');
+      setActiveTab('branding');
+      return;
+    }
+    if (!businessName.trim() || !placementTag.trim()) {
+      showToast('Enter a business name and placement tag before saving the QR design.');
+      setActiveTab('branding');
+      return;
+    }
+    setIsSavingQr(true);
+    try {
+      if (!isSupabaseConfigured) {
+        if (qrMode !== 'direct') {
+          throw new Error('Guided Review Assistant QR codes require Supabase and a public HTTPS app URL.');
+        }
+        const savedQr = saveQRCode({
+          id: selectedQrId || undefined,
+          orgId: org?.id || 'local-business',
+          slug: selectedQr?.slug || crypto.randomUUID(),
+          businessName: businessName.trim(),
+          destinationUrl: destinationValidation.url,
+          destinationMode: 'direct',
+          placementName: placementTag.trim(),
+          placementType: placementTag.trim(),
+          headline,
+          tagline: ctaText,
+          supportingText,
+          accentColor,
+          currentTemplate: selectedPreset,
+          preset: selectedPreset,
+          geometry,
+          centerEmblem,
+          status: 'active',
+        });
+        setQrList((current) => [savedQr, ...current.filter((qr) => qr.id !== savedQr.id)]);
+        setSelectedQrId(savedQr.id);
+        setStoredOrg({
+          id: savedQr.orgId,
+          name: businessName.trim(),
+          category: categoryValue,
+          subcategory,
+          city: location.trim(),
+          googleReviewUrl: destinationValidation.url,
+          accentColor,
+          logoUrl,
+        });
+        showToast('Direct QR design saved in this browser. Its code opens the exact review URL.');
+        return;
+      }
 
-    // Also persist business details to organization
-    setStoredOrg({
-      name: businessName,
-      category,
-      city: location,
-      accentColor,
-      googleReviewUrl,
-      logoUrl,
-    });
+      const updatingExisting = Boolean(selectedQrId && qrList.some((qr) => qr.id === selectedQrId));
+      const response = await fetch(updatingExisting ? `/api/qr/${encodeURIComponent(selectedQrId)}` : '/api/qr', {
+        method: updatingExisting ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          placementName: placementTag.trim(),
+          headline,
+          tagline: ctaText,
+          supportingText,
+          accentColor,
+          preset: selectedPreset,
+          geometry,
+          centerEmblem,
+          destinationMode: qrMode,
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.qr) {
+        throw new Error(result.message || result.code || 'Could not save this QR design.');
+      }
 
-    // Refresh list
-    setQrList(getStoredQRCodes());
-    showToast('Studio configuration saved! All previews synchronized.');
+      const savedQr = result.qr as QRCode;
+      setQrList((current) => [
+        savedQr,
+        ...current.filter((qr) => qr.id !== savedQr.id),
+      ]);
+      setSelectedQrId(savedQr.id);
+      saveQRCode(savedQr);
+
+      setStoredOrg({
+        id: org?.id,
+        name: businessName,
+        category: categoryValue,
+        subcategory,
+        city: location,
+        accentColor,
+        logoUrl,
+      });
+      showToast('QR design saved to your account. The customer QR is ready to scan.');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Could not save this QR design.');
+    } finally {
+      setIsSavingQr(false);
+    }
   };
 
   const handleDownloadPNG = () => {
-    showToast('Exporting high-resolution 300 DPI Standee PNG...');
+    if (!canPreviewQr || !destinationValidation.valid || !realQrDataUrl) {
+      showToast('Confirm a valid destination before exporting the poster.');
+      return;
+    }
+    const target = resolveQrDestination(
+      qrMode,
+      destinationValidation.url,
+      selectedQrToken || undefined,
+      process.env.NEXT_PUBLIC_APP_URL,
+      window.location.origin
+    );
+    if (!target.ok || target.url !== generatedQrTarget) {
+      showToast(target.ok ? 'The QR preview is updating. Try the export again.' : target.message);
+      return;
+    }
+
+    showToast('Preparing QR poster PNG…');
     setTimeout(() => {
       const link = document.createElement('a');
       link.download = `${businessName.toLowerCase().replace(/\s+/g, '_')}_${selectedPreset}_standee.png`;
-      link.href =
-        'data:image/svg+xml;charset=utf-8,' +
-        encodeURIComponent(`
+      const escapeXml = (value: string) =>
+        value.replace(/[&<>"']/g, (character) => {
+          const entities: Record<string, string> = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&apos;',
+          };
+          return entities[character];
+        });
+      const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" width="600" height="850" viewBox="0 0 600 850">
           <rect width="600" height="850" rx="24" fill="${
             selectedPreset === 'modern-navy'
@@ -725,25 +1076,71 @@ export default function QRDesignStudioPage() {
           }
           <text x="300" y="80" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="28" fill="${
             selectedPreset === 'modern-navy' || selectedPreset === 'dark-luxury' ? '#ffffff' : '#0b1c30'
-          }">${businessName.toUpperCase()}</text>
+          }">${escapeXml(businessName.toUpperCase())}</text>
           <text x="300" y="115" text-anchor="middle" font-family="Inter, sans-serif" font-weight="600" font-size="14" fill="${
             selectedPreset === 'modern-navy' || selectedPreset === 'dark-luxury' ? '#94a3b8' : '#565e74'
-          }">${category.toUpperCase()} • ${location.toUpperCase()}</text>
+          }">${escapeXml(businessDetails.toUpperCase())}</text>
           <rect x="150" y="160" width="300" height="300" rx="16" fill="#ffffff" stroke="#e5eeff" stroke-width="2"/>
+          <image x="160" y="170" width="280" height="280" href="${realQrDataUrl}"/>
           <text x="300" y="520" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="700" font-size="24" fill="${
             selectedPreset === 'modern-navy' || selectedPreset === 'dark-luxury' ? '#ffffff' : '#0b1c30'
-          }">${headline}</text>
-          ${showStarBar ? '<text x="300" y="555" text-anchor="middle" font-size="24" fill="#FBBC04">★★★★★</text>' : ''}
-          <rect x="100" y="590" width="400" height="50" rx="12" fill="${accentColor}"/>
-          <text x="300" y="622" text-anchor="middle" font-family="Inter, sans-serif" font-weight="600" font-size="16" fill="#ffffff">${ctaText}</text>
+          }">${escapeXml(headline)}</text>
+          <text x="300" y="560" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#FBBC04">★★★★★</text>
+          ${supportingText.trim() ? `<text x="300" y="590" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" fill="${selectedPreset === 'modern-navy' || selectedPreset === 'dark-luxury' ? '#cbd5e1' : '#565e74'}">${escapeXml(supportingText.trim())}</text>` : ''}
+          <rect x="100" y="620" width="400" height="50" rx="12" fill="${accentColor}"/>
+          <text x="300" y="652" text-anchor="middle" font-family="Inter, sans-serif" font-weight="600" font-size="16" fill="#ffffff">${escapeXml(ctaText)}</text>
         </svg>
-      `);
-      link.click();
-      showToast('PNG artwork downloaded successfully!');
+      `;
+      const svgUrl = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
+      const image = new Image();
+      image.onload = () => {
+        URL.revokeObjectURL(svgUrl);
+        const canvas = document.createElement('canvas');
+        canvas.width = 600;
+        canvas.height = 850;
+        const context = canvas.getContext('2d');
+        if (!context) {
+          showToast('Could not prepare the poster image in this browser.');
+          return;
+        }
+
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            showToast('Could not export the poster PNG.');
+            return;
+          }
+          const pngUrl = URL.createObjectURL(blob);
+          link.href = pngUrl;
+          link.click();
+          setTimeout(() => URL.revokeObjectURL(pngUrl), 1000);
+          showToast('Poster PNG downloaded.');
+        }, 'image/png');
+      };
+      image.onerror = () => {
+        URL.revokeObjectURL(svgUrl);
+        showToast('Could not render the poster PNG.');
+      };
+      image.src = svgUrl;
     }, 400);
   };
 
   const handleExportPDF = () => {
+    if (!canPreviewQr || !destinationValidation.valid || !realQrDataUrl) {
+      showToast('Confirm a valid destination before printing the poster.');
+      return;
+    }
+    const target = resolveQrDestination(
+      qrMode,
+      destinationValidation.url,
+      selectedQrToken || undefined,
+      process.env.NEXT_PUBLIC_APP_URL,
+      window.location.origin
+    );
+    if (!target.ok || target.url !== generatedQrTarget) {
+      showToast(target.ok ? 'The QR preview is updating. Try printing again.' : target.message);
+      return;
+    }
     window.print();
   };
 
@@ -761,7 +1158,7 @@ export default function QRDesignStudioPage() {
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/png,image/jpeg,image/webp,image/svg+xml"
+        accept="image/png,image/jpeg,image/webp"
         className="hidden"
         onChange={handleLogoUpload}
       />
@@ -791,21 +1188,22 @@ export default function QRDesignStudioPage() {
             {/* Touchpoint Placement Selector */}
             <select
               className="h-10 px-3 pr-8 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 border border-slate-200 cursor-pointer font-medium"
-              value={selectedTouchpoint}
+              value={selectedQrId}
               onChange={(e) => handleTouchpointChange(e.target.value)}
+              disabled={qrList.length === 0}
+              aria-label="Select a saved QR design"
             >
-              {qrList.length > 0 ? (
-                qrList.map((qr) => (
-                  <option key={qr.id} value={qr.placementName || qr.placementType}>
-                    {qr.placementName || qr.placementType}
-                  </option>
-                ))
+              {qrList.length === 0 ? (
+                <option value="">No saved QR designs</option>
               ) : (
-                <>
-                  <option>Table Tent — Main Dining Hall (T1-12)</option>
-                  <option>Front Reception &amp; Counter</option>
-                  <option>Rooftop Sky Lounge Bar</option>
-                </>
+                qrList.map((qr) => {
+                  const placement = qr.placementName || qr.placementType || qr.slug;
+                  return (
+                    <option key={qr.id} value={qr.id}>
+                      {placement}
+                    </option>
+                  );
+                })
               )}
             </select>
 
@@ -814,7 +1212,7 @@ export default function QRDesignStudioPage() {
               onClick={handleExportPDF}
             >
               <span className="material-symbols-outlined text-[18px]">picture_as_pdf</span>
-              <span>Export PDF</span>
+              <span>Print / Save PDF</span>
             </button>
             <button
               className="px-4 py-2 rounded-xl bg-[#005BBF] text-white hover:bg-[#1A73E8] text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 active:scale-95"
@@ -889,7 +1287,7 @@ export default function QRDesignStudioPage() {
                     <h2 className="text-base font-bold text-[#0B1C30]">Business &amp; Identity</h2>
                   </div>
                   <span className="text-[10px] uppercase font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">
-                    Place not verified
+                    Manual setup
                   </span>
                 </div>
 
@@ -901,85 +1299,324 @@ export default function QRDesignStudioPage() {
                     type="text"
                     value={placementTag}
                     onChange={(e) => setPlacementTag(e.target.value)}
-                    placeholder="e.g. Table Tent — Main Dining Hall (T1-12)"
+                    placeholder="Enter a label for this placement"
+                    required
                   />
                 </div>
 
-                {/* Destination Google Review URL with Validation */}
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-[#414754]">Google Place Review URL</label>
-                    <span
-                      className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                        verificationState === 'format-valid'
-                          ? 'bg-green-100 text-green-800'
-                          : verificationState === 'invalid'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-amber-100 text-amber-800'
-                      }`}
-                    >
-                      {verificationState === 'format-valid'
-                        ? 'Format valid'
-                        : verificationState === 'invalid'
-                        ? 'Invalid format'
-                        : 'Unchecked'}
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label htmlFor="business-name" className="text-xs font-semibold text-[#414754]">
+                      Business name
+                    </label>
                     <input
-                      className="flex-1 h-11 px-3.5 rounded-xl bg-slate-50 text-xs font-mono text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all truncate"
-                      type="url"
-                      value={googleReviewUrl}
-                      onChange={(e) => {
-                        setGoogleReviewUrl(e.target.value);
-                        setVerificationState('unverified');
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={handleVerifyLink}
-                      className="px-3 h-11 rounded-xl bg-[#EFF4FF] hover:bg-[#DCE9FF] text-[#005BBF] text-xs font-bold transition-colors"
-                    >
-                      Verify
-                    </button>
-                  </div>
-                </div>
-
-                {/* Business Display Name */}
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#414754]">Business Display Name</label>
-                  <div className="relative">
-                    <input
-                      className="w-full h-11 px-3.5 pr-10 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all font-semibold"
+                      id="business-name"
+                      className="w-full h-11 px-3.5 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all font-semibold"
                       type="text"
+                      autoComplete="organization"
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
-                    />
-                    <span className="material-symbols-outlined absolute right-3 top-2.5 text-[#005BBF] text-[20px]">
-                      verified
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-[#414754]">Category</label>
-                    <input
-                      className="w-full h-11 px-3.5 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all"
-                      type="text"
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
+                      required
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-[#414754]">City / Branch</label>
+                    <label htmlFor="business-location" className="text-xs font-semibold text-[#414754]">
+                      City or location
+                    </label>
                     <input
+                      id="business-location"
                       className="w-full h-11 px-3.5 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all"
                       type="text"
+                      autoComplete="address-level2"
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
                     />
                   </div>
+                </div>
+
+                <section className="space-y-4 rounded-xl border border-slate-200 bg-[#F8F9FF] p-4" aria-labelledby="destination-heading">
+                  <div>
+                    <h3 id="destination-heading" className="text-sm font-bold text-[#0B1C30]">
+                      Review destination
+                    </h3>
+                    <p className="mt-1 text-xs leading-5 text-[#565E74]">
+                      Find your listing without an API key, or paste a review link you already have.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2" aria-labelledby="qr-mode-heading">
+                    <h4 id="qr-mode-heading" className="text-xs font-bold text-[#414754]">
+                      Choose what the QR opens
+                    </h4>
+                    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      <button
+                        type="button"
+                        aria-pressed={qrMode === 'direct'}
+                        onClick={() => setQrMode('direct')}
+                        className={`min-h-16 rounded-lg border px-3 py-2 text-left text-xs transition-colors ${
+                          qrMode === 'direct'
+                            ? 'border-[#005BBF] bg-[#EFF4FF] text-[#0B1C30]'
+                            : 'border-slate-200 bg-white text-[#414754] hover:bg-slate-50'
+                        }`}
+                      >
+                        <span className="block font-bold">Direct Google Review</span>
+                        <span className="mt-1 block leading-4">QR opens the exact pasted link; no ReviewQR tracking.</span>
+                      </button>
+                      <button
+                        type="button"
+                        aria-pressed={qrMode === 'guided'}
+                        onClick={() => setQrMode('guided')}
+                        className={`min-h-16 rounded-lg border px-3 py-2 text-left text-xs transition-colors ${
+                          qrMode === 'guided'
+                            ? 'border-[#005BBF] bg-[#EFF4FF] text-[#0B1C30]'
+                            : 'border-slate-200 bg-white text-[#414754] hover:bg-slate-50'
+                        }`}
+                      >
+                        <span className="block font-bold">Guided Review Assistant</span>
+                        <span className="mt-1 block leading-4">QR opens the ReviewQR customer page and tracks scans.</span>
+                      </button>
+                    </div>
+                    {qrMode === 'guided' && qrGenerationMessage && (
+                      <p className="text-xs leading-5 text-amber-800" role="status">{qrGenerationMessage}</p>
+                    )}
+                    {qrMode === 'direct' && !isSupabaseConfigured && (
+                      <p className="text-xs leading-5 text-[#565E74]" role="status">
+                        Direct QR designs can be created in this browser without cloud setup.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2" role="tablist" aria-label="Choose how to find your review link">
+                    <button
+                      id="maps-mode-tab"
+                      type="button"
+                      role="tab"
+                      aria-selected={destinationMode === 'maps'}
+                      aria-controls="destination-mode-panel"
+                      onClick={() => setDestinationMode('maps')}
+                      className={`min-h-11 rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
+                        destinationMode === 'maps'
+                          ? 'bg-[#005BBF] text-white'
+                          : 'bg-white text-[#414754] border border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      Find on Google Maps
+                    </button>
+                    <button
+                      id="paste-mode-tab"
+                      type="button"
+                      role="tab"
+                      aria-selected={destinationMode === 'paste'}
+                      aria-controls="destination-mode-panel"
+                      onClick={() => setDestinationMode('paste')}
+                      className={`min-h-11 rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
+                        destinationMode === 'paste'
+                          ? 'bg-[#005BBF] text-white'
+                          : 'bg-white text-[#414754] border border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      Paste Review Link
+                    </button>
+                  </div>
+
+                  <div id="destination-mode-panel" role="tabpanel" aria-labelledby={destinationMode === 'maps' ? 'maps-mode-tab' : 'paste-mode-tab'}>
+                    {destinationMode === 'maps' ? (
+                      <div className="space-y-3">
+                        <p className="text-xs leading-5 text-[#414754]">
+                          Search opens Google Maps in a new tab. Select the correct listing yourself, then copy the
+                          review link from the listing or your Business Profile. ReviewQR does not read or verify Maps
+                          listings.
+                        </p>
+                        <a
+                          href={mapsSearchUrl || undefined}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-disabled={!mapsSearchUrl}
+                          onClick={(event) => {
+                            if (!mapsSearchUrl) event.preventDefault();
+                          }}
+                          className={`inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-colors ${
+                            mapsSearchUrl
+                              ? 'bg-[#EFF4FF] text-[#005BBF] hover:bg-[#DCE9FF]'
+                              : 'cursor-not-allowed bg-slate-100 text-slate-400'
+                          }`}
+                        >
+                          <span className="material-symbols-outlined text-[18px]">open_in_new</span>
+                          Search on Google Maps
+                        </a>
+                        {!mapsSearchUrl && (
+                          <p className="text-xs text-[#565E74]">Enter a business name and city to enable Maps search.</p>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-xs leading-5 text-[#414754]">
+                        Paste a review link copied from your Google Business Profile or Google Maps. ReviewQR checks
+                        HTTPS syntax only; it cannot confirm the business or page behind the link.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <label htmlFor="review-destination-url" className="text-xs font-semibold text-[#414754]">
+                      {destinationMode === 'maps'
+                        ? 'Paste the review link copied from the selected listing'
+                        : 'Review link'}
+                    </label>
+                    <input
+                      id="review-destination-url"
+                      className="w-full min-h-11 px-3.5 py-2 rounded-xl bg-white text-xs font-mono text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 border border-slate-200"
+                      type="url"
+                      inputMode="url"
+                      autoComplete="url"
+                      value={googleReviewUrl}
+                      onChange={(event) => {
+                        setGoogleReviewUrl(event.target.value);
+                        setHasConfirmedDestination(false);
+                        setDestinationMessage(null);
+                      }}
+                      placeholder="https://..."
+                      aria-describedby="destination-validation-message"
+                    />
+                    {destinationValidation.valid && (
+                      <p className="text-xs leading-5 text-amber-800" role="status">
+                        {destinationValidation.message}
+                      </p>
+                    )}
+                    {!destinationValidation.valid && googleReviewUrl.trim() !== '' && (
+                      <p className="text-xs leading-5 text-red-700" role="alert">
+                        {destinationValidation.message}
+                      </p>
+                    )}
+                    <div id="destination-validation-message" className="sr-only" aria-live="polite">
+                      {destinationValidation.message}
+                    </div>
+                  </div>
+
+                  {destinationValidation.valid && (
+                    <a
+                      href={destinationValidation.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-10 items-center gap-1 text-xs font-semibold text-[#005BBF] underline underline-offset-2"
+                    >
+                      Open link to test it
+                      <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                    </a>
+                  )}
+
+                  <label className="flex items-start gap-2 text-xs leading-5 text-[#414754]">
+                    <input
+                      type="checkbox"
+                      checked={hasConfirmedDestination}
+                      onChange={(event) => setHasConfirmedDestination(event.target.checked)}
+                      className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-[#005BBF] focus:ring-[#1A73E8]"
+                    />
+                    <span>I checked this link and confirm it opens the correct business review destination.</span>
+                  </label>
+
+                  {isLoadingDestination && (
+                    <p className="text-xs text-[#565E74]" role="status">Loading your saved destination…</p>
+                  )}
+                  {!isSupabaseConfigured && (
+                    <p className="text-xs leading-5 text-amber-800" role="status">
+                      {qrMode === 'direct'
+                        ? 'Cloud sync is unavailable. Direct destination and QR settings will be saved in this browser only.'
+                        : 'Guided Review Assistant mode requires an authenticated Supabase account and a public HTTPS app URL.'}
+                    </p>
+                  )}
+                  {destinationMessage && (
+                    <p
+                      className={`text-xs leading-5 ${
+                        destinationMessage.type === 'error'
+                          ? 'text-red-700'
+                          : destinationMessage.type === 'success'
+                          ? 'text-green-800'
+                          : 'text-[#414754]'
+                      }`}
+                      role={destinationMessage.type === 'error' ? 'alert' : 'status'}
+                    >
+                      {destinationMessage.text}
+                    </p>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={handleConfirmDestination}
+                    disabled={
+                      !destinationValidation.valid ||
+                      !hasConfirmedDestination ||
+                      isSavingDestination ||
+                      isLoadingDestination ||
+                      (!isSupabaseConfigured && qrMode !== 'direct')
+                    }
+                    className="w-full min-h-11 rounded-xl bg-[#005BBF] px-4 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#1A73E8] disabled:cursor-not-allowed disabled:bg-slate-300"
+                  >
+                    {isSavingDestination
+                      ? 'Saving destination…'
+                      : isDestinationSaved && isBusinessCategorySaved
+                      ? 'Destination saved — continue to QR editor'
+                      : isDestinationSaved
+                      ? 'Save business category & continue'
+                      : 'Confirm destination & continue'}
+                  </button>
+                </section>
+
+                <div className="space-y-1">
+                  <label htmlFor="business-category" className="text-xs font-semibold text-[#414754]">
+                    Business Category
+                  </label>
+                  <input
+                    id="business-category"
+                    list="business-category-options"
+                    className="w-full h-11 px-3.5 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all"
+                    type="search"
+                    value={category}
+                    onChange={(e) => {
+                      setCategory(e.target.value);
+                      if (e.target.value !== 'Other') setCustomCategory('');
+                      if (e.target.value !== 'Hotel') setSubcategory('');
+                    }}
+                    placeholder="Select a business category"
+                    maxLength={80}
+                    required
+                    aria-required="true"
+                  />
+                  <datalist id="business-category-options">
+                    {BUSINESS_CATEGORIES.map((option) => (
+                      <option key={option} value={option} />
+                    ))}
+                  </datalist>
+                  {category.trim().toLowerCase() === 'other' && (
+                    <input
+                      id="custom-business-category"
+                      className="w-full h-11 px-3.5 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all"
+                      type="text"
+                      value={customCategory}
+                      onChange={(event) => setCustomCategory(event.target.value)}
+                      placeholder="Enter your business category"
+                      maxLength={80}
+                      required
+                      aria-label="Custom business category"
+                    />
+                  )}
+                  {categoryValue === 'Hotel' && (
+                    <div className="space-y-1">
+                      <label htmlFor="business-subcategory" className="text-xs font-semibold text-[#414754]">
+                        Subcategory (optional)
+                      </label>
+                      <select
+                        id="business-subcategory"
+                        value={subcategory}
+                        onChange={(event) => setSubcategory(event.target.value)}
+                        className="w-full h-11 px-3.5 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all"
+                      >
+                        <option value="">No subcategory</option>
+                        {HOTEL_SUBCATEGORIES.map((option) => (
+                          <option key={option} value={option}>{option}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                 </div>
 
                 {/* Logo Uploader Box */}
@@ -1306,43 +1943,28 @@ export default function QRDesignStudioPage() {
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="material-symbols-outlined text-amber-500 text-[20px]"
-                      style={{ fontVariationSettings: "'FILL' 1" }}
-                    >
-                      star
-                    </span>
-                    <span className="text-xs font-semibold text-[#0B1C30]">
-                      Show 5-Star Recommendation Bar
-                    </span>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={showStarBar}
-                    onChange={(e) => setShowStarBar(e.target.checked)}
-                    className="w-4 h-4 rounded text-[#005BBF] focus:ring-0 cursor-pointer"
-                  />
-                </div>
-
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#414754]">Hospitality Perks Note (Optional)</label>
-                  <input
-                    className="w-full h-11 px-3.5 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all"
-                    type="text"
-                    value={perksNote}
-                    onChange={(e) => setPerksNote(e.target.value)}
-                  />
+                <label className="text-xs font-semibold text-[#414754]">Supporting text (Optional)</label>
+                <input
+                  className="w-full h-11 px-3.5 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all"
+                  type="text"
+                  value={supportingText}
+                  onChange={(e) => setSupportingText(e.target.value)}
+                  placeholder="Add neutral context for customers"
+                />
                 </div>
 
                 <button
                   className="w-full mt-2 py-3 px-4 rounded-xl bg-[#005BBF] hover:bg-[#1A73E8] text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
                   type="button"
                   onClick={handleSaveConfiguration}
+                  disabled={isSavingQr}
+                  aria-busy={isSavingQr}
                 >
-                  <span className="material-symbols-outlined text-[18px]">save</span>
-                  <span>Save Microcopy</span>
+                  <span className="material-symbols-outlined text-[18px]">
+                    {isSavingQr ? 'progress_activity' : 'save'}
+                  </span>
+                  <span>{isSavingQr ? 'Saving QR Design…' : 'Save QR Design'}</span>
                 </button>
               </div>
             )}
@@ -1394,14 +2016,15 @@ export default function QRDesignStudioPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <Link
-                  className="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#005BBF] text-xs flex items-center gap-1.5 transition-colors font-semibold"
-                  href="/qr/table-tent-main-dining"
-                  target="_blank"
-                >
-                  <span className="material-symbols-outlined text-[18px]">open_in_new</span>
-                  <span>Test Mobile Flow</span>
-                </Link>
+                <span className="text-xs text-slate-500">
+                  {qrMode === 'direct'
+                    ? 'Direct review URL QR'
+                    : qrGenerationMessage
+                    ? 'Guided QR is unavailable'
+                    : selectedQrToken
+                    ? 'Guided customer page QR'
+                    : 'Save the guided QR design to create its customer link'}
+                </span>
                 <button
                   className="p-1.5 rounded-lg hover:bg-slate-100 text-[#414754]"
                   title="Reset Zoom"
@@ -1413,7 +2036,10 @@ export default function QRDesignStudioPage() {
             </div>
 
             {/* Real Poster Canvas Workspace (Image 1) */}
-            <div className="relative w-full rounded-2xl bg-[#EFF4FF] p-8 flex flex-col items-center justify-center overflow-hidden shadow-inner min-h-[640px] border border-slate-200">
+            <div
+              className="relative w-full rounded-2xl bg-[#EFF4FF] p-8 flex flex-col items-center justify-center overflow-hidden shadow-inner min-h-[640px] border border-slate-200"
+              style={{ perspective: viewMode === 'mockup' ? '1200px' : undefined }}
+            >
               {/* Studio Ambient Glows */}
               <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-[#1A73E8]/5 blur-3xl pointer-events-none"></div>
               <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-amber-500/5 blur-3xl pointer-events-none"></div>
@@ -1425,17 +2051,20 @@ export default function QRDesignStudioPage() {
                   LIVE STAND PREVIEW
                 </span>
                 <span className="text-[11px] text-[#565E74] uppercase font-semibold">
-                  300 DPI Export Ready
+                  Browser preview; print resolution is not certified
                 </span>
               </div>
 
               {/* Physical Table Tent Stand Mockup (Image 1) */}
               <div
                 ref={posterRef}
-                style={{ transform: `scale(${zoomLevel / 100})` }}
+                style={{
+                  transform: `scale(${zoomLevel / 100})${viewMode === 'mockup' ? ' rotateY(-12deg) rotateX(5deg)' : ''}`,
+                  transformStyle: 'preserve-3d',
+                }}
                 className={`relative w-full max-w-[380px] rounded-3xl shadow-[0_25px_50px_-12px_rgba(15,23,42,0.18)] overflow-hidden flex flex-col items-center transition-all duration-300 border border-black/5 ${
                   currentPresetData.previewBg
-                }`}
+                } qr-poster-print-art motion-reduce:transition-none`}
               >
                 {/* Top Google Strip if google-classic */}
                 {selectedPreset === 'google-classic' && (
@@ -1464,12 +2093,12 @@ export default function QRDesignStudioPage() {
                   <h1
                     className={`text-lg font-extrabold tracking-wider uppercase leading-tight ${currentPresetData.textColor}`}
                   >
-                    {businessName || 'ROYAL PALACE HOTEL'}
+                    {businessName || 'YOUR BUSINESS NAME'}
                   </h1>
                   <p
                     className={`text-[10px] font-bold tracking-widest uppercase mt-1 ${currentPresetData.subtitleColor}`}
                   >
-                    {category} · {location}
+                    {businessDetails}
                   </p>
                 </div>
 
@@ -1489,8 +2118,10 @@ export default function QRDesignStudioPage() {
                         }`}
                       />
                     ) : (
-                      <div className="w-52 h-52 bg-slate-50 flex items-center justify-center text-slate-300">
-                        <span className="material-symbols-outlined text-4xl animate-spin">refresh</span>
+                      <div className="w-52 h-52 bg-slate-50 flex items-center justify-center p-4 text-center text-xs text-[#565E74]">
+                        {qrGenerationMessage || (qrMode === 'direct'
+                          ? 'Confirm your review URL to preview its direct QR.'
+                          : 'Save the QR design after configuring a public HTTPS app URL.')}
                       </div>
                     )}
 
@@ -1532,19 +2163,16 @@ export default function QRDesignStudioPage() {
                     </span>
                   </div>
 
-                  {/* 5 Stars Rating Bar */}
-                  {showStarBar && (
-                    <div className="flex items-center justify-center gap-1 text-amber-400 my-1">
-                      {[1, 2, 3, 4, 5].map((s) => (
-                        <span
-                          key={s}
-                          className="material-symbols-outlined text-[24px]"
-                          style={{ fontVariationSettings: "'FILL' 1" }}
-                        >
-                          star
-                        </span>
-                      ))}
-                    </div>
+                  <div className="flex items-center justify-center gap-0.5" aria-label="Five yellow stars">
+                    {Array.from({ length: 5 }, (_, index) => (
+                      <span key={index} className="material-symbols-outlined text-xl leading-5 text-[#FBBC04]">
+                        star
+                      </span>
+                    ))}
+                  </div>
+
+                  {supportingText.trim() && (
+                    <p className="text-xs text-[#565E74] my-1">{supportingText}</p>
                   )}
 
                   {/* Scan CTA Button (Image 1) */}
@@ -1572,7 +2200,7 @@ export default function QRDesignStudioPage() {
                   onClick={handleExportPDF}
                 >
                   <span className="material-symbols-outlined text-[18px]">picture_as_pdf</span>
-                  <span>Print-Ready PDF</span>
+                  <span>Print / Save PDF</span>
                 </button>
               </div>
             </div>

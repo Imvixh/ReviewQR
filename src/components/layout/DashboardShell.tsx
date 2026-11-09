@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { getStoredOrg, getStoredUser, setStoredUser } from '@/lib/data-store';
-import { Organization, SessionUser } from '@/lib/types';
+import { getStoredUser, setStoredUser } from '@/lib/data-store';
+import { SessionUser } from '@/lib/types';
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/client';
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -14,13 +15,13 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<SessionUser | null>(null);
-  const [org, setOrg] = useState<Organization | null>(null);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     setUser(getStoredUser());
-    setOrg(getStoredOrg());
   }, [pathname]);
 
   const navItems = [
@@ -31,9 +32,22 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
     { label: 'Settings', href: '/settings', icon: 'settings' },
   ];
 
-  const handleLogout = () => {
-    setStoredUser(null);
-    router.push('/login');
+  const handleLogout = async () => {
+    setLogoutError(null);
+    setIsLoggingOut(true);
+    try {
+      if (isSupabaseConfigured) {
+        const { error } = await createClient().auth.signOut();
+        if (error) throw error;
+      }
+
+      setStoredUser(null);
+      router.push('/login');
+    } catch (error) {
+      setLogoutError(error instanceof Error ? error.message : 'Could not log out. Please try again.');
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -53,15 +67,8 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
           <span className="font-bold text-lg tracking-tight">ReviewQR</span>
         </div>
         <div className="flex items-center gap-2">
-          <Link
-            href="/qr/dining-t1-12"
-            target="_blank"
-            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-blue-50 text-blue-600 border border-blue-200"
-          >
-            Preview Mobile
-          </Link>
           <div className="w-8 h-8 rounded-full bg-[#005BBF] text-white flex items-center justify-center font-bold text-xs">
-            {user?.displayName ? user.displayName.slice(0, 2).toUpperCase() : 'RP'}
+            {user?.displayName ? user.displayName.slice(0, 2).toUpperCase() : 'U'}
           </div>
         </div>
       </div>
@@ -90,9 +97,6 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
               <span className="font-bold text-lg text-[#0B1C30] tracking-tight">
                 Review<span className="text-[#1A73E8]">QR</span>
               </span>
-              <span className="px-1.5 py-0.5 rounded-full bg-blue-100 text-[#004493] text-[10px] uppercase font-bold tracking-wider">
-                SaaS
-              </span>
             </div>
           </div>
 
@@ -119,20 +123,15 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
           </nav>
         </div>
 
-        {/* Pro Plan Card at Bottom of Sidebar */}
+        {/* Workspace status */}
         <div className="p-4 m-3 rounded-2xl bg-[#EFF4FF] border border-[#DCE9FF] flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs uppercase font-bold text-[#005BBF]">Pro Plan</span>
-            <span className="text-[10px] uppercase bg-green-100 text-green-800 px-2 py-0.5 rounded-full font-bold">
-              Active
+            <span className="text-xs uppercase font-bold text-[#005BBF]">Workspace</span>
+            <span className="text-[10px] uppercase bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full font-bold">
+              Prototype
             </span>
           </div>
-          <div className="font-semibold text-sm text-[#0B1C30] truncate">
-            {org?.name || 'Royal Palace Hotel'}
-          </div>
-          <div className="text-xs text-[#565E74] truncate">
-            {org?.category || 'Restaurant'} • {org?.city || 'Bettiah, Bihar'}
-          </div>
+          <div className="text-xs text-[#565E74]">QR designs are browser-local.</div>
           <div className="pt-2 border-t border-blue-200/50 flex items-center justify-between text-xs font-medium text-[#1A73E8]">
             <Link href="/settings" className="hover:underline flex items-center gap-1">
               <span className="material-symbols-outlined text-[15px]">tune</span> Manage
@@ -146,23 +145,13 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
       <div className="lg:pl-64 flex flex-col min-h-screen">
         {/* Sticky Desktop Top Header */}
         <header className="sticky top-0 h-16 bg-white/90 backdrop-blur-xl border-b border-slate-100 shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-6">
-          {/* Left: Search Input */}
-          <div className="flex items-center gap-4 flex-1 max-w-md">
-            <div className="relative w-full flex items-center">
-              <span className="material-symbols-outlined absolute left-3.5 text-slate-400 text-[19px]">
-                search
-              </span>
-              <input
-                className="w-full h-10 pl-10 pr-4 rounded-xl bg-slate-50 border border-slate-200 text-sm text-[#0B1C30] placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-[#1A73E8] focus:ring-1 focus:ring-[#1A73E8] transition-all"
-                placeholder="Search QR codes, stands, or analytics..."
-                type="text"
-              />
-            </div>
+          <div className="flex flex-1 items-center">
+            <span className="text-xs font-semibold text-slate-500">ReviewQR workspace</span>
           </div>
 
           {/* Right Controls */}
           <div className="flex items-center gap-3">
-            {/* View Switcher: Business Dashboard vs Customer Mobile */}
+            {/* Workspace navigation */}
             <div className="hidden sm:flex items-center p-1 rounded-xl bg-slate-100 border border-slate-200">
               <Link
                 href="/dashboard"
@@ -174,34 +163,7 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
               >
                 Business Dashboard
               </Link>
-              <Link
-                href="/qr/dining-t1-12"
-                target="_blank"
-                className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-colors flex items-center gap-1"
-              >
-                <span>Customer Mobile</span>
-                <span className="material-symbols-outlined text-[13px]">open_in_new</span>
-              </Link>
             </div>
-
-            {/* Notification Bell */}
-            <button
-              aria-label="Notifications"
-              className="relative p-2 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all"
-            >
-              <span className="material-symbols-outlined text-[22px]">notifications</span>
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500"></span>
-            </button>
-
-            {/* Documentation / Help */}
-            <Link
-              href="https://github.com"
-              target="_blank"
-              aria-label="Help Documentation"
-              className="p-2 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all flex items-center justify-center"
-            >
-              <span className="material-symbols-outlined text-[22px]">help_outline</span>
-            </Link>
 
             {/* User Profile Dropdown */}
             <div className="relative">
@@ -210,14 +172,14 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
                 className="flex items-center gap-2.5 pl-2 py-1 pr-1.5 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 <div className="w-8 h-8 rounded-full bg-[#005BBF] text-white flex items-center justify-center font-bold text-xs shadow-sm">
-                  {user?.displayName ? user.displayName.slice(0, 2).toUpperCase() : 'RP'}
+                  {user?.displayName ? user.displayName.slice(0, 2).toUpperCase() : 'U'}
                 </div>
                 <div className="hidden md:flex flex-col text-left">
                   <span className="text-xs font-bold text-[#0B1C30] leading-tight truncate max-w-[130px]">
-                    {user?.displayName || 'Rajesh Kumar'}
+                    {user?.displayName || 'Account'}
                   </span>
                   <span className="text-[11px] text-[#565E74] leading-tight">
-                    {user?.role === 'admin' ? 'Manager / Admin' : 'Staff'}
+                    {user?.role || 'ReviewQR account'}
                   </span>
                 </div>
                 <span className="material-symbols-outlined text-slate-400 text-sm">
@@ -227,6 +189,11 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
 
               {userDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50">
+                  {logoutError && (
+                    <p className="px-4 py-2 text-xs text-red-700" role="alert">
+                      {logoutError}
+                    </p>
+                  )}
                   <div className="px-4 py-2 border-b border-slate-100">
                     <p className="text-xs font-bold text-[#0B1C30]">{user?.displayName}</p>
                     <p className="text-[11px] text-slate-500 truncate">{user?.email}</p>
@@ -250,10 +217,11 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
                   <div className="border-t border-slate-100 mt-1 pt-1">
                     <button
                       onClick={handleLogout}
+                      disabled={isLoggingOut}
                       className="w-full flex items-center gap-2 px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 text-left font-medium"
                     >
                       <span className="material-symbols-outlined text-[18px]">logout</span>
-                      <span>Log Out</span>
+                      <span>{isLoggingOut ? 'Logging out…' : 'Log Out'}</span>
                     </button>
                   </div>
                 </div>
@@ -268,4 +236,3 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
     </div>
   );
 };
-

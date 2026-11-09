@@ -73,12 +73,12 @@ export default function LandingPage() {
 
                 {/* Main Headline */}
                 <h1 className="font-display-hero text-display-hero text-on-surface mb-6 tracking-tight">
-                  Turn Every Happy Customer Into Your Next Great Review.
+                  Make It Easier to Share Honest Customer Feedback.
                 </h1>
 
                 {/* Supporting Copy */}
                 <p className="font-body-lg text-body-lg text-secondary max-w-2xl mb-8">
-                  Create beautiful QR posters that make it frictionless for customers to share honest feedback and leave reviews on Google. Simple for your guests. Powerful for your business.
+                  Design a QR poster that gives customers a direct path to your Google destination and lets them share feedback on their own terms.
                 </p>
 
                 {/* CTA Cluster */}
@@ -101,7 +101,7 @@ export default function LandingPage() {
 
                 <p className="font-body-sm text-body-sm text-secondary flex items-center gap-space-xs">
                   <span className="material-symbols-outlined text-[15px] text-tertiary">check_circle</span>
-                  No complicated setup. Print your first high-converting stand in under 2 minutes.
+                  Prototype notice: QR designs are browser-local; cloud QR sync, customer-facing QR pages and analytics are not available yet.
                 </p>
               </div>
 
@@ -141,7 +141,7 @@ export default function LandingPage() {
                       <div className="w-full flex items-center justify-between pb-3 mb-3 border-b border-surface-container">
                         <span className="font-label-caps text-label-caps uppercase tracking-wider text-secondary">Tabletop Standee</span>
                         <span className="flex items-center text-[11px] font-bold text-tertiary gap-0.5">
-                          <span className="material-symbols-outlined text-[14px]">bolt</span> Ready to Print
+                          <span className="material-symbols-outlined text-[14px]">edit</span> Design Preview
                         </span>
                       </div>
 
@@ -149,7 +149,7 @@ export default function LandingPage() {
                       <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center mb-2 shadow-inner">
                         <span className="material-symbols-outlined text-primary text-[26px]">hotel</span>
                       </div>
-                      <h3 className="font-headline-sm text-headline-sm text-on-surface tracking-tight mb-0.5">Royal Palace Hotel</h3>
+                      <h3 className="font-headline-sm text-headline-sm text-on-surface tracking-tight mb-0.5">Your business</h3>
                       <p className="font-label-caps text-label-caps uppercase text-secondary mb-3">Restaurant &amp; Lounge</p>
 
                       {/* Stylized Scannable QR Component */}
@@ -191,15 +191,6 @@ export default function LandingPage() {
                         Review us on <span className="text-primary">Google</span>
                       </p>
 
-                      {/* 5 Stars */}
-                      <div className="flex items-center gap-1 text-[#FBBC04] mb-3">
-                        <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                        <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                        <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                        <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                        <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                      </div>
-
                       <div className="w-full bg-surface-container py-1.5 px-3 rounded-md">
                         <p className="font-label-md text-label-md text-secondary">Point phone camera &amp; tap</p>
                       </div>
@@ -222,7 +213,7 @@ export default function LandingPage() {
                           </div>
                           <span className="font-label-lg text-label-lg font-bold text-on-surface">Review Assistant</span>
                         </div>
-                        <span className="font-label-md text-label-md text-secondary">No App Needed</span>
+                        <span className="font-label-md text-label-md text-secondary">Preview only</span>
                       </div>
 
                       {/* Location Details */}
@@ -231,46 +222,27 @@ export default function LandingPage() {
                           <span className="material-symbols-outlined text-[20px]">apartment</span>
                         </div>
                         <div>
-                          <h4 className="font-headline-sm text-headline-sm text-on-surface leading-tight">Royal Palace Hotel</h4>
-                          <p className="font-body-sm text-body-sm text-secondary">Restaurant · Bettiah</p>
+                          <h4 className="font-headline-sm text-headline-sm text-on-surface leading-tight">Your business</h4>
+                          <p className="font-body-sm text-body-sm text-secondary">Business location</p>
                         </div>
                       </div>
 
                       {/* Interactive Star Picker Mock */}
                       <div className="bg-surface-container-low rounded-xl p-3 text-center mb-4">
                         <span className="font-label-caps text-label-caps uppercase text-secondary block mb-1">How was your experience?</span>
-                        <div className="flex justify-center gap-2 text-[#FBBC04] mb-1">
-                          <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                          <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                          <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                          <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                          <span className="material-symbols-outlined text-[24px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                        </div>
-                        <span className="font-label-md text-label-md text-on-surface font-semibold">5 out of 5 stars · Outstanding</span>
+                        <span className="font-label-md text-label-md text-on-surface font-semibold">Customers choose their own rating</span>
                       </div>
 
-                      {/* Smart Writing Suggestions */}
-                      <div className="space-y-2 mb-4">
-                        <p className="font-label-caps text-label-caps uppercase text-secondary">Optional Suggestions (Tap to Copy)</p>
-                        <div className="bg-surface-container-low p-2.5 rounded-lg flex items-center justify-between text-left cursor-pointer hover:bg-surface-container transition-colors">
-                          <span className="font-body-sm text-body-sm text-on-surface">&quot;Friendly and polite staff with great service.&quot;</span>
-                          <span className="material-symbols-outlined text-[18px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                        </div>
-                        <div className="bg-surface-container-lowest p-2.5 rounded-lg shadow-sm flex items-center justify-between text-left opacity-75">
-                          <span className="font-body-sm text-body-sm text-secondary">&quot;Delicious food and pleasant atmosphere.&quot;</span>
-                          <span className="material-symbols-outlined text-[18px] text-outline">radio_button_unchecked</span>
-                        </div>
+                      <div className="mb-4 rounded-lg bg-surface-container-low p-3 text-left">
+                        <p className="font-label-caps text-label-caps uppercase text-secondary">Customer-authored feedback</p>
+                        <p className="mt-1 font-body-sm text-body-sm text-secondary">
+                          ReviewQR does not provide prewritten review suggestions.
+                        </p>
                       </div>
 
-                      {/* Forward Handoff CTA Button */}
-                      <Link
-                        href="/qr/dining-t1-12"
-                        className="w-full py-2.5 px-4 rounded-lg bg-primary-container text-on-primary-container font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-sm hover:bg-primary transition-all active:scale-95"
-                      >
-                        <span className="material-symbols-outlined text-[18px]">content_copy</span>
-                        <span>Copy &amp; Go to Google Review</span>
-                      </Link>
-                      <p className="font-label-caps text-label-caps text-center text-secondary mt-2">You will submit your genuine review directly on Google</p>
+                      <div className="w-full rounded-lg bg-surface-container px-4 py-2.5 text-center font-label-md text-label-md text-secondary">
+                        Customer QR flow is not available yet
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -342,7 +314,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-3">Remove the Blank Page</h3>
                 <p className="font-body-md text-body-md text-secondary leading-relaxed mb-6">
-                  Offer optional review prompts that highlight your venue&apos;s strengths—prompting ideas on polite staff, quick service, or great ambience that they can copy in a tap.
+                  Customers should describe their own experience. ReviewQR does not currently provide prewritten review prompts or a working public customer flow.
                 </p>
                 <div className="mt-auto pt-4 border-t border-surface-container flex items-center gap-2 font-label-md text-label-md text-tertiary">
                   <span className="material-symbols-outlined text-[18px]">thumb_up</span>
@@ -357,7 +329,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-3">Look Polished &amp; Established</h3>
                 <p className="font-body-md text-body-md text-secondary leading-relaxed mb-6">
-                  No generic black-and-white printouts taped to walls. Generate elegant print-ready standees, table tents, and counter cards crafted to match your brand.
+                  Preview poster designs in the QR Design Studio. Print-ready PDF and poster output have not been verified.
                 </p>
                 <div className="mt-auto pt-4 border-t border-surface-container flex items-center gap-2 font-label-md text-label-md text-primary">
                   <span className="material-symbols-outlined text-[18px]">print</span>
@@ -372,7 +344,7 @@ export default function LandingPage() {
             <div className="max-w-7xl mx-auto px-6 lg:px-12">
               <div className="text-center max-w-2xl mx-auto mb-16">
                 <span className="font-label-caps text-label-caps uppercase text-primary tracking-wider block mb-2">Simplicity First</span>
-                <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">Three simple steps to verified reviews</h2>
+                <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">A simple path to customer-submitted reviews</h2>
                 <p className="font-body-lg text-body-lg text-secondary">A transparent and direct workflow where customers stay in full control at every touchpoint.</p>
               </div>
 
@@ -387,13 +359,13 @@ export default function LandingPage() {
                     <span className="font-label-caps text-label-caps uppercase text-secondary">Setup</span>
                   </div>
                   <h3 className="font-headline-md text-headline-md text-on-surface mb-2">Create Your QR</h3>
-                  <p className="font-body-md text-body-md text-secondary mb-6">Enter your Google review link and venue name. Customize colors and select your preferred stand layout.</p>
+                  <p className="font-body-md text-body-md text-secondary mb-6">Search Google Maps manually, paste your chosen HTTPS destination, and preview a poster layout.</p>
                   <div className="mt-auto bg-surface-container-low p-4 rounded-xl">
                     <div className="flex items-center gap-3">
                       <span className="material-symbols-outlined text-primary text-[24px]">tune</span>
                       <div className="flex flex-col text-left">
-                        <span className="font-label-md text-label-md text-on-surface font-semibold">Auto-detect Place ID</span>
-                        <span className="font-body-sm text-body-sm text-secondary">One-click Google link validation</span>
+                        <span className="font-label-md text-label-md text-on-surface font-semibold">Find your listing on Google Maps</span>
+                        <span className="font-body-sm text-body-sm text-secondary">Manual search; no automatic listing detection</span>
                       </div>
                     </div>
                   </div>
@@ -406,13 +378,13 @@ export default function LandingPage() {
                     <span className="font-label-caps text-label-caps uppercase text-secondary">Customer Scan</span>
                   </div>
                   <h3 className="font-headline-md text-headline-md text-on-surface mb-2">Let Customers Scan</h3>
-                  <p className="font-body-md text-body-md text-secondary mb-6">Guests scan the acrylic table tent using their native phone camera. The lightweight review assistant opens instantly.</p>
+                  <p className="font-body-md text-body-md text-secondary mb-6">The intended flow is a phone scan followed by a customer-facing page. That public page is not implemented yet.</p>
                   <div className="mt-auto bg-surface-container-low p-4 rounded-xl">
                     <div className="flex items-center gap-3">
                       <span className="material-symbols-outlined text-tertiary text-[24px]">phonelink_ring</span>
                       <div className="flex flex-col text-left">
-                        <span className="font-label-md text-label-md text-on-surface font-semibold">Sub-second Load</span>
-                        <span className="font-body-sm text-body-sm text-secondary">Compatible with iOS and Android</span>
+                        <span className="font-label-md text-label-md text-on-surface font-semibold">Public QR page</span>
+                        <span className="font-body-sm text-body-sm text-secondary">Live use requires the secure Supabase migration</span>
                       </div>
                     </div>
                   </div>
@@ -425,28 +397,28 @@ export default function LandingPage() {
                     <span className="font-label-caps text-label-caps uppercase text-secondary">Submission</span>
                   </div>
                   <h3 className="font-headline-md text-headline-md text-on-surface mb-2">Share Honest Feedback</h3>
-                  <p className="font-body-md text-body-md text-secondary mb-6">Customers pick a rating, tap an optional suggestion if desired, and continue directly to Google to submit their review.</p>
+                  <p className="font-body-md text-body-md text-secondary mb-6">Customers choose whether to continue and submit their own feedback at the external destination. The flow does not verify Google policy compliance.</p>
                   <div className="mt-auto bg-surface-container-low p-4 rounded-xl">
                     <div className="flex items-center gap-3">
                       <span className="material-symbols-outlined text-[#FBBC04] text-[24px]">verified</span>
                       <div className="flex flex-col text-left">
-                        <span className="font-label-md text-label-md text-on-surface font-semibold">Direct Google Post</span>
-                        <span className="font-body-sm text-body-sm text-secondary">100% compliant with Google policies</span>
+                        <span className="font-label-md text-label-md text-on-surface font-semibold">Customer-controlled submission</span>
+                        <span className="font-body-sm text-body-sm text-secondary">Policy compliance has not been independently verified</span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Policy Guarantee Note */}
+              {/* Customer submission note */}
               <div className="mt-12 bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left shadow-sm">
                 <div className="w-10 h-10 rounded-full bg-tertiary-fixed/40 flex items-center justify-center text-tertiary shrink-0">
                   <span className="material-symbols-outlined text-[22px]">policy</span>
                 </div>
                 <div>
-                  <h4 className="font-headline-sm text-headline-sm text-on-surface font-bold">Fairness &amp; Compliance Guarantee</h4>
+                  <h4 className="font-headline-sm text-headline-sm text-on-surface font-bold">Customer submission</h4>
                   <p className="font-body-sm text-body-sm text-secondary">
-                    Customers remain in 100% control of their star ratings, review text, editing, and final submission directly on Google. ReviewQR never filters, gates, or alters reviews.
+                    ReviewQR does not submit reviews on a customer&apos;s behalf or claim Google policy certification. Live QR use requires configured Supabase and the secure QR migration.
                   </p>
                 </div>
               </div>
@@ -474,7 +446,7 @@ export default function LandingPage() {
                   </li>
                   <li className="flex items-center gap-3 font-body-md text-body-md text-on-surface">
                     <span className="material-symbols-outlined text-[20px] text-tertiary">check_circle</span>
-                    Export in 300 DPI vector formats ready for acrylic stands or stickers
+                    Preview editable poster layouts in the QR Design Studio
                   </li>
                 </ul>
                 <Link className="inline-flex items-center gap-2 font-label-lg text-label-lg text-primary hover:underline font-semibold" href="/qr-studio">
@@ -492,12 +464,11 @@ export default function LandingPage() {
                     <div className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface mb-2">
                       <span className="material-symbols-outlined text-[18px]">local_cafe</span>
                     </div>
-                    <span className="font-label-md text-label-md text-on-surface font-bold">Roast &amp; Co.</span>
+                    <span className="font-label-md text-label-md text-on-surface font-bold">Your Business</span>
                     <div className="w-20 h-20 bg-surface-container-low rounded my-3 flex items-center justify-center">
                       <span className="material-symbols-outlined text-secondary text-[32px]">qr_code</span>
                     </div>
                     <span className="text-[11px] font-semibold text-secondary">Review Us</span>
-                    <div className="flex text-[#FBBC04] text-[12px] mt-1">★★★★★</div>
                   </div>
 
                   {/* Poster 2: Luxury Gold/Dark */}
@@ -506,12 +477,11 @@ export default function LandingPage() {
                     <div className="w-8 h-8 rounded-full bg-inverse-surface border border-[#FBBC04]/40 flex items-center justify-center text-[#FBBC04] mb-2">
                       <span className="material-symbols-outlined text-[18px]">spa</span>
                     </div>
-                    <span className="font-label-md text-label-md text-white font-bold">L&apos;Aura Salon</span>
+                    <span className="font-label-md text-label-md text-white font-bold">Your Business</span>
                     <div className="w-20 h-20 bg-white/10 rounded my-3 flex items-center justify-center">
                       <span className="material-symbols-outlined text-[#FBBC04] text-[32px]">qr_code</span>
                     </div>
-                    <span className="text-[11px] font-semibold text-white/80">Rate Experience</span>
-                    <div className="flex text-[#FBBC04] text-[12px] mt-1">★★★★★</div>
+                    <span className="text-[11px] font-semibold text-white/80">Share Experience</span>
                   </div>
 
                   {/* Poster 3: Classic Hospitality */}
@@ -520,12 +490,11 @@ export default function LandingPage() {
                     <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center mb-2">
                       <span className="material-symbols-outlined text-[18px]">hotel</span>
                     </div>
-                    <span className="font-label-md text-label-md text-on-surface font-bold">Grand Vista</span>
+                    <span className="font-label-md text-label-md text-on-surface font-bold">Your Business</span>
                     <div className="w-20 h-20 bg-primary-fixed/30 rounded my-3 flex items-center justify-center">
                       <span className="material-symbols-outlined text-primary text-[32px]">qr_code</span>
                     </div>
                     <span className="text-[11px] font-semibold text-primary">Google Reviews</span>
-                    <div className="flex text-[#FBBC04] text-[12px] mt-1">★★★★★</div>
                   </div>
                 </div>
               </div>
@@ -641,7 +610,7 @@ export default function LandingPage() {
                 <div className="bg-surface-container-lowest rounded-xl p-4 shadow-sm">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-label-md text-label-md text-on-surface font-semibold">Weekly Scan Volume</span>
-                    <span className="font-label-md text-label-md text-tertiary font-bold">+28.4%</span>
+                    <span className="font-label-md text-label-md text-secondary font-bold">Unavailable</span>
                   </div>
                   <div className="h-16 w-full flex items-end gap-2 pt-2">
                     <div className="flex-1 bg-primary-fixed rounded-t h-[40%]"></div>
@@ -650,7 +619,7 @@ export default function LandingPage() {
                     <div className="flex-1 bg-primary-fixed rounded-t h-[75%]"></div>
                     <div className="flex-1 bg-primary-fixed rounded-t h-[65%]"></div>
                     <div className="flex-1 bg-primary-container rounded-t h-[95%]"></div>
-                    <div className="flex-1 bg-primary rounded-t h-[100%]"></div>
+                    <div className="flex-1 rounded-t bg-primary/10"></div>
                   </div>
                   <div className="flex justify-between font-label-caps text-label-caps text-secondary uppercase mt-2">
                     <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
@@ -720,8 +689,8 @@ export default function LandingPage() {
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-xs">RP</div>
                         <div className="flex flex-col text-left overflow-hidden">
-                          <span className="font-label-md text-label-md text-on-surface truncate font-semibold">Royal Palace</span>
-                          <span className="font-body-sm text-body-sm text-secondary truncate">Google Verified</span>
+                          <span className="font-label-md text-label-md text-on-surface truncate font-semibold">Your business</span>
+                          <span className="font-body-sm text-body-sm text-secondary truncate">Destination not verified</span>
                         </div>
                       </div>
                     </div>
@@ -759,11 +728,11 @@ export default function LandingPage() {
                         <div className="space-y-3">
                           <div>
                             <label className="font-label-caps text-label-caps uppercase text-secondary block mb-1">Business Name</label>
-                            <div className="bg-surface-container-lowest px-3 py-2 rounded-lg font-body-md text-body-md text-on-surface font-medium">Royal Palace Hotel &amp; Restaurant</div>
+                            <div className="bg-surface-container-lowest px-3 py-2 rounded-lg font-body-md text-body-md text-on-surface font-medium">Your business</div>
                           </div>
                           <div>
                             <label className="font-label-caps text-label-caps uppercase text-secondary block mb-1">Direct Google Review Link</label>
-                            <div className="bg-surface-container-lowest px-3 py-2 rounded-lg font-body-sm text-body-sm text-secondary truncate font-mono">https://g.page/r/Cb41940a.../review</div>
+                            <div className="bg-surface-container-lowest px-3 py-2 rounded-lg font-body-sm text-body-sm text-secondary truncate font-mono">No destination selected</div>
                           </div>
                           <div>
                             <label className="font-label-caps text-label-caps uppercase text-secondary block mb-1">Theme Palette</label>
@@ -777,15 +746,11 @@ export default function LandingPage() {
                         </div>
                       </div>
                       <div className="md:col-span-5 flex flex-col items-center justify-center bg-surface-container-lowest p-4 rounded-xl shadow-sm text-center">
-                        <span className="font-label-caps text-label-caps uppercase text-secondary mb-2">Live Stand Preview</span>
+                        <span className="font-label-caps text-label-caps uppercase text-secondary mb-2">Illustrative poster preview</span>
                         <div className="w-24 h-24 bg-surface-container flex items-center justify-center rounded-lg mb-2">
                           <span className="material-symbols-outlined text-[48px] text-primary">qr_code_2</span>
                         </div>
-                        <span className="font-label-md text-label-md font-bold text-on-surface">Table Tent 4x6&quot;</span>
-                        <div className="flex gap-2 mt-3 w-full">
-                          <Link href="/create-qr" className="flex-1 py-1.5 px-2 bg-primary-container text-on-primary-container font-label-md text-label-md rounded shadow-sm text-center">PDF</Link>
-                          <Link href="/create-qr" className="flex-1 py-1.5 px-2 bg-surface-container text-on-surface font-label-md text-label-md rounded text-center">PNG</Link>
-                        </div>
+                        <span className="font-label-md text-label-md font-bold text-on-surface">Export unavailable</span>
                       </div>
                     </div>
                   </div>
@@ -896,7 +861,7 @@ export default function LandingPage() {
                 <span className="font-label-caps text-label-caps uppercase text-primary tracking-wider block mb-2">Got Questions?</span>
                 <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">Frequently Asked Questions</h2>
                 <p className="font-body-lg text-body-lg text-secondary">
-                  Clear, straightforward answers about how ReviewQR works and keeps your business Google-compliant.
+                  Clear, straightforward answers about the current prototype and its limitations.
                 </p>
               </div>
 
@@ -908,7 +873,7 @@ export default function LandingPage() {
                     <span className="material-symbols-outlined text-secondary transition-transform group-open:rotate-180">expand_more</span>
                   </summary>
                   <div className="mt-4 pt-3 border-t border-surface-container font-body-md text-body-md text-secondary leading-relaxed">
-                    ReviewQR is an in-store review enablement platform. We provide beautiful, print-ready tabletop stands, counter cards, and smart QR endpoints that guide happy physical customers directly to your Google Business Profile to leave genuine reviews.
+                    ReviewQR is a prototype for designing QR posters that point customers to a business-selected destination. QR designs remain browser-local, and public customer QR pages are not currently available.
                   </div>
                 </details>
 
@@ -919,7 +884,7 @@ export default function LandingPage() {
                     <span className="material-symbols-outlined text-secondary transition-transform group-open:rotate-180">expand_more</span>
                   </summary>
                   <div className="mt-4 pt-3 border-t border-surface-container font-body-md text-body-md text-secondary leading-relaxed">
-                    No. Guests simply open their smartphone camera app, scan your stand&apos;s QR code, and are instantly taken to the mobile-friendly web review assistant in Safari, Chrome, or their default browser. No account registration or download is ever required.
+                    The public customer QR page is not currently available. The intended flow is to scan a printed QR code and open its destination in a browser.
                   </div>
                 </details>
 
@@ -930,7 +895,7 @@ export default function LandingPage() {
                     <span className="material-symbols-outlined text-secondary transition-transform group-open:rotate-180">expand_more</span>
                   </summary>
                   <div className="mt-4 pt-3 border-t border-surface-container font-body-md text-body-md text-secondary leading-relaxed">
-                    Yes, 100%. ReviewQR assists the customer by offering optional suggestions to cure writer&apos;s block. Customers always post directly through Google&apos;s native review form and retain full control to edit their stars, photos, and commentary.
+                    ReviewQR does not submit reviews. Customers choose whether to edit their own text and submit feedback through the saved external destination.
                   </div>
                 </details>
 
@@ -941,7 +906,7 @@ export default function LandingPage() {
                     <span className="material-symbols-outlined text-secondary transition-transform group-open:rotate-180">expand_more</span>
                   </summary>
                   <div className="mt-4 pt-3 border-t border-surface-container font-body-md text-body-md text-secondary leading-relaxed">
-                    No software can legally submit Google reviews on a customer&apos;s behalf. Google requires that the authenticated user submits their own review from their personal Google Account. ReviewQR makes this transition frictionless with automatic link opening and one-tap clipboard copy.
+                    ReviewQR does not submit reviews on a customer&apos;s behalf. Customers must follow the external provider&apos;s applicable policies and submit their own reviews directly.
                   </div>
                 </details>
 
@@ -952,7 +917,7 @@ export default function LandingPage() {
                     <span className="material-symbols-outlined text-secondary transition-transform group-open:rotate-180">expand_more</span>
                   </summary>
                   <div className="mt-4 pt-3 border-t border-surface-container font-body-md text-body-md text-secondary leading-relaxed">
-                    You can export crisp 300-DPI print-ready PDFs with crop marks for standard acrylic dimensions (4×6 in, 5×7 in, A5, and A6), as well as transparent PNGs and SVGs for your own custom signage or marketing collateral.
+                    The QR Design Studio has limited local export functionality. Print-ready PDF sizes, crop marks, and export fidelity have not been verified.
                   </div>
                 </details>
               </div>
@@ -972,7 +937,7 @@ export default function LandingPage() {
                   Make It Easier for Customers to Share Their Experience.
                 </h2>
                 <p className="font-body-lg text-body-lg text-primary-fixed mb-8 leading-relaxed">
-                  Create your first ReviewQR poster in minutes and give your in-store guests a simpler, faster way to leave honest reviews.
+                  Explore the prototype and its current QR poster design workflow.
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
                   <Link
@@ -989,7 +954,7 @@ export default function LandingPage() {
                   </Link>
                 </div>
                 <p className="font-body-sm text-body-sm text-primary-fixed/80">
-                  Free to start · Instant print setup · No credit card required
+                  Prototype · Business destination requires configured Supabase
                 </p>
               </div>
             </div>
@@ -1013,21 +978,21 @@ export default function LandingPage() {
                 </span>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">
-                Empowering physical retailers and local venues to convert in-person customers into genuine Google 5-star reviews with high-converting smart QR touchpoints.
+                Helping local businesses design QR touchpoints for customer-selected feedback destinations.
               </p>
               <div className="inline-flex items-center gap-space-sm px-space-sm py-space-xs rounded-full bg-surface-container">
-                <span className="w-2 h-2 rounded-full bg-tertiary-container animate-pulse"></span>
-                <span className="font-label-md text-label-md text-on-surface-variant font-medium">All systems operational</span>
+                <span className="w-2 h-2 rounded-full bg-slate-400"></span>
+                <span className="font-label-md text-label-md text-on-surface-variant font-medium">Prototype; some features unavailable</span>
               </div>
             </div>
 
             <div>
               <h4 className="font-label-caps text-label-caps uppercase text-on-surface mb-space-md tracking-wider font-bold">Product</h4>
               <ul className="space-y-space-sm">
-                <li className="font-body-md text-body-md"><Link className="text-on-surface-variant hover:text-on-surface transition-colors" href="/create-qr">QR Stand Generator</Link></li>
-                <li className="font-body-md text-body-md"><Link className="text-on-surface-variant hover:text-on-surface transition-colors" href="/qr-studio">Review Assistant</Link></li>
-                <li className="font-body-md text-body-md"><Link className="text-on-surface-variant hover:text-on-surface transition-colors" href="/create-qr">Print-Ready Kits</Link></li>
-                <li className="font-body-md text-body-md"><Link className="text-on-surface-variant hover:text-on-surface transition-colors" href="/analytics">Realtime Telemetry</Link></li>
+                <li className="font-body-md text-body-md"><Link className="text-on-surface-variant hover:text-on-surface transition-colors" href="/qr-studio">QR Design Studio</Link></li>
+                <li className="font-body-md text-body-md text-on-surface-variant">Customer QR flow is unavailable.</li>
+                <li className="font-body-md text-body-md text-on-surface-variant">Print via browser; output is not print-certified.</li>
+                <li className="font-body-md text-body-md text-on-surface-variant">Analytics are unavailable.</li>
               </ul>
             </div>
 
@@ -1036,27 +1001,27 @@ export default function LandingPage() {
               <ul className="space-y-space-sm">
                 <li className="font-body-md text-body-md"><a className="text-on-surface-variant hover:text-on-surface transition-colors" href="#faq">Help Center &amp; FAQ</a></li>
                 <li className="font-body-md text-body-md"><a className="text-on-surface-variant hover:text-on-surface transition-colors" href="#how-it-works">Implementation Guide</a></li>
-                <li className="font-body-md text-body-md"><Link className="text-on-surface-variant hover:text-on-surface transition-colors" href="/dashboard">Customer Stories</Link></li>
-                <li className="font-body-md text-body-md"><Link className="text-on-surface-variant hover:text-on-surface transition-colors" href="/api/public/qr/dining-t1-12">API Documentation</Link></li>
+                <li className="font-body-md text-body-md text-on-surface-variant">Customer stories are not available.</li>
+                <li className="font-body-md text-body-md text-on-surface-variant">API documentation is available in the repository.</li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-label-caps text-label-caps uppercase text-on-surface mb-space-md tracking-wider font-bold">Legal &amp; Trust</h4>
               <ul className="space-y-space-sm">
-                <li className="font-body-md text-body-md"><Link className="text-on-surface-variant hover:text-on-surface transition-colors" href="/settings">Privacy Policy</Link></li>
-                <li className="font-body-md text-body-md"><Link className="text-on-surface-variant hover:text-on-surface transition-colors" href="/settings">Terms of Service</Link></li>
-                <li className="font-body-md text-body-md"><Link className="text-on-surface-variant hover:text-on-surface transition-colors" href="/settings">Cookie Settings</Link></li>
-                <li className="font-body-md text-body-md"><Link className="text-on-surface-variant hover:text-on-surface transition-colors" href="/settings">Security Standards</Link></li>
+                <li className="font-body-md text-body-md text-on-surface-variant">Privacy policy not published</li>
+                <li className="font-body-md text-body-md text-on-surface-variant">Terms of service not published</li>
+                <li className="font-body-md text-body-md text-on-surface-variant">Cookie settings not available</li>
+                <li className="font-body-md text-body-md text-on-surface-variant">Security documentation is in progress</li>
               </ul>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-between pt-space-xl text-on-surface-variant border-t border-surface-container">
-            <p className="font-body-sm text-body-sm">© 2025 ReviewQR Technologies Inc. All rights reserved.</p>
+            <p className="font-body-sm text-body-sm">© ReviewQR</p>
             <p className="font-body-sm text-body-sm flex items-center gap-space-xs mt-space-sm sm:mt-0">
-              <span className="material-symbols-outlined text-[16px] text-tertiary-container">verified</span>
-              Verified Google Business Profile Companion Tool
+              <span className="material-symbols-outlined text-[16px] text-tertiary-container">info</span>
+              Independent prototype; not affiliated with Google
             </p>
           </div>
         </div>

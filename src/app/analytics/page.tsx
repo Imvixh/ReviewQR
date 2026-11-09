@@ -2,81 +2,89 @@
 
 import React, { useEffect, useState } from 'react';
 import { DashboardShell } from '@/components/layout/DashboardShell';
-import { getAnalyticsStats } from '@/lib/data-store';
+
+interface AnalyticsRow {
+  qrCodeId: string;
+  placementName: string;
+  scans: number;
+  destinationClicks: number;
+  clickThroughRate: number;
+}
+
+interface AnalyticsResponse {
+  scans: number;
+  uniqueVisitors: null;
+  destinationClicks: number;
+  clickThroughRate: number;
+  byQr: AnalyticsRow[];
+}
 
 export default function AnalyticsPage() {
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [stats, setStats] = useState({
-    totalScans: 0,
-    uniqueVisitors: null as number | null,
-    googleClicks: 0,
-    ctr: null as string | null,
-  });
+  const [analyticsMessage, setAnalyticsMessage] = useState('Loading persisted analytics…');
+  const [analytics, setAnalytics] = useState<AnalyticsResponse | null>(null);
 
   useEffect(() => {
-    setStats(getAnalyticsStats());
+    let cancelled = false;
+    void fetch('/api/analytics')
+      .then(async (response) => {
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.message || 'Persistent analytics are unavailable.');
+        }
+        return result;
+      })
+      .then((result: AnalyticsResponse) => {
+        if (!cancelled) {
+          setAnalytics(result);
+          setAnalyticsMessage('Owner-scoped scan and destination-click analytics loaded.');
+        }
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setAnalyticsMessage(
+            error instanceof Error ? error.message : 'Persistent analytics are unavailable.'
+          );
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
-
-  const handleExport = (format: 'CSV' | 'PDF') => {
-    if (format === 'PDF') {
-      window.print();
-      return;
-    }
-
-    const csv = [
-      'metric,value,scope',
-      `scans,${stats.totalScans},this browser only`,
-      `unique_visitors,not available,this browser only`,
-      `google_clicks,${stats.googleClicks},this browser only`,
-      `conversion_rate,${stats.ctr ?? 'not available'},this browser only`,
-    ].join('\n');
-    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'reviewqr-local-analytics.csv';
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 0);
-    setToastMessage('Browser-local analytics CSV downloaded.');
-    setTimeout(() => setToastMessage(null), 3000);
-  };
 
   return (
     <DashboardShell>
       <div className="p-6 lg:p-8 max-w-7xl mx-auto w-full flex flex-col gap-8">
-        {toastMessage && (
-          <div className="fixed bottom-6 right-6 z-50 bg-[#0B1C30] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-700 animate-slide-up">
-            <span className="material-symbols-outlined text-green-400 text-xl">check_circle</span>
-            <span className="text-xs font-semibold">{toastMessage}</span>
-          </div>
-        )}
-
         {/* Top Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1 text-xs font-bold uppercase text-[#1A73E8] tracking-wider">
-              <span>Local browser counts</span>
+              <span>Persistent event analytics</span>
               <span className="text-slate-300">•</span>
-              <span className="text-slate-600">Not synced</span>
+              <span className="text-slate-600">
+                {analytics ? 'Owner-scoped' : 'Unavailable'}
+              </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0B1C30] tracking-tight">
               Analytics & Conversion
             </h1>
             <p className="text-sm text-[#414754] mt-1">
-              Counts include only scan and click events saved in this browser. They are not shared across devices.
+              ReviewQR records QR scans and destination clicks; unique visitors and review submissions are not measured.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
             <button
-              onClick={() => handleExport('CSV')}
-              className="h-10 px-3.5 rounded-xl bg-white border border-slate-200 text-[#0B1C30] font-semibold text-xs shadow-sm hover:bg-slate-50 transition-colors flex items-center gap-1.5"
+              disabled
+              title="CSV export is unavailable until analytics are persisted."
+              className="h-10 px-3.5 rounded-xl bg-white border border-slate-200 text-[#0B1C30] font-semibold text-xs shadow-sm opacity-50 cursor-not-allowed flex items-center gap-1.5"
             >
               <span className="material-symbols-outlined text-base text-slate-500">csv</span>
               <span>CSV</span>
             </button>
             <button
-              onClick={() => handleExport('PDF')}
-              className="h-10 px-3.5 rounded-xl bg-white border border-slate-200 text-[#0B1C30] font-semibold text-xs shadow-sm hover:bg-slate-50 transition-colors flex items-center gap-1.5"
+              disabled
+              title="PDF export is unavailable until analytics are persisted."
+              className="h-10 px-3.5 rounded-xl bg-white border border-slate-200 text-[#0B1C30] font-semibold text-xs shadow-sm opacity-50 cursor-not-allowed flex items-center gap-1.5"
             >
               <span className="material-symbols-outlined text-base text-slate-500">picture_as_pdf</span>
               <span>PDF</span>
@@ -92,8 +100,10 @@ export default function AnalyticsPage() {
               <span className="material-symbols-outlined text-blue-600 text-lg">qr_code_scanner</span>
             </div>
             <div className="mt-4">
-              <div className="text-3xl font-extrabold text-[#0B1C30]">{stats.totalScans}</div>
-              <div className="text-xs text-slate-500 mt-1">Saved in this browser only</div>
+              <div className="text-3xl font-extrabold text-[#0B1C30]">
+                {analytics?.scans.toLocaleString() ?? '—'}
+              </div>
+              <div className="text-xs text-slate-500 mt-1">Persisted scan events</div>
             </div>
           </div>
 
@@ -114,8 +124,10 @@ export default function AnalyticsPage() {
               <span className="material-symbols-outlined text-purple-600 text-lg">rate_review</span>
             </div>
             <div className="mt-4">
-              <div className="text-3xl font-extrabold text-[#0B1C30]">{stats.googleClicks}</div>
-              <div className="text-xs text-slate-500 mt-1">Saved in this browser only</div>
+              <div className="text-3xl font-extrabold text-[#0B1C30]">
+                {analytics?.destinationClicks.toLocaleString() ?? '—'}
+              </div>
+              <div className="text-xs text-slate-500 mt-1">Destination handoff clicks</div>
             </div>
           </div>
 
@@ -126,9 +138,9 @@ export default function AnalyticsPage() {
             </div>
             <div className="mt-4">
               <div className="text-3xl font-extrabold text-[#0B1C30]">
-                {stats.ctr === null ? '—' : `${stats.ctr}%`}
+                {analytics ? `${analytics.clickThroughRate.toFixed(1)}%` : '—'}
               </div>
-              <div className="text-xs text-slate-500 mt-1">Calculated from local scan and click events</div>
+              <div className="text-xs text-slate-500 mt-1">Destination clicks / scans</div>
             </div>
           </div>
         </div>
@@ -140,21 +152,32 @@ export default function AnalyticsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-bold text-sm text-[#0B1C30]">Scans vs. Google Review Handoffs</h3>
-                <p className="text-xs text-[#565E74]">Historical trends are not available yet.</p>
+                <p className="text-xs text-[#565E74]">A time-series view is not implemented.</p>
               </div>
             </div>
 
             <div className="flex min-h-64 items-center justify-center rounded-xl bg-slate-50 p-8 text-center text-sm text-slate-600">
-              A historical trend is unavailable until analytics events are persisted by the server.
+              Historical trend visualization is unavailable. Counts below reflect persisted events.
             </div>
           </div>
 
           {/* Stand Breakdown Progress (4 cols) */}
           <div className="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-5">
             <h3 className="font-bold text-sm text-[#0B1C30]">Volume by Stand Location</h3>
-            <p className="text-sm text-slate-600">
-              Touchpoint breakdown is unavailable until scan and click events are stored per QR code.
-            </p>
+            {analytics?.byQr.length ? (
+              <ul className="space-y-3">
+                {analytics.byQr.map((row) => (
+                  <li key={row.qrCodeId} className="flex items-center justify-between gap-3 text-xs">
+                    <span className="truncate font-medium text-slate-700">{row.placementName}</span>
+                    <span className="shrink-0 text-slate-500">{row.scans.toLocaleString()} scans</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-slate-600">
+                {analytics ? 'No saved QR designs have events yet.' : 'Owner-scoped analytics are unavailable.'}
+              </p>
+            )}
           </div>
         </div>
 
@@ -169,20 +192,28 @@ export default function AnalyticsPage() {
               <thead className="bg-slate-50 text-slate-500 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-100">
                 <tr>
                   <th className="py-3 px-6">Touchpoint & Placement</th>
-                  <th className="py-3 px-4">Category</th>
                   <th className="py-3 px-4">Total Scans</th>
-                  <th className="py-3 px-4">Unique Visitors</th>
-                  <th className="py-3 px-4">Google Clicks</th>
-                  <th className="py-3 px-4">Conversion Rate</th>
+                  <th className="py-3 px-4">Destination Clicks</th>
+                  <th className="py-3 px-4">Click-through Rate</th>
                   <th className="py-3 px-6 text-right">Performance Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-slate-500">
-                    No persisted touchpoint analytics are available yet.
-                  </td>
-                </tr>
+                {analytics?.byQr.length ? analytics.byQr.map((row) => (
+                  <tr key={row.qrCodeId}>
+                    <td className="px-6 py-4 font-medium text-[#0B1C30]">{row.placementName}</td>
+                    <td className="px-4 py-4">{row.scans.toLocaleString()}</td>
+                    <td className="px-4 py-4">{row.destinationClicks.toLocaleString()}</td>
+                    <td className="px-4 py-4">{row.clickThroughRate.toFixed(1)}%</td>
+                    <td className="px-6 py-4 text-right text-slate-500">Recorded events</td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
+                      {analytics ? 'No persisted touchpoint analytics are available yet.' : 'Owner-scoped analytics are unavailable.'}
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -191,9 +222,7 @@ export default function AnalyticsPage() {
         {/* Disclaimer Notice */}
         <div className="p-4 rounded-xl bg-slate-100 text-xs text-slate-500 flex items-center gap-2">
           <span className="material-symbols-outlined text-slate-400 text-base">info</span>
-          <span>
-            Current counts are browser-local and are not persisted or shared. ReviewQR does not retrieve submitted Google reviews.
-          </span>
+          <span role="status">{analyticsMessage} ReviewQR does not retrieve submitted Google reviews.</span>
         </div>
       </div>
     </DashboardShell>

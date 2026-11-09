@@ -65,11 +65,11 @@ export function generateQrSvg(
   }
 
   const svg = [
-    '<svg xmlns="http://www.w3.org/2000/svg"',
-    `width="320" height="320" viewBox="0 0 ${size} ${size}"`,
-    'shape-rendering="crispEdges"',
-    '>',
+    `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 ${size + 8} ${size + 8}" shape-rendering="crispEdges">`,
+    '<rect width="100%" height="100%" fill="#FFFFFF" />',
+    '<g transform="translate(4 4)">',
     parts.join(''),
+    '</g>',
     '</svg>',
   ].join('');
 
