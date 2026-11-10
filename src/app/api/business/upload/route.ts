@@ -73,8 +73,9 @@ export async function POST(request: NextRequest) {
   } catch (e) {
     console.error('Failed to initialize admin client:', e);
   }
-  const dbClient = adminClient || supabase;
+
   const storageClient = adminClient || supabase;
+  const dbClient = adminClient || supabase;
 
   const { error: uploadError } = await storageClient.storage
     .from('business-assets')
@@ -85,19 +86,31 @@ export async function POST(request: NextRequest) {
 
   if (uploadError) {
     console.error('Failed to upload business branding asset:', uploadError);
-    return NextResponse.json({ code: 'ASSET_UPLOAD_FAILED', message: uploadError.message }, { status: 502 });
+    return NextResponse.json(
+      {
+        code: 'ASSET_UPLOAD_FAILED',
+        message: uploadError.message || 'Storage upload failed. Please verify storage permissions.',
+      },
+      { status: 502 }
+    );
   }
 
-  const { data: signedAsset, error: signedAssetError } = await storageClient.storage
+  let assetUrl: string | undefined;
+  const { data: signedAsset } = await storageClient.storage
     .from('business-assets')
     .createSignedUrl(path, 60 * 60 * 24 * 365); // 1 year signed URL
-  if (signedAssetError || !signedAsset) {
-    console.error('Failed to create a private business asset URL:', signedAssetError);
-    const { error: cleanupError } = await storageClient.storage.from('business-assets').remove([path]);
-    if (cleanupError) {
-      console.error('Failed to clean up branding asset after URL signing failed:', cleanupError);
-    }
-    return NextResponse.json({ code: 'ASSET_URL_CREATION_FAILED' }, { status: 502 });
+
+  if (signedAsset?.signedUrl) {
+    assetUrl = signedAsset.signedUrl;
+  } else {
+    const { data: publicAsset } = storageClient.storage
+      .from('business-assets')
+      .getPublicUrl(path);
+    assetUrl = publicAsset.publicUrl;
+  }
+
+  if (!assetUrl) {
+    return NextResponse.json({ code: 'ASSET_URL_CREATION_FAILED', message: 'Failed to generate asset URL.' }, { status: 502 });
   }
 
   const update = type === 'logo'
@@ -111,16 +124,15 @@ export async function POST(request: NextRequest) {
 
   if (saveError) {
     console.error('Failed to save business branding asset metadata:', saveError);
-    const { error: cleanupError } = await supabase.storage.from('business-assets').remove([path]);
-    if (cleanupError) {
-      console.error('Failed to clean up branding asset after metadata persistence failed:', cleanupError);
-    }
-    return NextResponse.json({ code: 'ASSET_METADATA_SAVE_FAILED' }, { status: 500 });
+    return NextResponse.json(
+      { code: 'ASSET_METADATA_SAVE_FAILED', message: 'Uploaded asset could not be linked to the business.' },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({
     success: true,
-    url: signedAsset.signedUrl,
+    url: assetUrl,
     path,
     type,
     storage: 'supabase',

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { isSupabaseConfigured } from '@/lib/supabase/env';
 import { publicQrTokenSchema, safeHttpsUrlSchema } from '@/lib/validation';
 
@@ -34,6 +35,54 @@ export async function GET(
     return NextResponse.json({ code: 'PUBLIC_DESTINATION_INVALID' }, { status: 503 });
   }
 
+  let logoUrl: string | undefined;
+  let thumbnailUrl: string | undefined;
+
+  try {
+    let adminClient;
+    try {
+      adminClient = createAdminClient();
+    } catch {
+      adminClient = null;
+    }
+    const queryClient = adminClient || supabase;
+    const { data: businessData } = await queryClient
+      .from('qr_codes')
+      .select('businesses!qr_codes_business_id_fkey(logo_path, thumbnail_path, logo_url, thumbnail_url)')
+      .eq('token', parsedToken.data.token)
+      .maybeSingle();
+
+    const business = businessData?.businesses as {
+      logo_path?: string | null;
+      thumbnail_path?: string | null;
+      logo_url?: string | null;
+      thumbnail_url?: string | null;
+    } | null;
+
+    if (business) {
+      const storage = queryClient.storage.from('business-assets');
+      if (business.logo_path) {
+        const { data: signed } = await storage
+          .createSignedUrl(business.logo_path, 60 * 60 * 24 * 365)
+          .catch(() => ({ data: null }));
+        logoUrl = signed?.signedUrl || storage.getPublicUrl(business.logo_path).data?.publicUrl;
+      } else if (business.logo_url) {
+        logoUrl = business.logo_url;
+      }
+
+      if (business.thumbnail_path) {
+        const { data: signed } = await storage
+          .createSignedUrl(business.thumbnail_path, 60 * 60 * 24 * 365)
+          .catch(() => ({ data: null }));
+        thumbnailUrl = signed?.signedUrl || storage.getPublicUrl(business.thumbnail_path).data?.publicUrl;
+      } else if (business.thumbnail_url) {
+        thumbnailUrl = business.thumbnail_url;
+      }
+    }
+  } catch (assetErr) {
+    console.warn('Failed to resolve business asset URLs for public QR:', assetErr);
+  }
+
   return NextResponse.json({
     qr: {
       businessName: row.business_name,
@@ -47,6 +96,9 @@ export async function GET(
         typeof row.business_category === 'string' ? row.business_category : '',
       businessSubcategory:
         typeof row.business_subcategory === 'string' ? row.business_subcategory : '',
+      logoUrl,
+      thumbnailUrl,
     },
   });
 }
+

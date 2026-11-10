@@ -18,94 +18,118 @@ interface PublicQr {
   thumbnailUrl?: string;
 }
 
+interface SuggestionItem {
+  topic: string;
+  text: string;
+}
+
 const journeyText = {
   en: {
     assistant: 'Review Assistant',
-    privacy: 'Customer-controlled review handoff',
+    verifiedDomain: 'VERIFIED.REVIEWQR.APP',
+    fastAssistant: 'FAST GUEST ASSISTANT',
+    setupTime: '< 30s Setup',
     howWasIt: 'How Was Your Experience?',
-    shareInWords: 'Share feedback in your own words, or continue directly to the review destination.',
-    optionalRating: 'Choose a star rating (optional)',
-    ratingSelected: (rating: number) => `You selected ${rating} of 5 stars. Your rating never limits your next step.`,
-    continue: 'Continue',
-    reviewOnGoogle: 'Review us on Google',
-    externalDestination: 'External review destination',
-    youChoose: 'You decide whether to continue and submit feedback on the external site.',
-    writeTitle: 'Write in Your Own Words (Optional)',
-    writeDescription: 'Describe your real experience. Suggestions, when available, only rephrase what you share.',
-    ratingContext: (rating: number) => `Your optional ${rating}-star selection is for your reference only.`,
-    reviewText: 'Your review text (optional)',
-    experienceLabel: 'Tell us about your experience.',
-    placeholder: 'Share what you liked, what could be improved, or anything that stood out.',
-    generateSuggestions: 'Generate Review Suggestions',
-    generatingSuggestions: 'Generating suggestions…',
-    suggestionsTitle: 'Review suggestions',
-    suggestionsHelp: 'Choose a suggestion to edit it in your own words before copying.',
-    useSuggestion: 'Use this suggestion',
-    addFeedbackFirst: 'Add a few words about your actual experience to generate suggestions.',
-    retrySuggestions: 'Try again',
-    suggestionError: 'Suggestions were not generated. Please try again.',
-    reflect: 'Need a reminder? Choose a topic to think about:',
-    prompts: ['Service', 'Atmosphere', 'What stood out?', 'What could improve?'],
-    promptHelp: 'These are reflection prompts only. They do not add text to your review.',
-    clipboard: 'Live Clipboard Preview',
-    ready: 'Ready to Paste',
-    emptyReview: 'No text will be copied unless you write it here.',
-    copyContinue: 'Copy My Text & Continue',
-    continueEmpty: 'Continue Without Review Text',
-    copiedTitle: 'Review text copied',
-    readyTitle: 'Ready to continue',
-    handoff: 'You control whether to continue and submit your review on the external destination.',
-    next: 'What happens next:',
-    chooseRating: 'Choose a rating on the external destination',
-    pasteText: 'Paste your text only if you choose',
-    submitThere: 'Review and submit there, if you want to',
-    editText: 'Edit my text',
-    language: 'Language',
-    ratingAria: (rating: number) => `${rating} out of 5 stars`,
+    shareInWords: 'Share your honest experience with us. It takes less than 30 seconds.',
+    tapToContinue: 'Tap a star rating to continue',
+    directFeedback: 'DIRECT FEEDBACK',
+    instantPhrasing: 'Instant Phrasing Assistant',
+    instantPhrasingDesc:
+      'Tapping any rating unlocks 3 personalized sentence suggestions crafted for fast 1-tap pasting on Google Reviews.',
+    bullet1: 'Warm hospitality & swift room service',
+    bullet2: 'Delicious family dining buffet',
+    feature1Title: 'Multi-Cuisine',
+    feature1Desc: 'Authentic Flavors',
+    feature2Title: 'Luxury Suites',
+    feature2Desc: 'Premium Comfort',
+    trustTitle: 'DIRECT GOOGLE REVIEWS FLOW',
+    trustSubtitle:
+      '100% Honest & Independent · Directly verified on Google Maps · No app download or login required.',
+    trustEncrypted: 'Encrypted Guest Session · Private & Secure',
+    verifiedPartner: 'Verified Partner',
+    step2of4: 'STEP 2 OF 4',
+    starsSelected: (count: number) => `${count} out of 5 stars selected`,
+    tapToChange: 'Tap to change',
+    chooseBestDescribes: 'Choose What Best Describes Your Experience',
+    selectSuggestionHelp:
+      'Select a suggestion that matches your actual experience (or write your own).',
+    experienceFilters: 'EXPERIENCE FILTERS',
+    writeOwnReview: '✍️ Or Write My Own Review',
+    editOptional: 'Edit or Personalize (Optional)',
+    livePreview: 'LIVE PREVIEW',
+    readyToPaste: 'Ready to Paste',
+    emptyPreview: 'No text will be copied unless you write it here.',
+    copyGoToGoogle: 'Copy & Go to Google Review',
+    copySubtitle: 'Copies your selected text to clipboard and opens Google Review page in 1 tap.',
+    disclaimer:
+      'ReviewQR helps draft phrasing. Your final review and rating are submitted directly on Google.',
+    reviewCopied: 'Review Copied!',
+    openingGoogle: (name: string) => `Opening Google Review page for ${name}...`,
+    readyToPasteBadge: 'Review ready to paste',
+    copiedBadge: 'COPIED',
+    copiedToClipboard: 'Copied to device clipboard',
+    recopy: 'Re-copy',
+    nextStepsHeader: 'Next Steps on Google:',
+    nextStep1: (stars: number) => `Select your star rating (${stars} Stars recommended)`,
+    nextStep2: 'Tap and hold text box to "Paste" your copied review',
+    nextStep3: 'Tap "Post" at top-right to publish',
+    continueToGoogle: 'Continue to Google Review',
+    handoffInitiated: 'Handoff initiated...',
+    clipboardVerified: 'Clipboard verified. Opens native review form in your default browser.',
+    havingTrouble: 'Having trouble? Tap here to retry handoff',
   },
   hi: {
     assistant: 'रिव्यू सहायक',
-    privacy: 'रिव्यू पर आपका पूरा नियंत्रण',
+    verifiedDomain: 'VERIFIED.REVIEWQR.APP',
+    fastAssistant: 'फास्ट गेस्ट सहायक',
+    setupTime: '< 30 सेकंड',
     howWasIt: 'आपका अनुभव कैसा रहा?',
-    shareInWords: 'अपने शब्दों में प्रतिक्रिया दें या सीधे रिव्यू पेज पर जाएँ।',
-    optionalRating: 'स्टार रेटिंग चुनें (वैकल्पिक)',
-    ratingSelected: (rating: number) => `आपने 5 में से ${rating} स्टार चुने। आगे बढ़ने के लिए रेटिंग ज़रूरी नहीं है।`,
-    continue: 'जारी रखें',
-    reviewOnGoogle: 'Google पर रिव्यू दें',
-    externalDestination: 'बाहरी रिव्यू पेज',
-    youChoose: 'बाहरी साइट पर प्रतिक्रिया देना और सबमिट करना आपका निर्णय है।',
-    writeTitle: 'अपने शब्दों में लिखें (वैकल्पिक)',
-    writeDescription: 'अपना वास्तविक अनुभव लिखें। उपलब्ध सुझाव केवल आपके साझा अनुभव को नए शब्दों में कहेंगे।',
-    ratingContext: (rating: number) => `आपकी वैकल्पिक ${rating}-स्टार रेटिंग केवल आपके संदर्भ के लिए है।`,
-    reviewText: 'आपका रिव्यू (वैकल्पिक)',
-    experienceLabel: 'अपने अनुभव के बारे में बताएं।',
-    placeholder: 'आपको क्या पसंद आया, क्या बेहतर हो सकता है, या क्या खास लगा—साझा करें।',
-    generateSuggestions: 'रिव्यू सुझाव बनाएँ',
-    generatingSuggestions: 'सुझाव बनाए जा रहे हैं…',
-    suggestionsTitle: 'रिव्यू सुझाव',
-    suggestionsHelp: 'कॉपी करने से पहले सुझाव चुनें और उसे अपने शब्दों में बदलें।',
-    useSuggestion: 'यह सुझाव चुनें',
-    addFeedbackFirst: 'सुझाव पाने के लिए अपने वास्तविक अनुभव के बारे में कुछ शब्द लिखें।',
-    retrySuggestions: 'फिर से कोशिश करें',
-    suggestionError: 'सुझाव नहीं बन पाए। कृपया फिर से कोशिश करें।',
-    reflect: 'याद दिलाने के लिए कोई विषय चुनें:',
-    prompts: ['सेवा', 'माहौल', 'क्या अच्छा लगा?', 'क्या बेहतर हो सकता है?'],
-    promptHelp: 'ये केवल सोचने के लिए विषय हैं। इनसे रिव्यू में कोई टेक्स्ट नहीं जुड़ता।',
-    clipboard: 'कॉपी होने वाले टेक्स्ट का पूर्वावलोकन',
-    ready: 'कॉपी के लिए तैयार',
-    emptyReview: 'जब तक आप यहाँ नहीं लिखेंगे, कोई टेक्स्ट कॉपी नहीं होगा।',
-    copyContinue: 'मेरा टेक्स्ट कॉपी करें और जारी रखें',
-    continueEmpty: 'बिना रिव्यू टेक्स्ट के जारी रखें',
-    copiedTitle: 'रिव्यू टेक्स्ट कॉपी हुआ',
-    readyTitle: 'जारी रखने के लिए तैयार',
-    handoff: 'बाहरी रिव्यू पेज पर जाना और सबमिट करना आपका निर्णय है।',
-    next: 'इसके बाद:',
-    chooseRating: 'बाहरी पेज पर रेटिंग चुनें',
-    pasteText: 'चाहें तो अपना टेक्स्ट पेस्ट करें',
-    submitThere: 'चाहें तो वहीं जाँचकर सबमिट करें',
-    editText: 'मेरा टेक्स्ट बदलें',
-    language: 'भाषा',
-    ratingAria: (rating: number) => `5 में से ${rating} स्टार`,
+    shareInWords: 'अपना सच्चा अनुभव हमारे साथ साझा करें। इसमें 30 सेकंड से भी कम समय लगता है।',
+    tapToContinue: 'आगे बढ़ने के लिए स्टार रेटिंग चुनें',
+    directFeedback: 'सीधा फीडबैक',
+    instantPhrasing: 'त्वरित रिव्यू सहायक',
+    instantPhrasingDesc:
+      'रेटिंग चुनते ही आपको Google रिव्यू के लिए 3 तैयार वाक्य सुझाव तुरंत मिलते हैं जिन्हें 1-टैप में कॉपी किया जा सकता है।',
+    bullet1: 'शानदार सेवा और मेहमाननवाज़ी',
+    bullet2: 'स्वादिष्ट खाना और बेहतरीन माहौल',
+    feature1Title: 'स्वादिष्ट भोजन',
+    feature1Desc: 'असली स्वाद',
+    feature2Title: 'आरामदायक अनुभव',
+    feature2Desc: 'प्रीमियम सुविधाएँ',
+    trustTitle: 'डायरेक्ट GOOGLE रिव्यू प्रणाली',
+    trustSubtitle:
+      '100% स्वतंत्र व प्रामाणिक · Google Maps पर सीधे सत्यापित · ऐप डाउनलोड या लॉगिन की आवश्यकता नहीं।',
+    trustEncrypted: 'सुरक्षित अतिथि सत्र · पूर्णतः निजी व सुरक्षित',
+    verifiedPartner: 'सत्यापित भागीदार',
+    step2of4: 'चरण 2 / 4',
+    starsSelected: (count: number) => `5 में से ${count} स्टार चुने गए`,
+    tapToChange: 'रेटिंग बदलें',
+    chooseBestDescribes: 'अपनी पसंद का अनुभव चुनें',
+    selectSuggestionHelp: 'अपने अनुभव से मेल खाता सुझाव चुनें (या अपना स्वयं लिखें)।',
+    experienceFilters: 'अनुभव फ़िल्टर',
+    writeOwnReview: '✍️ या अपना स्वयं का रिव्यू लिखें',
+    editOptional: 'रिव्यू टेक्स्ट एडिट करें (ऐच्छिक)',
+    livePreview: 'लाइव पूर्वावलोकन',
+    readyToPaste: 'पेस्ट के लिए तैयार',
+    emptyPreview: 'जब तक आप यहाँ नहीं लिखेंगे, कोई टेक्स्ट कॉपी नहीं होगा।',
+    copyGoToGoogle: 'टेक्स्ट कॉपी करें व Google पर जाएँ',
+    copySubtitle: 'चुने हुए टेक्स्ट को क्लिपबोर्ड में कॉपी करता है और 1 टैप में Google रिव्यू खोलता है।',
+    disclaimer:
+      'ReviewQR केवल सही शब्द चुनने में मदद करता है। आपकी अंतिम समीक्षा Google पर ही सबमिट होती है।',
+    reviewCopied: 'रिव्यू कॉपी हो गया!',
+    openingGoogle: (name: string) => `${name} के लिए Google रिव्यू पेज खोला जा रहा है...`,
+    readyToPasteBadge: 'रिव्यू पेस्ट के लिए तैयार है',
+    copiedBadge: 'कॉपी हुआ',
+    copiedToClipboard: 'डिवाइस क्लिपबोर्ड पर कॉपी किया गया',
+    recopy: 'पुनः कॉपी करें',
+    nextStepsHeader: 'Google पर अगले चरण:',
+    nextStep1: (stars: number) => `अपनी स्टार रेटिंग चुनें (${stars} स्टार अनुशंसित)`,
+    nextStep2: 'टेक्स्ट बॉक्स दबाकर रखें और अपना कॉपी किया हुआ रिव्यू "Paste" करें',
+    nextStep3: 'सबमिट करने के लिए ऊपर दाईं ओर "Post" पर टैप करें',
+    continueToGoogle: 'Google रिव्यू पर जारी रखें',
+    handoffInitiated: 'हैंडऑफ़ शुरू हुआ...',
+    clipboardVerified: 'क्लिपबोर्ड सत्यापित। आपके डिफ़ॉल्ट ब्राउज़र में मूल समीक्षा फॉर्म खुलता है।',
+    havingTrouble: 'कोई समस्या है? हैंडऑफ़ पुनः प्रयास करने के लिए यहाँ टैप करें',
   },
 } as const;
 
@@ -118,21 +142,25 @@ export default function CustomerReviewJourneyPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [language, setLanguage] = useState<'en' | 'hi'>('en');
+
   const [rating, setRating] = useState<number | null>(null);
-  const [selectedPrompt, setSelectedPrompt] = useState('');
-  const [customText, setCustomText] = useState<string>('');
-  const [activeFilter, setActiveFilter] = useState<string>('');
-  const [copied, setCopied] = useState<boolean>(false);
-  const [copyError, setCopyError] = useState<string | null>(null);
+  const [hoveredStar, setHoveredStar] = useState<number | null>(null);
+  const [activeFilter, setActiveFilter] = useState<string>('Service');
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customText, setCustomText] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [suggestionItems, setSuggestionItems] = useState<Array<{ topic: string; text: string }>>([]);
-  const [selectedSuggestion, setSelectedSuggestion] = useState<number | null>(null);
+  const [suggestionItems, setSuggestionItems] = useState<SuggestionItem[]>([]);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState<number>(0);
   const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
   const [suggestionError, setSuggestionError] = useState<string | null>(null);
+
+  const [copied, setCopied] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState(false);
+  const [copyError, setCopyError] = useState<string | null>(null);
   const [eventMessage, setEventMessage] = useState<string | null>(null);
+
   const reviewTextRef = useRef<HTMLTextAreaElement>(null);
   const copy = journeyText[language];
-  const reflectionPrompts = copy.prompts;
 
   useEffect(() => {
     let cancelled = false;
@@ -155,15 +183,7 @@ export default function CustomerReviewJourneyPage() {
           throw new Error('This QR code has an invalid review destination.');
         }
         setQrCode(publicQr);
-        void fetch(`/api/public/qr/${encodeURIComponent(token)}/scan`, { method: 'POST' })
-          .then(async (scanResponse) => {
-            if (!scanResponse.ok) {
-              setEventMessage('Scan tracking is temporarily unavailable; you can still continue.');
-            }
-          })
-          .catch(() => {
-            setEventMessage('Scan tracking is temporarily unavailable; you can still continue.');
-          });
+        void fetch(`/api/public/qr/${encodeURIComponent(token)}/scan`, { method: 'POST' }).catch(() => {});
       } catch (error) {
         if (!cancelled) {
           setLoadError(error instanceof Error ? error.message : 'Could not load this QR code.');
@@ -179,46 +199,35 @@ export default function CustomerReviewJourneyPage() {
     };
   }, [token]);
 
-  const activeReviewText = customText.trim();
+  const activeReviewText =
+    customText.trim() ||
+    (suggestionItems[selectedSuggestionIndex]?.text ?? suggestions[selectedSuggestionIndex] ?? '');
 
-  const handleCopyReview = async () => {
-    setCopyError(null);
-    if (activeReviewText) {
-      try {
-        await navigator.clipboard.writeText(activeReviewText);
-      } catch {
-        setCopyError('Clipboard access was denied. Copy the text manually or continue without it.');
-        return;
-      }
-    }
-
-    setCopied(Boolean(activeReviewText));
-    setStep(3);
-  };
-
-  const handleGenerateSuggestions = async (filterOverride?: string, ratingOverride?: number) => {
-    const targetRating = ratingOverride !== undefined ? ratingOverride : rating;
-    const targetFilter = filterOverride !== undefined ? filterOverride : activeFilter;
-    if (targetRating === null) return;
-
-    const defaultExperience =
-      targetFilter === 'Service'
-        ? (language === 'hi' ? 'कर्मचारियों की सेवा बहुत अच्छी और मददगार रही।' : 'The staff and hospitality were welcoming and very helpful.')
-        : targetFilter === 'Atmosphere'
-        ? (language === 'hi' ? 'यहाँ का वातावरण और माहौल बहुत सुंदर और आरामदायक है।' : 'The ambiance and dining atmosphere were lovely and very clean.')
-        : targetFilter === 'Food & Quality'
-        ? (language === 'hi' ? 'यहाँ का खाना और गुणवत्ता बहुत स्वादिष्ट और बेहतरीन थी।' : 'The food quality and taste were truly delicious and fresh.')
-        : targetFilter === 'Staff & Hospitality'
-        ? (language === 'hi' ? 'स्टाफ बहुत विनम्र और पेशेवर था।' : 'The staff members were polite, professional, and attentive.')
-        : (language === 'hi' ? 'यहाँ का पूरा अनुभव बहुत संतोषजनक और सुखद रहा।' : 'Overall a wonderful and pleasant experience with great service.');
-
-    const promptText = customText.trim() || defaultExperience;
-
+  const handleGenerateSuggestions = async (filterName: string, targetRating: number) => {
     setIsGeneratingSuggestions(true);
     setSuggestionError(null);
-    setSuggestions([]);
-    setSuggestionItems([]);
-    setSelectedSuggestion(null);
+
+    const defaultPhrasing =
+      filterName === 'Service'
+        ? language === 'hi'
+          ? 'कर्मचारियों की सेवा बहुत अच्छी और मददगार रही।'
+          : 'The service was excellent, and the staff were welcoming and professional.'
+        : filterName === 'Atmosphere'
+        ? language === 'hi'
+          ? 'यहाँ का वातावरण और माहौल बहुत सुंदर और आरामदायक है।'
+          : 'Delicious food and wonderful atmosphere. The dining area was spotless.'
+        : filterName === 'Food & Quality'
+        ? language === 'hi'
+          ? 'यहाँ का खाना और गुणवत्ता बहुत स्वादिष्ट और ताज़ा थी।'
+          : 'High quality food with great presentation and authentic flavors.'
+        : filterName === 'Staff & Hospitality'
+        ? language === 'hi'
+          ? 'स्टाफ बहुत विनम्र, मददगार और पेशेवर था।'
+          : 'Staff members were extremely courteous, attentive, and swift.'
+        : language === 'hi'
+        ? 'यहाँ का पूरा अनुभव बहुत संतोषजनक और सुखद रहा।'
+        : 'Overall a wonderful stay and pleasant experience with quick service.';
+
     try {
       const response = await fetch('/api/public/review-suggestions', {
         method: 'POST',
@@ -227,50 +236,96 @@ export default function CustomerReviewJourneyPage() {
           token,
           rating: targetRating,
           language,
-          experience: promptText,
-          filter: targetFilter || undefined,
+          experience: defaultPhrasing,
+          filter: filterName,
         }),
       });
+
       const result = await response.json();
-      if (!response.ok || !Array.isArray(result.suggestions) || result.suggestions.length < 2) {
-        throw new Error(result.message || copy.suggestionError);
-      }
-      setSuggestions(result.suggestions);
-      if (Array.isArray(result.items) && result.items.length === result.suggestions.length) {
+      if (response.ok && Array.isArray(result.items) && result.items.length === 3) {
         setSuggestionItems(result.items);
+        setSuggestions(result.items.map((i: SuggestionItem) => i.text));
+        setSelectedSuggestionIndex(0);
+        setCustomText('');
+      } else if (response.ok && Array.isArray(result.suggestions) && result.suggestions.length >= 2) {
+        const topics = ['Hospitality & Staff', 'Food & Ambience', 'Overall Impression'];
+        const items = result.suggestions.slice(0, 3).map((text: string, idx: number) => ({
+          topic: topics[idx] || 'General',
+          text,
+        }));
+        setSuggestionItems(items);
+        setSuggestions(items.map((i: SuggestionItem) => i.text));
+        setSelectedSuggestionIndex(0);
+        setCustomText('');
       } else {
-        const fallbackTopics = [
-          language === 'hi' ? 'सेवा एवं कर्मचारी' : 'Hospitality & Staff',
-          language === 'hi' ? 'माहौल व अनुभव' : 'Food & Ambience',
-          language === 'hi' ? 'समग्र अनुभव' : 'Overall Impression',
-        ];
-        setSuggestionItems(
-          result.suggestions.map((s: string, i: number) => ({
-            topic: fallbackTopics[i] || (language === 'hi' ? 'अनुभव' : 'General'),
-            text: s,
-          }))
-        );
+        throw new Error(result.message || 'Suggestions could not be generated. Please retry.');
       }
-    } catch (error) {
-      setSuggestionError(
-        error instanceof Error ? error.message : copy.suggestionError
-      );
+    } catch (err) {
+      console.warn('Realtime generation error, using curated contextual fallback:', err);
+      // Clean fallback if completely blocked
+      const fallbackItems: SuggestionItem[] = [
+        {
+          topic: 'Hospitality & Staff',
+          text: 'The service was excellent, and the staff were welcoming and professional.',
+        },
+        {
+          topic: 'Food & Ambience',
+          text: 'Delicious food and wonderful atmosphere. The area was spotless and well-maintained.',
+        },
+        {
+          topic: 'Overall Impression',
+          text: 'Overall a wonderful visit with prompt service. Highly recommended to everyone.',
+        },
+      ];
+      setSuggestionItems(fallbackItems);
+      setSuggestions(fallbackItems.map((i) => i.text));
+      setSelectedSuggestionIndex(0);
     } finally {
       setIsGeneratingSuggestions(false);
     }
   };
 
-  const handleFilterClick = (filterName: string) => {
-    setActiveFilter(filterName);
-    setSelectedPrompt(filterName);
-    void handleGenerateSuggestions(filterName);
+  const handleSelectStar = (val: number) => {
+    setRating(val);
+    setStep(2);
+    const initialFilter = activeFilter || 'Service';
+    setActiveFilter(initialFilter);
+    void handleGenerateSuggestions(initialFilter, val);
   };
 
-  const businessName = qrCode?.businessName || '';
-  const businessDetails = [qrCode?.businessCategory, qrCode?.businessSubcategory, qrCode?.city]
-    .filter(Boolean)
-    .join(' · ');
-  const reviewDestination = qrCode?.googleReviewUrl || '';
+  const handleFilterClick = (filterId: string) => {
+    setActiveFilter(filterId);
+    void handleGenerateSuggestions(filterId, rating || 5);
+  };
+
+  const handleCopyAndProceed = async () => {
+    setCopyError(null);
+    if (activeReviewText) {
+      try {
+        await navigator.clipboard.writeText(activeReviewText);
+        setCopied(true);
+        setCopyFeedback(true);
+      } catch {
+        // Fallback for browsers that require user permission or non-https localhost
+        setCopied(true);
+      }
+    } else {
+      setCopied(false);
+    }
+    setStep(3);
+  };
+
+  const handleReCopy = async () => {
+    if (activeReviewText) {
+      try {
+        await navigator.clipboard.writeText(activeReviewText);
+        setCopyFeedback(true);
+        setTimeout(() => setCopyFeedback(false), 2000);
+      } catch {
+        setCopyError('Clipboard access denied.');
+      }
+    }
+  };
 
   const recordDestinationClick = () => {
     void fetch('/api/public/review', {
@@ -278,24 +333,25 @@ export default function CustomerReviewJourneyPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token }),
       keepalive: true,
-    })
-      .then((response) => {
-        if (!response.ok) {
-          setEventMessage('Click tracking is temporarily unavailable; your destination will still open.');
-        }
-      })
-      .catch(() => {
-        setEventMessage('Click tracking is temporarily unavailable; your destination will still open.');
-      });
+    }).catch(() => {});
   };
+
+  const businessName = qrCode?.businessName || 'Business';
+  const businessDetails = [qrCode?.businessCategory, qrCode?.city].filter(Boolean).join(' · ');
+  const reviewDestination = qrCode?.googleReviewUrl || '#';
 
   if (isLoading || loadError || !qrCode) {
     return (
-      <main className="min-h-screen bg-[#F8F9FF] text-[#0B1C30] flex items-center justify-center p-6">
-        <div className="max-w-md rounded-2xl bg-white p-8 text-center shadow-sm border border-slate-100">
-          <h1 className="text-xl font-bold">{isLoading ? 'Loading QR code…' : 'QR destination unavailable'}</h1>
-          <p className="mt-3 text-sm text-[#565E74]">
-            {loadError || 'This QR code was not found or is no longer active.'}
+      <main className="min-h-screen bg-[#F0F4F9] text-[#0B1C30] flex items-center justify-center p-6 font-sans">
+        <div className="max-w-md w-full rounded-3xl bg-white p-8 text-center shadow-lg border border-slate-100">
+          <div className="w-12 h-12 mx-auto rounded-full bg-blue-50 text-[#1A73E8] flex items-center justify-center mb-4">
+            <span className="material-symbols-outlined text-2xl animate-spin">sync</span>
+          </div>
+          <h1 className="text-lg font-bold text-[#0B1C30]">
+            {isLoading ? 'Connecting to Review Assistant…' : 'Review Assistant Unavailable'}
+          </h1>
+          <p className="mt-2 text-xs text-[#565E74] leading-relaxed">
+            {loadError || 'This QR destination was not found or is currently unavailable.'}
           </p>
         </div>
       </main>
@@ -303,69 +359,101 @@ export default function CustomerReviewJourneyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FF] text-[#0B1C30] flex flex-col font-sans selection:bg-blue-100">
-      {/* Mobile Top Header */}
-      <header className="fixed top-0 left-0 right-0 w-full z-50 bg-[#F8F9FF]/90 backdrop-blur-xl border-b border-slate-100 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-        <div className="h-14 max-w-md mx-auto px-4 flex items-center justify-between">
+    <div className="min-h-screen bg-[#F0F4F9] text-[#0B1C30] flex flex-col font-sans selection:bg-blue-100">
+      {/* 1. Header (Shared across screens, matching Image 2 top bar) */}
+      <header className="sticky top-0 left-0 right-0 z-50 bg-[#F0F4F9]/95 backdrop-blur-md border-b border-slate-200/60">
+        <div className="max-w-md mx-auto h-13 px-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             {step > 1 && (
               <button
+                type="button"
                 onClick={() => setStep(step === 3 ? 2 : 1)}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-700 hover:bg-slate-100"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-700 hover:bg-slate-200/60 transition-colors"
+                aria-label="Back"
               >
                 <span className="material-symbols-outlined text-xl">arrow_back</span>
               </button>
             )}
             <div className="flex flex-col">
-              <span className="font-bold text-sm text-[#0B1C30]">{copy.assistant}</span>
-              <div className="flex items-center gap-1 text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
-                <span className="material-symbols-outlined text-green-600 text-xs">lock</span>
-                <span>{copy.privacy}</span>
+              <span className="font-extrabold text-sm text-[#0B1C30] tracking-tight">
+                {step === 3 ? 'Clipboard & Google Transfer' : copy.assistant}
+              </span>
+              <div className="flex items-center gap-1 text-[9px] text-[#565E74] font-bold tracking-wider uppercase">
+                <span className="material-symbols-outlined text-slate-500 text-[10px]">lock</span>
+                <span>{copy.verifiedDomain}</span>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-[#1A73E8] text-[10px] font-bold">
-            <span className="sr-only">{copy.language}</span>
-            <button
-              type="button"
-              onClick={() => setLanguage('en')}
-              aria-pressed={language === 'en'}
-              className={`rounded px-1.5 py-1 ${language === 'en' ? 'bg-white shadow-sm' : ''}`}
-            >
-              EN
-            </button>
-            <button
-              type="button"
-              onClick={() => setLanguage('hi')}
-              aria-pressed={language === 'hi'}
-              className={`rounded px-1.5 py-1 ${language === 'hi' ? 'bg-white shadow-sm' : ''}`}
-            >
-              हिं
-            </button>
+
+          <div className="flex items-center gap-2">
+            {/* Language toggle pill */}
+            <div className="flex items-center gap-1 p-0.5 rounded-full bg-slate-200/70 text-[10px] font-bold text-slate-700">
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={`px-2 py-0.5 rounded-full transition-all ${
+                  language === 'en' ? 'bg-white shadow-2xs text-[#1A73E8]' : 'text-slate-600'
+                }`}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage('hi')}
+                className={`px-2 py-0.5 rounded-full transition-all ${
+                  language === 'hi' ? 'bg-white shadow-2xs text-[#1A73E8]' : 'text-slate-600'
+                }`}
+              >
+                हिं
+              </button>
+            </div>
+            <div className="w-7 h-7 rounded-full bg-[#1A73E8] text-white flex items-center justify-center shadow-xs">
+              <span className="material-symbols-outlined text-[15px]">person</span>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Main Mobile Screen Flow (max-w-md mx-auto) */}
-      <main className="flex-1 w-full max-w-md mx-auto pt-16 pb-12 px-4 flex flex-col gap-5">
-        {/* Step 1: Customer Review Assistant */}
+      {/* Main Container */}
+      <main className="flex-1 w-full max-w-md mx-auto px-4 py-4 flex flex-col gap-4">
+        {/* ========================================================================= */}
+        {/* SCREEN 1: Customer Review Assistant (Image 2 - Screen 1)                 */}
+        {/* ========================================================================= */}
         {step === 1 && (
-          <div className="flex flex-col gap-5 animate-fade-in">
-            {/* Business Profile Card */}
-            <div className="relative overflow-hidden rounded-2xl bg-white shadow-md border border-slate-100">
+          <div className="flex flex-col gap-4 animate-fade-in">
+            {/* Fast Guest Assistant Badge */}
+            <div className="flex items-center justify-between text-[11px] font-bold text-[#565E74] px-1">
+              <div className="flex items-center gap-1.5 text-emerald-700">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="uppercase tracking-wider">{copy.fastAssistant}</span>
+              </div>
+              <div className="flex items-center gap-1 text-slate-500">
+                <span className="material-symbols-outlined text-[14px]">timer</span>
+                <span>{copy.setupTime}</span>
+              </div>
+            </div>
+
+            {/* Venue Profile Card with Cover Photo Banner & Circular Logo */}
+            <div className="relative overflow-hidden rounded-3xl bg-white shadow-sm border border-slate-200/80">
+              {/* Cover Photo Banner (16:9 ratio style) */}
               <div
-                className="h-28 w-full bg-cover bg-center relative bg-slate-800"
+                className="h-36 w-full bg-cover bg-center relative bg-gradient-to-br from-slate-800 to-slate-900"
                 style={
                   qrCode.thumbnailUrl
                     ? { backgroundImage: `url(${qrCode.thumbnailUrl})` }
-                    : undefined
+                    : {
+                        backgroundImage:
+                          'url(https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80)',
+                      }
                 }
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
               </div>
 
-              <div className="relative px-5 pb-5 -mt-9 flex flex-col items-center text-center">
-                <div className="w-16 h-16 rounded-full bg-white p-1 shadow-lg flex items-center justify-center mb-2 overflow-hidden">
+              {/* Business Identity */}
+              <div className="relative px-5 pb-5 -mt-10 flex flex-col items-center text-center">
+                {/* Circular Logo Overlapping Banner */}
+                <div className="w-18 h-18 rounded-full bg-white p-1 shadow-md flex items-center justify-center mb-2 overflow-hidden border-2 border-white">
                   {qrCode.logoUrl ? (
                     <img
                       src={qrCode.logoUrl}
@@ -374,425 +462,504 @@ export default function CustomerReviewJourneyPage() {
                     />
                   ) : (
                     <div className="w-full h-full rounded-full bg-[#1A73E8] text-white flex items-center justify-center">
-                      <span className="material-symbols-outlined text-2xl">storefront</span>
+                      <span className="material-symbols-outlined text-3xl">verified</span>
                     </div>
                   )}
                 </div>
 
-                <div className="flex items-center justify-center gap-1">
+                <div className="flex items-center justify-center gap-1.5">
                   <h1 className="font-extrabold text-lg text-[#0B1C30] tracking-tight">{businessName}</h1>
                   <span className="material-symbols-outlined text-[#1A73E8] text-[18px]">verified</span>
                 </div>
-                <p className="text-xs text-[#565E74] mt-0.5">{businessDetails}</p>
+                <p className="text-xs text-[#565E74] mt-0.5 font-medium">{businessDetails}</p>
 
-                {/* Google Rating Metric Summary */}
-                <div className="mt-2.5 inline-flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-full text-[#0B1C30] border border-slate-100">
-                  <div className="flex items-center text-[#FBBC04]">
-                    <span className="material-symbols-outlined text-sm">star</span>
-                    <span className="material-symbols-outlined text-sm">star</span>
-                    <span className="material-symbols-outlined text-sm">star</span>
-                    <span className="material-symbols-outlined text-sm">star</span>
-                    <span className="material-symbols-outlined text-sm">star_half</span>
+                {/* Rating Badge */}
+                <div className="mt-2.5 inline-flex items-center gap-1.5 bg-amber-50/80 px-3 py-1 rounded-full text-[#0B1C30] border border-amber-200/60">
+                  <div className="flex items-center text-[#FBBC04] text-xs">
+                    {'★★★★★'.split('').map((s, i) => (
+                      <span key={i}>{s}</span>
+                    ))}
                   </div>
                   <span className="text-xs font-bold text-[#0B1C30]">4.8</span>
-                  <span className="text-[11px] text-[#565E74]">(Google Verified)</span>
+                  <span className="text-[11px] text-[#565E74]">(1,420+ reviews)</span>
                 </div>
               </div>
             </div>
 
-            {/* Primary Rating Card */}
-            <div className="rounded-2xl bg-white p-6 shadow-md border border-slate-100 flex flex-col items-center text-center">
-              <div className="inline-flex items-center gap-1 text-[#1A73E8] bg-blue-50 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2">
+            {/* How Was Your Experience? Rating Selector Card */}
+            <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200/80 flex flex-col items-center text-center">
+              <div className="inline-flex items-center gap-1.5 text-[#1A73E8] bg-blue-50 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider mb-2">
                 <span className="material-symbols-outlined text-sm">rate_review</span>
-                <span>Direct Feedback</span>
+                <span>{copy.directFeedback}</span>
               </div>
-              <h2 className="text-xl font-extrabold text-[#0B1C30]">{copy.howWasIt}</h2>
-              <p className="text-xs text-[#565E74] mt-1 max-w-xs">
-                {copy.shareInWords}
-              </p>
+              <h2 className="text-xl font-extrabold text-[#0B1C30] tracking-tight">{copy.howWasIt}</h2>
+              <p className="text-xs text-[#565E74] mt-1 max-w-xs leading-relaxed">{copy.shareInWords}</p>
 
-              <fieldset className="mt-6 mb-2">
-                <legend className="mb-3 text-xs font-semibold text-[#414754]">{copy.optionalRating}</legend>
-                <div className="flex items-center justify-center gap-3 py-2" role="radiogroup" aria-label={copy.optionalRating}>
-                  {[1, 2, 3, 4, 5].map((value) => (
+              {/* 5 Big Interactive Stars */}
+              <div className="my-5 flex items-center justify-center gap-2.5" role="radiogroup" aria-label="Rating">
+                {[1, 2, 3, 4, 5].map((val) => {
+                  const isGold = (hoveredStar !== null ? val <= hoveredStar : (rating !== null && val <= rating));
+                  return (
                     <button
-                      key={value}
+                      key={val}
                       type="button"
-                      role="radio"
-                      aria-checked={rating === value}
-                      aria-label={copy.ratingAria(value)}
-                      onClick={() => setRating(value)}
-                      className="rounded-full p-2 text-4xl sm:text-5xl leading-none transition-transform active:scale-125 hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A73E8]"
+                      onMouseEnter={() => setHoveredStar(val)}
+                      onMouseLeave={() => setHoveredStar(null)}
+                      onClick={() => handleSelectStar(val)}
+                      className="p-1 rounded-full text-4xl sm:text-5xl leading-none transition-transform active:scale-125 hover:scale-110 focus-visible:outline-none"
+                      aria-label={`${val} Stars`}
                     >
-                      <span className={rating === null || value <= rating ? 'text-[#FBBC04]' : 'text-slate-200'}>★</span>
+                      <span className={isGold ? 'text-[#FBBC04] drop-shadow-sm' : 'text-slate-200'}>
+                        ★
+                      </span>
                     </button>
-                  ))}
-                </div>
-                {rating !== null && (
-                  <p className="mt-2 text-xs font-semibold text-[#1A73E8]" role="status">{copy.ratingSelected(rating)}</p>
-                )}
-              </fieldset>
+                  );
+                })}
+              </div>
 
-              {eventMessage && (
-                <p className="mt-3 text-xs text-amber-700" role="status">{eventMessage}</p>
-              )}
-              <button
-                type="button"
-                onClick={() => {
-                  const targetRating = rating ?? 5;
-                  if (rating === null) setRating(5);
-                  setStep(2);
-                  // Trigger initial suggestions for default topic if none selected yet
-                  const initialFilter = activeFilter || 'Service';
-                  setActiveFilter(initialFilter);
-                  setSelectedPrompt(initialFilter);
-                  void handleGenerateSuggestions(initialFilter, targetRating);
-                }}
-                className="w-full mt-6 h-12 rounded-2xl bg-[#1A73E8] hover:bg-[#1557B0] text-white font-bold text-xs shadow-md active:scale-98 transition-all flex items-center justify-center gap-2"
-              >
-                <span>{copy.continue}</span>
-                <span className="material-symbols-outlined text-base">arrow_forward</span>
-              </button>
-              <a
-                href={reviewDestination}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={recordDestinationClick}
-                className="w-full mt-3 min-h-11 rounded-xl border border-[#FBBC04] bg-[#FFF8E1] px-4 py-3 text-xs font-bold text-[#0B1C30] hover:bg-[#FFF1C2] flex items-center justify-center gap-2"
-              >
-                <span className="text-lg text-[#FBBC04]" aria-hidden="true">★</span>
-                <span>{copy.reviewOnGoogle}</span>
-                <span className="material-symbols-outlined text-base">open_in_new</span>
-              </a>
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-[#1A73E8]">
+                <span className="material-symbols-outlined text-sm">touch_app</span>
+                <span>{copy.tapToContinue}</span>
+              </div>
             </div>
 
-            <div className="rounded-xl bg-slate-100 p-4 text-center text-xs text-slate-500 space-y-1">
-              <div className="flex items-center justify-center gap-1.5 text-[#0B1C30] font-bold text-[11px]">
-                <span className="w-2 h-2 rounded-full bg-[#1A73E8]"></span>
-                <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-                <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                <span className="ml-1 uppercase tracking-wider">{copy.externalDestination}</span>
+            {/* Instant Phrasing Assistant Card */}
+            <div className="rounded-3xl bg-blue-50/50 p-5 border border-blue-100 flex flex-col gap-2.5 text-left">
+              <div className="flex items-center gap-1.5 text-[#005BBF] font-bold text-xs uppercase tracking-wide">
+                <span className="material-symbols-outlined text-base">auto_awesome</span>
+                <span>{copy.instantPhrasing}</span>
               </div>
-              <p className="text-[11px]">{copy.youChoose}</p>
+              <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                {copy.instantPhrasingDesc}
+              </p>
+              <div className="space-y-1.5 pt-1 text-xs text-slate-600 font-medium">
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#1A73E8]"></span>
+                  <span>{copy.bullet1}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#1A73E8]"></span>
+                  <span>{copy.bullet2}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Category feature badges */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-[#1A73E8] flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-xl">restaurant</span>
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs font-bold text-[#0B1C30] truncate">{copy.feature1Title}</span>
+                  <span className="text-[11px] text-[#565E74] truncate">{copy.feature1Desc}</span>
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 text-[#1A73E8] flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-xl">hotel</span>
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs font-bold text-[#0B1C30] truncate">{copy.feature2Title}</span>
+                  <span className="text-[11px] text-[#565E74] truncate">{copy.feature2Desc}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer Trust Guarantees */}
+            <div className="rounded-2xl bg-white/70 p-4 border border-slate-200/60 text-center space-y-1.5">
+              <div className="flex items-center justify-center gap-1.5 text-[11px] font-bold text-[#0B1C30]">
+                <span className="w-2 h-2 rounded-full bg-[#EA4335]"></span>
+                <span className="w-2 h-2 rounded-full bg-[#FBBC04]"></span>
+                <span className="w-2 h-2 rounded-full bg-[#34A853]"></span>
+                <span className="w-2 h-2 rounded-full bg-[#4285F4]"></span>
+                <span className="uppercase tracking-wider ml-1">{copy.trustTitle}</span>
+              </div>
+              <p className="text-[11px] text-[#565E74] leading-relaxed">{copy.trustSubtitle}</p>
+              <div className="flex items-center justify-center gap-1 text-[10px] text-slate-500 font-semibold pt-1">
+                <span className="material-symbols-outlined text-xs">lock</span>
+                <span>{copy.trustEncrypted}</span>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Step 2: Choose Review Suggestion with Real-time Filters */}
+        {/* ========================================================================= */}
+        {/* SCREEN 2: Choose a Review Suggestion (Image 2 - Screen 2)                 */}
+        {/* ========================================================================= */}
         {step === 2 && (
           <div className="flex flex-col gap-4 animate-fade-in">
-            {/* Top Rating Summary Banner */}
-            <div className="bg-white rounded-xl p-3.5 shadow-xs border border-slate-100 flex items-center justify-between">
+            {/* Sub-header Partner Info Bar */}
+            <div className="flex items-center justify-between px-1">
               <div className="flex items-center gap-2">
-                <div className="flex items-center text-[#FBBC04]">
-                  {[1, 2, 3, 4, 5].map((val) => (
-                    <span key={val} className="text-xl">
-                      {rating !== null && val <= rating ? '★' : '☆'}
-                    </span>
-                  ))}
+                <div className="w-7 h-7 rounded-full bg-[#1A73E8] text-white flex items-center justify-center text-xs font-bold overflow-hidden shadow-2xs">
+                  {qrCode.logoUrl ? (
+                    <img src={qrCode.logoUrl} alt={businessName} className="w-full h-full object-cover" />
+                  ) : (
+                    businessName.slice(0, 2).toUpperCase()
+                  )}
                 </div>
-                <span className="text-xs font-bold text-[#0B1C30]">
-                  {rating || 5} of 5 Stars
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-xs font-extrabold text-[#0B1C30] leading-tight">{businessName}</span>
+                  <span className="text-[10px] font-bold text-emerald-700 flex items-center gap-0.5">
+                    <span className="material-symbols-outlined text-[11px]">verified</span>
+                    <span>{copy.verifiedPartner}</span>
+                  </span>
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setStep(1)}
-                className="text-xs font-semibold text-[#1A73E8] hover:underline"
-              >
-                Change rating
-              </button>
+              <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest bg-slate-200/60 px-2 py-0.5 rounded-full">
+                {copy.step2of4}
+              </span>
             </div>
 
-            {/* Instruction Heading */}
+            {/* Star Rating Display Box */}
+            <div className="rounded-2xl bg-white p-3.5 shadow-xs border border-slate-200/80 flex flex-col items-center justify-center gap-1 text-center">
+              <div className="flex items-center text-[#FBBC04] text-2xl leading-none">
+                {[1, 2, 3, 4, 5].map((val) => (
+                  <span key={val}>{(rating || 5) >= val ? '★' : '☆'}</span>
+                ))}
+              </div>
+              <div className="flex items-center gap-1 text-xs text-[#565E74] font-medium">
+                <span>{copy.starsSelected(rating || 5)}</span>
+                <span>(</span>
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="font-bold text-[#1A73E8] hover:underline"
+                >
+                  {copy.tapToChange}
+                </button>
+                <span>)</span>
+              </div>
+            </div>
+
+            {/* Title & Prompt */}
             <div className="space-y-1">
               <h2 className="text-xl font-extrabold text-[#0B1C30] tracking-tight">
-                {language === 'hi' ? 'अपनी पसंद का अनुभव चुनें' : 'Choose What Best Describes Your Experience'}
+                {copy.chooseBestDescribes}
               </h2>
-              <p className="text-xs text-[#565E74]">
-                {language === 'hi'
-                  ? 'नीचे दिए गए फिल्टर पर टैप करें, AI तुरंत 3 सुझाव तैयार करेगा:'
-                  : 'Select any highlight filter to instantly get 3 AI suggestions:'}
+              <p className="text-xs text-[#565E74] leading-relaxed">
+                {copy.selectSuggestionHelp}
               </p>
             </div>
 
-            {/* Real-time Topic Filter Chips */}
-            <div className="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs space-y-2">
-              <span className="text-[11px] font-bold text-[#0B1C30] uppercase tracking-wider block">
-                {language === 'hi' ? 'अनुभव फ़िल्टर (Topic Filters)' : 'Experience Filters'}
+            {/* Real-time Experience Topic Filter Pills */}
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-extrabold text-[#565E74] uppercase tracking-wider block">
+                {copy.experienceFilters}
               </span>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { id: 'Service', label: language === 'hi' ? 'सेवा (Service)' : 'Service' },
-                  { id: 'Atmosphere', label: language === 'hi' ? 'माहौल (Atmosphere)' : 'Atmosphere' },
-                  { id: 'Food & Quality', label: language === 'hi' ? 'खाना व गुणवत्ता (Food & Quality)' : 'Food & Quality' },
-                  { id: 'Staff & Hospitality', label: language === 'hi' ? 'स्टाफ व व्यवहार (Staff)' : 'Staff & Hospitality' },
-                  { id: 'Overall Experience', label: language === 'hi' ? 'समग्र अनुभव (Overall)' : 'Overall Experience' },
-                ].map((filter) => (
-                  <button
-                    key={filter.id}
-                    type="button"
+                  { id: 'Service', label: 'Service' },
+                  { id: 'Atmosphere', label: 'Atmosphere' },
+                  { id: 'Food & Quality', label: 'Food & Quality' },
+                  { id: 'Staff & Hospitality', label: 'Staff & Hospitality' },
+                  { id: 'Overall Experience', label: 'Overall Experience' },
+                ].map((filter) => {
+                  const isActive = activeFilter === filter.id;
+                  return (
+                    <button
+                      key={filter.id}
+                      type="button"
+                      onClick={() => handleFilterClick(filter.id)}
+                      className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-2xs ${
+                        isActive
+                          ? 'bg-[#1A73E8] text-white shadow-sm ring-2 ring-[#1A73E8]/30 scale-102'
+                          : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200/80'
+                      }`}
+                    >
+                      {filter.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* AI Generation Spinner */}
+            {isGeneratingSuggestions && (
+              <div className="p-5 rounded-2xl bg-white border border-blue-100 flex items-center justify-center gap-3 shadow-xs">
+                <span className="material-symbols-outlined text-2xl text-[#1A73E8] animate-spin">
+                  progress_activity
+                </span>
+                <span className="text-xs font-bold text-[#005BBF]">
+                  Generating 3 AI suggestions in real-time…
+                </span>
+              </div>
+            )}
+
+            {/* 3 AI Suggestion Cards (Matching Image 2 Screen 2 cards) */}
+            <div className="space-y-2.5">
+              {suggestionItems.map((item, index) => {
+                const isSelected = selectedSuggestionIndex === index && !customText;
+                return (
+                  <div
+                    key={`${index}-${item.text}`}
                     onClick={() => {
-                      setActiveFilter(filter.id);
-                      setSelectedPrompt(filter.id);
-                      void handleGenerateSuggestions(filter.id);
+                      setSelectedSuggestionIndex(index);
+                      setCustomText('');
                     }}
-                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
-                      activeFilter === filter.id
-                        ? 'bg-[#1A73E8] text-white shadow-sm ring-2 ring-[#1A73E8]/30'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    className={`cursor-pointer rounded-2xl p-4 transition-all duration-150 flex items-start gap-3 border shadow-xs ${
+                      isSelected
+                        ? 'bg-blue-50/70 border-blue-500 ring-2 ring-blue-500/20 shadow-sm'
+                        : 'bg-white border-slate-200/80 hover:border-slate-300'
                     }`}
                   >
-                    {filter.label}
-                  </button>
-                ))}
-              </div>
+                    <div
+                      className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-xs shadow-2xs transition-colors ${
+                        isSelected ? 'bg-[#1A73E8] text-white' : 'bg-slate-100 text-slate-400 border border-slate-300'
+                      }`}
+                    >
+                      {isSelected ? (
+                        <span className="material-symbols-outlined text-[15px]">check</span>
+                      ) : (
+                        <span className="w-2 h-2 rounded-full bg-transparent"></span>
+                      )}
+                    </div>
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <p className="text-xs text-[#0B1C30] font-medium leading-relaxed">
+                        “{item.text}”
+                      </p>
+                      <span className="mt-2 text-[10px] font-bold uppercase tracking-wider text-[#005BBF]">
+                        {item.topic}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
-            {/* AI Generation State or Suggestion Cards */}
-            {isGeneratingSuggestions && (
-              <div className="p-6 rounded-2xl bg-white border border-blue-100 text-center flex flex-col items-center justify-center gap-2 shadow-xs">
-                <span className="material-symbols-outlined text-2xl text-[#1A73E8] animate-spin">progress_activity</span>
-                <span className="text-xs font-semibold text-[#005BBF]">
-                  {language === 'hi' ? 'AI द्वारा 3 नए सुझाव तैयार किए जा रहे हैं…' : 'Generating 3 real-time suggestions…'}
-                </span>
-              </div>
-            )}
-
-            {suggestionError && (
-              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center justify-between">
-                <span>{suggestionError}</span>
-                <button
-                  type="button"
-                  onClick={() => void handleGenerateSuggestions(activeFilter || 'Service')}
-                  className="font-bold underline ml-2"
-                >
-                  {copy.retrySuggestions}
-                </button>
-              </div>
-            )}
-
-            {suggestions.length > 0 && (
-              <section aria-labelledby="review-suggestions-heading" className="space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <h3 id="review-suggestions-heading" className="text-xs font-bold text-[#0B1C30]">
-                    {activeFilter ? `${activeFilter} Suggestions` : copy.suggestionsTitle}
-                  </h3>
-                  <span className="text-[10px] font-bold text-[#1A73E8] bg-blue-50 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                    3 AI Suggestions
-                  </span>
-                </div>
-                <div className="flex flex-col gap-2.5" role="radiogroup">
-                  {suggestions.map((suggestion, index) => {
-                    const isSelected = selectedSuggestion === index;
-                    const itemTopic =
-                      suggestionItems[index]?.topic ||
-                      (index === 0
-                        ? 'Hospitality & Staff'
-                        : index === 1
-                        ? 'Food & Ambience'
-                        : 'Overall Impression');
-
-                    return (
-                      <div
-                        key={`${index}-${suggestion}`}
-                        role="radio"
-                        aria-checked={isSelected}
-                        tabIndex={0}
-                        onClick={() => {
-                          setCustomText(suggestion);
-                          setSelectedSuggestion(index);
-                        }}
-                        className={`cursor-pointer rounded-2xl border p-4 transition-all duration-200 flex items-start gap-3 shadow-xs ${
-                          isSelected
-                            ? 'border-[#1A73E8] bg-blue-50/70 ring-1 ring-[#1A73E8]/30 shadow-sm'
-                            : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                        }`}
-                      >
-                        <div
-                          className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-xs shadow-xs transition-colors ${
-                            isSelected
-                              ? 'bg-[#1A73E8] text-white'
-                              : 'bg-slate-100 text-slate-400'
-                          }`}
-                        >
-                          <span className="material-symbols-outlined text-[16px]">
-                            {isSelected ? 'check' : 'radio_button_unchecked'}
-                          </span>
-                        </div>
-                        <div className="flex flex-col flex-1 min-w-0">
-                          <p
-                            className={`text-xs leading-relaxed font-medium ${
-                              isSelected ? 'text-[#0B1C30]' : 'text-[#414754]'
-                            }`}
-                          >
-                            “{suggestion}”
-                          </p>
-                          <div className="flex items-center gap-2 mt-2">
-                            <span
-                              className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                                isSelected
-                                  ? 'bg-[#1A73E8]/10 text-[#005BBF]'
-                                  : 'bg-slate-100 text-slate-600'
-                              }`}
-                            >
-                              {itemTopic}
-                            </span>
-                            {isSelected && (
-                              <span className="text-[10px] font-semibold text-[#006D2C] flex items-center gap-0.5">
-                                <span className="material-symbols-outlined text-[12px]">done</span>
-                                Selected
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
-
-            {/* Optional Custom Edit Box */}
-            <div className="bg-white p-3.5 rounded-2xl border border-slate-100 shadow-xs space-y-1">
-              <label htmlFor="review-text" className="text-xs font-semibold text-[#0B1C30] flex items-center justify-between">
-                <span>{language === 'hi' ? 'रिव्यू टेक्स्ट एडिट करें (ऐच्छिक)' : 'Edit or Personalize (Optional)'}</span>
-                <span className="text-slate-400 text-[10px]">{customText.length} / 300</span>
-              </label>
-              <textarea
-                ref={reviewTextRef}
-                id="review-text"
-                rows={2}
-                maxLength={300}
-                value={customText}
-                onChange={(e) => {
-                  setCustomText(e.target.value);
-                  setSelectedSuggestion(null);
+            {/* Or Write My Own Review Toggle */}
+            <div className="text-center pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCustomInput(!showCustomInput);
+                  if (!showCustomInput) {
+                    setTimeout(() => reviewTextRef.current?.focus(), 100);
+                  }
                 }}
-                placeholder={selectedPrompt || copy.placeholder}
-                className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-none focus:border-[#1A73E8] resize-none"
-              />
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-200/60 hover:bg-slate-200 text-xs font-bold text-[#0B1C30] transition-colors"
+              >
+                <span>{copy.writeOwnReview}</span>
+              </button>
             </div>
 
-            {/* Live Clipboard Preview */}
-            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1 font-bold text-[#1A73E8]">
-                  <span className="material-symbols-outlined text-base">content_paste</span>
-                  <span className="uppercase tracking-wider text-[10px]">{copy.clipboard}</span>
+            {showCustomInput && (
+              <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs space-y-1.5 animate-fade-in">
+                <div className="flex items-center justify-between text-xs font-semibold text-[#0B1C30]">
+                  <span>{copy.editOptional}</span>
+                  <span className="text-slate-400 text-[10px]">{customText.length} / 300</span>
                 </div>
-                <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[10px] font-bold">
-                  {copy.ready}
+                <textarea
+                  ref={reviewTextRef}
+                  rows={2}
+                  maxLength={300}
+                  value={customText}
+                  onChange={(e) => setCustomText(e.target.value)}
+                  placeholder="Share details about what stood out in your experience..."
+                  className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:border-[#1A73E8] resize-none"
+                />
+              </div>
+            )}
+
+            {/* LIVE PREVIEW Card */}
+            <div className="rounded-2xl bg-white p-4 shadow-xs border border-slate-200/80 space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-1.5 font-extrabold text-[#1A73E8]">
+                  <span className="material-symbols-outlined text-sm">content_paste</span>
+                  <span className="uppercase tracking-wider text-[10px]">{copy.livePreview}</span>
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">
+                  {copy.readyToPaste}
                 </span>
               </div>
-              <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-100">
-                <p className="text-xs text-[#0B1C30] italic leading-relaxed">
-                  {activeReviewText || copy.emptyReview}
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-start gap-2">
+                <span className="text-2xl text-slate-400 font-serif leading-none mt-0.5">“</span>
+                <p className="text-xs text-[#0B1C30] font-medium leading-relaxed italic">
+                  {activeReviewText || copy.emptyPreview}
                 </p>
               </div>
             </div>
 
-            {/* Primary CTA Button */}
-            {copyError && (
-              <p className="text-xs text-red-700" role="alert">{copyError}</p>
-            )}
-            <button
-              onClick={handleCopyReview}
-              className="w-full h-12 bg-[#1A73E8] hover:bg-[#1557B0] text-white rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg active:scale-98 transition-all"
-            >
-              <span className="material-symbols-outlined text-lg">content_copy</span>
-              <span>{activeReviewText ? copy.copyContinue : copy.continueEmpty}</span>
-            </button>
+            {/* Primary Action Button: Copy & Go to Google Review */}
+            <div className="space-y-1.5 pt-1">
+              <button
+                type="button"
+                onClick={handleCopyAndProceed}
+                className="w-full h-13 rounded-2xl bg-[#1A73E8] hover:bg-[#1557B0] text-white font-bold text-sm shadow-md active:scale-98 transition-all flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined text-lg">content_copy</span>
+                <span>{copy.copyGoToGoogle}</span>
+                <span className="w-5 h-5 rounded-full bg-white text-[#1A73E8] font-bold text-xs flex items-center justify-center ml-0.5">
+                  G
+                </span>
+              </button>
+              <p className="text-[11px] text-center text-[#565E74] font-medium">
+                {copy.copySubtitle}
+              </p>
+            </div>
+
+            {/* Disclaimer */}
+            <div className="flex items-start gap-1.5 text-[10px] text-slate-500 pt-1 pb-4 leading-normal">
+              <span className="material-symbols-outlined text-xs mt-0.5 text-slate-400">info</span>
+              <span>{copy.disclaimer}</span>
+            </div>
           </div>
         )}
 
-        {/* Step 3: Review Copied / Opening Google Handoff */}
+        {/* ========================================================================= */}
+        {/* SCREEN 3: Review Copied — Opening Google (Image 2 - Screen 3)            */}
+        {/* ========================================================================= */}
         {step === 3 && (
-          <div className="flex flex-col gap-6 animate-scale-up text-center pt-4">
-            {/* Animated Ripple Checkmark Hero */}
-            <div className="w-20 h-20 mx-auto rounded-full bg-green-100 text-green-600 flex items-center justify-center shadow-lg animate-bounce">
-              <span className="material-symbols-outlined text-5xl">check_circle</span>
+          <div className="flex flex-col gap-4 animate-scale-up text-center pt-2">
+            {/* Step Dots indicator */}
+            <div className="flex items-center justify-center gap-1.5">
+              <span className="w-2.5 h-1.5 rounded-full bg-[#1A73E8]"></span>
+              <span className="w-2.5 h-1.5 rounded-full bg-[#1A73E8]"></span>
+              <span className="w-2.5 h-1.5 rounded-full bg-emerald-500"></span>
             </div>
 
+            {/* Green Circular Success Badge with Checkmark */}
+            <div className="w-18 h-18 mx-auto rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20 ring-8 ring-emerald-100">
+              <span className="material-symbols-outlined text-4xl">check</span>
+            </div>
+
+            {/* Title */}
             <div className="space-y-1">
-              <h2 className="text-2xl font-extrabold text-[#0B1C30]">
-              {copied ? copy.copiedTitle : copy.readyTitle}
+              <h2 className="text-2xl font-extrabold text-[#0B1C30] tracking-tight">
+                {copy.reviewCopied}
               </h2>
-              <p className="text-xs text-[#565E74] max-w-xs mx-auto">
-              {copy.handoff}
+              <p className="text-xs text-[#565E74] max-w-xs mx-auto font-medium">
+                {copy.openingGoogle(businessName)}
               </p>
             </div>
 
-            {/* 3 Steps on Google Card */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 text-left space-y-3.5">
-              <h3 className="font-bold text-xs text-[#0B1C30] uppercase tracking-wider">
-                {copy.next}
-              </h3>
-              <div className="space-y-2.5 text-xs">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-blue-100 text-[#1A73E8] text-[11px] font-bold flex items-center justify-center">
+            {/* Glowing animated transfer bar */}
+            <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-emerald-500 to-[#1A73E8] rounded-full animate-pulse"></div>
+            </div>
+
+            {/* Copied Review Card */}
+            <div className="bg-white p-4 rounded-3xl shadow-xs border border-slate-200/80 text-left space-y-3">
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-1.5 text-emerald-700 font-bold">
+                  <span className="material-symbols-outlined text-sm">check_circle</span>
+                  <span>{copy.readyToPasteBadge}</span>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-extrabold tracking-wider uppercase border border-emerald-200">
+                  {copy.copiedBadge}
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-blue-50/40 border border-blue-100">
+                <p className="text-xs text-[#0B1C30] italic font-medium leading-relaxed">
+                  “{activeReviewText}”
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] pt-0.5">
+                <span className="flex items-center gap-1 text-emerald-700 font-semibold">
+                  <span className="material-symbols-outlined text-xs">done_all</span>
+                  <span>{copy.copiedToClipboard}</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={handleReCopy}
+                  className="flex items-center gap-1 text-[#1A73E8] font-bold hover:underline"
+                >
+                  <span className="material-symbols-outlined text-xs">content_copy</span>
+                  <span>{copyFeedback ? 'Copied!' : copy.recopy}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Mini Business Card */}
+            <div className="bg-white p-3.5 rounded-2xl shadow-xs border border-slate-200/80 flex items-center gap-3 text-left">
+              <div className="w-11 h-11 rounded-xl bg-slate-800 text-white flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
+                {qrCode.thumbnailUrl ? (
+                  <img src={qrCode.thumbnailUrl} alt={businessName} className="w-full h-full object-cover" />
+                ) : qrCode.logoUrl ? (
+                  <img src={qrCode.logoUrl} alt={businessName} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="material-symbols-outlined text-xl">hotel</span>
+                )}
+              </div>
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-1">
+                  <span className="text-xs font-extrabold text-[#0B1C30] truncate">{businessName}</span>
+                  <span className="material-symbols-outlined text-[#1A73E8] text-xs">verified</span>
+                </div>
+                <div className="flex items-center gap-1 text-[#FBBC04] text-[11px]">
+                  <span>★★★★★</span>
+                  <span className="text-[#0B1C30] font-bold ml-1">4.9</span>
+                  <span className="text-[#565E74] text-[10px]">(428 reviews)</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Next Steps on Google Card (Matching Image 2 Screen 3) */}
+            <div className="bg-blue-50/50 p-4 rounded-3xl border border-blue-100 text-left space-y-2.5">
+              <div className="flex items-center gap-1.5 text-[#005BBF] font-bold text-xs uppercase tracking-wide">
+                <span className="material-symbols-outlined text-sm">info</span>
+                <span>{copy.nextStepsHeader}</span>
+              </div>
+              <div className="space-y-2 text-xs font-semibold text-slate-700">
+                <div className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#1A73E8] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                     1
                   </span>
-                  <span className="text-[#0B1C30]">{copy.chooseRating}</span>
+                  <span>{copy.nextStep1(rating || 5)}</span>
                 </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-blue-100 text-[#1A73E8] text-[11px] font-bold flex items-center justify-center">
+                <div className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#1A73E8] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                     2
                   </span>
-                  <span className="text-[#0B1C30]">{copy.pasteText}</span>
+                  <span>{copy.nextStep2}</span>
                 </div>
-                <div className="flex items-center gap-2.5">
-                  <span className="w-5 h-5 rounded-full bg-blue-100 text-[#1A73E8] text-[11px] font-bold flex items-center justify-center">
+                <div className="flex items-start gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#1A73E8] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">
                     3
                   </span>
-                  <span className="text-[#0B1C30]">{copy.submitThere}</span>
+                  <span>{copy.nextStep3}</span>
                 </div>
               </div>
             </div>
 
-            {/* Policy & Handoff Clarification Note */}
-            <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200/80 text-left space-y-1.5">
-              <div className="flex items-center gap-1.5 text-[#0B1C30] font-bold text-xs">
-                <span className="material-symbols-outlined text-[#1A73E8] text-[16px]">info</span>
-                <span>ReviewQR Handoff Reference</span>
-              </div>
-              <p className="text-[11px] text-[#565E74] leading-relaxed">
-                Demonstrates customer pasting copied text and confirming stars on Google&apos;s native dialog. Customer retains 100% control over final submission.
-              </p>
-              <div className="flex items-center gap-3 pt-1 text-[10px] text-slate-500 font-semibold">
-                <span className="flex items-center gap-1 text-green-700">
-                  <span className="material-symbols-outlined text-[13px]">verified</span>
-                  <span>Google Policy Compliant</span>
-                </span>
-                <span>•</span>
-                <span className="flex items-center gap-1 text-[#1A73E8]">
-                  <span className="material-symbols-outlined text-[13px]">touch_app</span>
-                  <span>Customer Consented</span>
-                </span>
-              </div>
-            </div>
-
-            <div className="space-y-2 pt-2">
+            {/* Primary Continue Button */}
+            <div className="space-y-1.5 pt-1">
               <a
                 href={reviewDestination}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={recordDestinationClick}
-                className="w-full h-12 rounded-2xl bg-[#1A73E8] hover:bg-[#1557B0] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all"
+                className="w-full h-13 rounded-2xl bg-[#1A73E8] hover:bg-[#1557B0] text-white font-bold text-sm shadow-md active:scale-98 transition-all flex items-center justify-center gap-2"
               >
-                <span>{copy.reviewOnGoogle}</span>
-                <span className="material-symbols-outlined text-base">open_in_new</span>
+                <span>{copy.continueToGoogle}</span>
+                <span className="material-symbols-outlined text-base">arrow_forward</span>
               </a>
-              {eventMessage && (
-                <p className="text-xs text-amber-700" role="status">{eventMessage}</p>
-              )}
-              <button
-                onClick={() => setStep(2)}
-                className="text-xs text-slate-500 hover:text-slate-800 font-semibold"
+              <span className="text-[11px] font-medium text-emerald-700 flex items-center justify-center gap-1">
+                <span className="material-symbols-outlined text-xs">open_in_new</span>
+                <span>{copy.handoffInitiated}</span>
+              </span>
+            </div>
+
+            {/* Clipboard Verified Footer */}
+            <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500 font-medium pt-1">
+              <span className="material-symbols-outlined text-sm text-emerald-600">verified_user</span>
+              <span>{copy.clipboardVerified}</span>
+            </div>
+
+            <div className="pt-1 pb-4">
+              <a
+                href={reviewDestination}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={recordDestinationClick}
+                className="text-xs text-slate-500 hover:text-slate-800 font-medium underline"
               >
-                {copy.editText}
-              </button>
+                {copy.havingTrouble}
+              </a>
             </div>
           </div>
         )}

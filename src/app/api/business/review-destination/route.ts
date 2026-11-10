@@ -85,9 +85,6 @@ async function toResponseBusiness(
           })
       : Promise.resolve({ data: null, error: null }),
   ]);
-  if (logo.error || thumbnail.error) {
-    console.warn('Signing returned error, continuing without asset URLs:', logo.error || thumbnail.error);
-  }
 
   return {
     id: row.id,
@@ -135,8 +132,13 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const parsed = reviewDestinationSchema.safeParse(body);
   if (!parsed.success) {
+    const errorDetails = parsed.error.issues.map((i) => i.message).join('; ');
     return NextResponse.json(
-      { code: 'VALIDATION_ERROR', errors: parsed.error.flatten() },
+      {
+        code: 'VALIDATION_ERROR',
+        message: errorDetails || 'Invalid review destination input.',
+        errors: parsed.error.flatten(),
+      },
       { status: 400 }
     );
   }
@@ -150,7 +152,13 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     if (lookupError) {
       console.error('Failed to find the authenticated owner business:', lookupError);
-      return NextResponse.json({ code: 'DESTINATION_SAVE_FAILED' }, { status: 500 });
+      return NextResponse.json(
+        {
+          code: 'DESTINATION_SAVE_FAILED',
+          message: lookupError.message || 'Failed to locate business record.',
+        },
+        { status: 500 }
+      );
     }
     const categoryForValidation =
       parsed.data.category ?? existing?.category ?? 'Restaurant & Lounge';
@@ -158,6 +166,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json(
         {
           code: 'VALIDATION_ERROR',
+          message: 'Hotel subcategories require the Hotel category.',
           errors: { fieldErrors: { subcategory: ['Hotel subcategories require the Hotel category.'] } },
         },
         { status: 400 }
@@ -199,7 +208,13 @@ export async function POST(request: Request): Promise<NextResponse> {
 
       if (error || !data) {
         console.error('Failed to update the owner business review destination:', error);
-        return NextResponse.json({ code: 'DESTINATION_SAVE_FAILED' }, { status: 500 });
+        return NextResponse.json(
+          {
+            code: 'DESTINATION_SAVE_FAILED',
+            message: error?.message || 'Failed to update review destination in database.',
+          },
+          { status: 500 }
+        );
       }
 
       return NextResponse.json({ business: await toResponseBusiness(auth.supabase, data) });
@@ -249,7 +264,13 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     if (error || !data) {
       console.error('Failed to create the authenticated owner business:', error);
-      return NextResponse.json({ code: 'DESTINATION_SAVE_FAILED' }, { status: 500 });
+      return NextResponse.json(
+        {
+          code: 'DESTINATION_SAVE_FAILED',
+          message: error?.message || 'Failed to insert business record.',
+        },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json(
@@ -258,6 +279,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   } catch (error) {
     console.error('Unexpected error saving the authenticated business review destination:', error);
-    return NextResponse.json({ code: 'DESTINATION_SAVE_FAILED' }, { status: 500 });
+    const msg = error instanceof Error ? error.message : 'Unexpected error saving review destination.';
+    return NextResponse.json({ code: 'DESTINATION_SAVE_FAILED', message: msg }, { status: 500 });
   }
 }

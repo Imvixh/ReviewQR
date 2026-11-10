@@ -104,7 +104,16 @@ export async function POST(request: Request): Promise<NextResponse> {
   const apiUrl = isRouter
     ? (process.env.AI_BASE_URL || 'https://openrouter.ai/api/v1/chat/completions')
     : (process.env.AI_BASE_URL || 'https://api.openai.com/v1/chat/completions');
-  const model = process.env.OPENROUTER_MODEL || process.env.OPENAI_MODEL || (isRouter ? 'meta-llama/llama-3.3-70b-instruct:free' : 'gpt-4o-mini');
+
+  // Candidate free models in order of response speed & quality
+  const candidateModels = isRouter
+    ? [
+        process.env.OPENROUTER_MODEL || 'liquid/lfm-3-1.7b:free',
+        'liquid/lfm-3-1.7b:free',
+        'nvidia/nemotron-3.5-lightning:free',
+        'liquid/lfm-2.5-2.6b:free',
+      ].filter((v, i, a) => Boolean(v) && a.indexOf(v) === i)
+    : [process.env.OPENAI_MODEL || 'gpt-4o-mini'];
 
   const headers: Record<string, string> = {
     Authorization: `Bearer ${apiKey}`,
@@ -115,110 +124,105 @@ export async function POST(request: Request): Promise<NextResponse> {
     headers['X-Title'] = 'ReviewQR';
   }
 
-  const requestBody: Record<string, unknown> = {
-    model,
-    temperature: 0.6,
-    messages: [
-      {
-        role: 'system',
-        content:
-          'Rephrase only the customer-provided experience into exactly three distinct, natural review phrasings in the requested language. For each suggestion, provide a short topic pill label (2-4 words, such as "Hospitality & Staff", "Food & Ambience", "Overall Impression", or matching the specific theme of what the customer discussed) and the review text. Treat the rating, business category, and optional topic filter as context, never evidence. Do not add any service, event, product, feeling, or fact that the customer did not state. Do not infer a positive or negative experience from the rating. Keep the same meaning and sentiment as the customer. Return ONLY a valid JSON object with the key "items", containing an array of 3 objects with "topic" and "text".',
-      },
-      {
-        role: 'user',
-        content: JSON.stringify({
-          language: parsed.data.language === 'hi' ? 'Hindi' : 'English',
-          rating: parsed.data.rating,
-          businessCategory: businessCategory || 'not provided',
-          topicFilter: parsed.data.filter || undefined,
-          customerExperience: parsed.data.experience,
-        }),
-      },
-    ],
-  };
+  let completionContent: string | null = null;
 
-  // Only pass strict response_format if not using arbitrary third-party free models that fail on json_schema
-  if (!isRouter) {
-    requestBody.response_format = {
-      type: 'json_schema',
-      json_schema: {
-        name: 'review_suggestions',
-        strict: true,
-        schema: suggestionResponseSchema,
-      },
+  for (const model of candidateModels) {
+    const requestBody: Record<string, unknown> = {
+      model,
+      temperature: 0.6,
+      messages: [
+        {
+          role: 'system',
+          content:
+            'Rephrase only the customer-provided experience into exactly three distinct, natural review phrasings in the requested language. For each suggestion, provide a short topic pill label (2-4 words, such as "Hospitality & Staff", "Food & Ambience", "Overall Impression", or matching the specific theme of what the customer discussed) and the review text. Treat the rating, business category, and optional topic filter as context, never evidence. Do not add any service, event, product, feeling, or fact that the customer did not state. Do not infer a positive or negative experience from the rating. Keep the same meaning and sentiment as the customer. Return ONLY a valid JSON object with the key "items", containing an array of 3 objects with "topic" and "text".',
+        },
+        {
+          role: 'user',
+          content: JSON.stringify({
+            language: parsed.data.language === 'hi' ? 'Hindi' : 'English',
+            rating: parsed.data.rating,
+            businessCategory: businessCategory || 'not provided',
+            topicFilter: parsed.data.filter || undefined,
+            customerExperience: parsed.data.experience,
+          }),
+        },
+      ],
     };
+
+    if (!isRouter) {
+      requestBody.response_format = {
+        type: 'json_schema',
+        json_schema: {
+          name: 'review_suggestions',
+          strict: true,
+          schema: suggestionResponseSchema,
+        },
+      };
+    }
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers,
+        signal: AbortSignal.timeout(20_000),
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        console.warn(`Model ${model} returned HTTP ${response.status}, attempting fallback if available...`);
+        continue;
+      }
+
+      const json = (await response.json()) as {
+        choices?: Array<{ message?: { content?: string | null } }>;
+      };
+      const text = json.choices?.[0]?.message?.content;
+      if (text && text.trim().length > 10) {
+        completionContent = text;
+        break;
+      }
+    } catch (modelErr) {
+      console.warn(`Model ${model} request failed or timed out:`, modelErr);
+    }
   }
 
-  let providerResponse: Response;
-  try {
-    providerResponse = await fetch(apiUrl, {
-      method: 'POST',
-      headers,
-      signal: AbortSignal.timeout(15_000),
-      body: JSON.stringify(requestBody),
-    });
-  } catch {
-    return NextResponse.json(
-      { code: 'AI_PROVIDER_UNAVAILABLE', message: 'Suggestions could not be generated. Please retry.' },
-      { status: 502 }
-    );
-  }
-
-  if (!providerResponse.ok) {
+  if (!completionContent) {
     return NextResponse.json(
       { code: 'AI_PROVIDER_ERROR', message: 'Suggestions could not be generated. Please retry.' },
       { status: 502 }
     );
   }
 
-  let completion: {
-    choices?: Array<{ message?: { content?: string | null } }>;
-  };
+  let parsedItemsData: Array<{ topic: string; text: string }> | null = null;
+
   try {
-    completion = (await providerResponse.json()) as typeof completion;
-  } catch {
-    return NextResponse.json(
-      { code: 'AI_RESPONSE_INVALID', message: 'Suggestions could not be generated. Please retry.' },
-      { status: 502 }
-    );
+    const match = completionContent.match(/\{[\s\S]*\}/);
+    const jsonStr = match ? match[0] : completionContent.replace(/```(?:json)?\s*([\s\S]*?)\s*```/i, '$1').trim();
+    const output = JSON.parse(jsonStr) as { items?: Array<{ topic?: unknown; text?: unknown }>; suggestions?: unknown };
+    const rawList = Array.isArray(output.items)
+      ? output.items
+      : Array.isArray(output.suggestions)
+      ? output.suggestions.map((s) => ({ topic: 'General Experience', text: s }))
+      : [];
+
+    const parsedItems = z
+      .array(
+        z.object({
+          topic: z.string().trim().min(2).max(60),
+          text: z.string().trim().min(8).max(500),
+        })
+      )
+      .length(3)
+      .safeParse(rawList);
+
+    if (parsedItems.success && new Set(parsedItems.data.map((item) => item.text.toLowerCase())).size === 3) {
+      parsedItemsData = parsedItems.data;
+    }
+  } catch (parseErr) {
+    console.warn('Failed to parse model JSON completion:', parseErr);
   }
 
-  let output: { items?: Array<{ topic?: unknown; text?: unknown }>; suggestions?: unknown };
-  try {
-    const rawContent = completion.choices?.[0]?.message?.content;
-    if (!rawContent) throw new Error('Empty model response');
-    
-    // Clean potential markdown code fences from open source models (e.g. ```json ... ```)
-    const sanitized = rawContent.replace(/```(?:json)?\s*([\s\S]*?)\s*```/i, '$1').trim();
-    output = JSON.parse(sanitized) as typeof output;
-  } catch {
-    return NextResponse.json(
-      { code: 'AI_RESPONSE_INVALID', message: 'Suggestions could not be generated. Please retry.' },
-      { status: 502 }
-    );
-  }
-
-  // Support both structured items with topic + text, and backward-compatible strings
-  const rawList = Array.isArray(output.items)
-    ? output.items
-    : Array.isArray(output.suggestions)
-    ? output.suggestions.map((s) => ({ topic: 'General Experience', text: s }))
-    : [];
-
-  const parsedItems = z
-    .array(
-      z.object({
-        topic: z.string().trim().min(2).max(60),
-        text: z.string().trim().min(8).max(500),
-      })
-    )
-    .length(3)
-    .safeParse(rawList);
-
-  if (
-    !parsedItems.success ||
-    new Set(parsedItems.data.map((item) => item.text.toLocaleLowerCase())).size !== 3
-  ) {
+  if (!parsedItemsData) {
     return NextResponse.json(
       { code: 'AI_RESPONSE_INVALID', message: 'Suggestions could not be generated. Please retry.' },
       { status: 502 }
@@ -226,7 +230,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   return NextResponse.json({
-    suggestions: parsedItems.data.map((item) => item.text),
-    items: parsedItems.data,
+    suggestions: parsedItemsData.map((item) => item.text),
+    items: parsedItemsData,
   });
 }

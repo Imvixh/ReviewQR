@@ -58,6 +58,10 @@ export default function QRDesignStudioPage() {
   const [logoUrl, setLogoUrl] = useState<string>('');
   const [logoName, setLogoName] = useState('');
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string>('');
+  const [thumbnailName, setThumbnailName] = useState('');
+  const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
+  const thumbInputRef = useRef<HTMLInputElement>(null);
 
   // QR Code Architecture State (Image 3)
   const [geometry, setGeometry] = useState<'classic' | 'rounded' | 'dots' | 'premium-eye'>('rounded');
@@ -639,6 +643,7 @@ export default function QRDesignStudioPage() {
           setBusinessName(business.name || '');
           setLocation(business.city || '');
           if (business.logoUrl) setLogoUrl(business.logoUrl);
+          if (business.thumbnailUrl) setThumbnailUrl(business.thumbnailUrl);
           const updatedOrg = setStoredOrg({
             id: business.id,
             name: business.name,
@@ -840,6 +845,7 @@ export default function QRDesignStudioPage() {
       setCustomCategory(savedCategory.customCategory);
       setSubcategory(business.subcategory || '');
       if (business.logoUrl) setLogoUrl(business.logoUrl);
+      if (business.thumbnailUrl) setThumbnailUrl(business.thumbnailUrl);
       const updatedOrg = setStoredOrg({
         id: business.id,
         name: business.name,
@@ -908,6 +914,51 @@ export default function QRDesignStudioPage() {
       showToast(error instanceof Error ? error.message : 'Logo upload failed.');
     } finally {
       setIsUploadingLogo(false);
+    }
+  };
+
+  const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+      showToast('Upload a PNG, JPEG, or WebP image.');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Image size exceeds 5 MB limit.');
+      return;
+    }
+
+    setIsUploadingThumbnail(true);
+    setThumbnailName(file.name);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', 'thumbnail');
+      if (!org?.id) {
+        throw new Error('Save your business review destination before uploading a cover image.');
+      }
+      formData.append('orgId', org.id);
+
+      const res = await fetch('/api/business/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success || !data.url) {
+        throw new Error(data.message || data.code || 'Cover image upload failed.');
+      }
+      setThumbnailUrl(data.url);
+      setStoredOrg({ thumbnailUrl: data.url, thumbnailPath: data.path });
+      showToast('Venue cover photo uploaded successfully.');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Cover image upload failed.');
+    } finally {
+      setIsUploadingThumbnail(false);
     }
   };
 
@@ -1161,6 +1212,15 @@ export default function QRDesignStudioPage() {
         accept="image/png,image/jpeg,image/webp"
         className="hidden"
         onChange={handleLogoUpload}
+      />
+
+      {/* Hidden File Input for Cover Thumbnail */}
+      <input
+        ref={thumbInputRef}
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        className="hidden"
+        onChange={handleThumbnailUpload}
       />
 
       <div className="flex flex-col w-full min-h-screen">
@@ -1633,9 +1693,9 @@ export default function QRDesignStudioPage() {
                       </div>
                       <div className="flex flex-col">
                         <span className="text-xs font-semibold text-[#0B1C30] truncate max-w-[140px]">
-                          {logoName}
+                          {logoName || (logoUrl ? 'Active logo applied' : 'Default emblem')}
                         </span>
-                        <span className="text-[11px] text-[#565E74]">PNG, SVG, JPG up to 5MB</span>
+                        <span className="text-[11px] text-[#565E74]">PNG, WebP, JPG up to 5MB</span>
                       </div>
                     </div>
                     <button
@@ -1644,7 +1704,37 @@ export default function QRDesignStudioPage() {
                       disabled={isUploadingLogo}
                       onClick={() => fileInputRef.current?.click()}
                     >
-                      {isUploadingLogo ? 'Uploading...' : 'Change'}
+                      {isUploadingLogo ? 'Uploading...' : logoUrl ? 'Change' : 'Upload'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Venue Cover Thumbnail Box */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-[#414754]">Venue Cover Photo (Customer Mobile Header)</label>
+                  <div className="p-3 rounded-xl bg-slate-50 flex items-center justify-between gap-3 border border-slate-200">
+                    <div className="flex items-center gap-3">
+                      <div className="w-16 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center overflow-hidden border border-slate-100 shrink-0">
+                        {thumbnailUrl ? (
+                          <img src={thumbnailUrl} alt="Cover" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="material-symbols-outlined text-slate-400 text-2xl">landscape</span>
+                        )}
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-xs font-semibold text-[#0B1C30] truncate max-w-[140px]">
+                          {thumbnailName || (thumbnailUrl ? 'Active cover photo' : 'Default venue photo')}
+                        </span>
+                        <span className="text-[11px] text-[#565E74]">16:9 PNG, JPG up to 5MB</span>
+                      </div>
+                    </div>
+                    <button
+                      className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-xs font-semibold text-[#005BBF] border border-slate-200 shadow-2xs transition-all shrink-0"
+                      type="button"
+                      disabled={isUploadingThumbnail}
+                      onClick={() => thumbInputRef.current?.click()}
+                    >
+                      {isUploadingThumbnail ? 'Uploading...' : thumbnailUrl ? 'Change' : 'Upload Cover'}
                     </button>
                   </div>
                 </div>
