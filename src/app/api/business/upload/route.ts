@@ -67,24 +67,25 @@ export async function POST(request: NextRequest) {
 
   const path = `${user.id}/${business.id}/${type}-${crypto.randomUUID()}.${extension}`;
   
-  // Use admin client for storage execution on the server side after verifying user and business ownership
-  let storageClient;
+  let adminClient;
   try {
-    storageClient = createAdminClient();
-  } catch {
-    storageClient = supabase;
+    adminClient = createAdminClient();
+  } catch (e) {
+    console.error('Failed to initialize admin client:', e);
   }
+  const dbClient = adminClient || supabase;
+  const storageClient = adminClient || supabase;
 
   const { error: uploadError } = await storageClient.storage
     .from('business-assets')
     .upload(path, await file.arrayBuffer(), {
       contentType: file.type,
-      upsert: false,
+      upsert: true,
     });
 
   if (uploadError) {
     console.error('Failed to upload business branding asset:', uploadError);
-    return NextResponse.json({ code: 'ASSET_UPLOAD_FAILED' }, { status: 502 });
+    return NextResponse.json({ code: 'ASSET_UPLOAD_FAILED', message: uploadError.message }, { status: 502 });
   }
 
   const { data: signedAsset, error: signedAssetError } = await storageClient.storage
@@ -102,7 +103,7 @@ export async function POST(request: NextRequest) {
   const update = type === 'logo'
     ? { logo_url: null, logo_path: path }
     : { thumbnail_url: null, thumbnail_path: path };
-  const { error: saveError } = await supabase
+  const { error: saveError } = await dbClient
     .from('businesses')
     .update(update)
     .eq('id', business.id)
