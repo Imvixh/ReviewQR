@@ -120,6 +120,7 @@ export const reviewSuggestionsSchema = z.object({
   rating: z.number().int().min(1).max(5),
   language: z.enum(['en', 'hi']),
   experience: z.string().trim().min(1).max(300),
+  filter: z.string().trim().max(50).optional(),
 });
 
 export const settingsProfileSchema = z.object({

@@ -34,3 +34,8 @@ Thumbs.db
 *.tsbuildinfo
 next-env.d.ts
 
+# Test results and artifacts
+/test-results/
+e2e/test-token.json
+
+

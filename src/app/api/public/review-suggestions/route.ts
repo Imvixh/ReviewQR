@@ -10,14 +10,28 @@ const suggestionResponseSchema = {
   type: 'object',
   additionalProperties: false,
   properties: {
-    suggestions: {
+    items: {
       type: 'array',
       minItems: 3,
       maxItems: 3,
-      items: { type: 'string' },
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+          topic: {
+            type: 'string',
+            description: 'Short 2-4 word theme or category pill label, e.g. Hospitality & Staff, Food & Ambience, Overall Impression',
+          },
+          text: {
+            type: 'string',
+            description: 'Natural review text phrased according to the customer experience',
+          },
+        },
+        required: ['topic', 'text'],
+      },
     },
   },
-  required: ['suggestions'],
+  required: ['items'],
 };
 
 function getClientKey(request: Request): string {
@@ -81,48 +95,67 @@ export async function POST(request: Request): Promise<NextResponse> {
       ? qr.business_category
       : '';
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ code: 'AI_NOT_CONFIGURED' }, { status: 503 });
   }
 
+  const isRouter = Boolean(process.env.OPENROUTER_API_KEY || apiKey.startsWith('sk-or-'));
+  const apiUrl = isRouter
+    ? (process.env.AI_BASE_URL || 'https://openrouter.ai/api/v1/chat/completions')
+    : (process.env.AI_BASE_URL || 'https://api.openai.com/v1/chat/completions');
+  const model = process.env.OPENROUTER_MODEL || process.env.OPENAI_MODEL || (isRouter ? 'meta-llama/llama-3.3-70b-instruct:free' : 'gpt-4o-mini');
+
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${apiKey}`,
+    'Content-Type': 'application/json',
+  };
+  if (isRouter) {
+    headers['HTTP-Referer'] = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    headers['X-Title'] = 'ReviewQR';
+  }
+
+  const requestBody: Record<string, unknown> = {
+    model,
+    temperature: 0.6,
+    messages: [
+      {
+        role: 'system',
+        content:
+          'Rephrase only the customer-provided experience into exactly three distinct, natural review phrasings in the requested language. For each suggestion, provide a short topic pill label (2-4 words, such as "Hospitality & Staff", "Food & Ambience", "Overall Impression", or matching the specific theme of what the customer discussed) and the review text. Treat the rating, business category, and optional topic filter as context, never evidence. Do not add any service, event, product, feeling, or fact that the customer did not state. Do not infer a positive or negative experience from the rating. Keep the same meaning and sentiment as the customer. Return ONLY a valid JSON object with the key "items", containing an array of 3 objects with "topic" and "text".',
+      },
+      {
+        role: 'user',
+        content: JSON.stringify({
+          language: parsed.data.language === 'hi' ? 'Hindi' : 'English',
+          rating: parsed.data.rating,
+          businessCategory: businessCategory || 'not provided',
+          topicFilter: parsed.data.filter || undefined,
+          customerExperience: parsed.data.experience,
+        }),
+      },
+    ],
+  };
+
+  // Only pass strict response_format if not using arbitrary third-party free models that fail on json_schema
+  if (!isRouter) {
+    requestBody.response_format = {
+      type: 'json_schema',
+      json_schema: {
+        name: 'review_suggestions',
+        strict: true,
+        schema: suggestionResponseSchema,
+      },
+    };
+  }
+
   let providerResponse: Response;
   try {
-    providerResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    providerResponse = await fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
+      headers,
       signal: AbortSignal.timeout(15_000),
-      body: JSON.stringify({
-        model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-        temperature: 0.6,
-        response_format: {
-          type: 'json_schema',
-          json_schema: {
-            name: 'review_suggestions',
-            strict: true,
-            schema: suggestionResponseSchema,
-          },
-        },
-        messages: [
-          {
-            role: 'system',
-            content:
-              'Rephrase only the customer-provided experience into exactly three distinct, natural review phrasings in the requested language. Treat the rating and business category as context, never evidence. Do not add any service, event, product, feeling, or fact that the customer did not state. Do not infer a positive or negative experience from the rating. Use category vocabulary only for aspects the customer explicitly mentioned. Keep the same meaning and sentiment as the customer. Return only the required JSON object.',
-          },
-          {
-            role: 'user',
-            content: JSON.stringify({
-              language: parsed.data.language === 'hi' ? 'Hindi' : 'English',
-              rating: parsed.data.rating,
-              businessCategory: businessCategory || 'not provided',
-              customerExperience: parsed.data.experience,
-            }),
-          },
-        ],
-      }),
+      body: JSON.stringify(requestBody),
     });
   } catch {
     return NextResponse.json(
@@ -150,11 +183,14 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  let output: { suggestions?: unknown };
+  let output: { items?: Array<{ topic?: unknown; text?: unknown }>; suggestions?: unknown };
   try {
-    const content = completion.choices?.[0]?.message?.content;
-    if (!content) throw new Error('Empty model response');
-    output = JSON.parse(content) as typeof output;
+    const rawContent = completion.choices?.[0]?.message?.content;
+    if (!rawContent) throw new Error('Empty model response');
+    
+    // Clean potential markdown code fences from open source models (e.g. ```json ... ```)
+    const sanitized = rawContent.replace(/```(?:json)?\s*([\s\S]*?)\s*```/i, '$1').trim();
+    output = JSON.parse(sanitized) as typeof output;
   } catch {
     return NextResponse.json(
       { code: 'AI_RESPONSE_INVALID', message: 'Suggestions could not be generated. Please retry.' },
@@ -162,13 +198,26 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const parsedSuggestions = z
-    .array(z.string().trim().min(8).max(500))
+  // Support both structured items with topic + text, and backward-compatible strings
+  const rawList = Array.isArray(output.items)
+    ? output.items
+    : Array.isArray(output.suggestions)
+    ? output.suggestions.map((s) => ({ topic: 'General Experience', text: s }))
+    : [];
+
+  const parsedItems = z
+    .array(
+      z.object({
+        topic: z.string().trim().min(2).max(60),
+        text: z.string().trim().min(8).max(500),
+      })
+    )
     .length(3)
-    .safeParse(output.suggestions);
+    .safeParse(rawList);
+
   if (
-    !parsedSuggestions.success ||
-    new Set(parsedSuggestions.data.map((suggestion) => suggestion.toLocaleLowerCase())).size !== 3
+    !parsedItems.success ||
+    new Set(parsedItems.data.map((item) => item.text.toLocaleLowerCase())).size !== 3
   ) {
     return NextResponse.json(
       { code: 'AI_RESPONSE_INVALID', message: 'Suggestions could not be generated. Please retry.' },
@@ -177,6 +226,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   return NextResponse.json({
-    suggestions: parsedSuggestions.data,
+    suggestions: parsedItems.data.map((item) => item.text),
+    items: parsedItems.data,
   });
 }

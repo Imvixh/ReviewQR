@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getAuthenticatedClient } from '@/lib/supabase/authenticated-client';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { reviewDestinationSchema, safeHttpsUrlSchema } from '../../../../lib/validation';
 
@@ -57,12 +58,19 @@ async function toResponseBusiness(
     throw new Error('Stored business destination is not a valid HTTPS URL.');
   }
 
+  let storageClient;
+  try {
+    storageClient = createAdminClient();
+  } catch {
+    storageClient = supabase;
+  }
+
   const [logo, thumbnail] = await Promise.all([
     row.logo_path
-      ? supabase.storage.from('business-assets').createSignedUrl(row.logo_path, 60 * 60)
+      ? storageClient.storage.from('business-assets').createSignedUrl(row.logo_path, 60 * 60 * 24 * 365)
       : Promise.resolve({ data: null, error: null }),
     row.thumbnail_path
-      ? supabase.storage.from('business-assets').createSignedUrl(row.thumbnail_path, 60 * 60)
+      ? storageClient.storage.from('business-assets').createSignedUrl(row.thumbnail_path, 60 * 60 * 24 * 365)
       : Promise.resolve({ data: null, error: null }),
   ]);
   if (logo.error || thumbnail.error) {

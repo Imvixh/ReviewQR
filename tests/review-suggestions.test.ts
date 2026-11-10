@@ -24,6 +24,7 @@ const feedback = {
 
 describe('Public review suggestions API', () => {
   beforeEach(() => {
+    vi.stubEnv('OPENROUTER_API_KEY', '');
     vi.stubEnv('OPENAI_API_KEY', 'test-server-key');
     vi.stubGlobal(
       'fetch',
@@ -63,6 +64,9 @@ describe('Public review suggestions API', () => {
 
     expect(response.status).toBe(200);
     expect(result.suggestions).toHaveLength(3);
+    expect(result.items).toHaveLength(3);
+    expect(result.items[0]).toHaveProperty('topic');
+    expect(result.items[0]).toHaveProperty('text');
     expect(userMessage.customerExperience).toBe(feedback.experience);
     expect(userMessage.businessCategory).toBe('Hotel');
     expect(payload.messages[0].content).toContain('Do not add any service');

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { isSupabaseConfigured } from '@/lib/supabase/env';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -65,7 +66,16 @@ export async function POST(request: NextRequest) {
   }
 
   const path = `${user.id}/${business.id}/${type}-${crypto.randomUUID()}.${extension}`;
-  const { error: uploadError } = await supabase.storage
+  
+  // Use admin client for storage execution on the server side after verifying user and business ownership
+  let storageClient;
+  try {
+    storageClient = createAdminClient();
+  } catch {
+    storageClient = supabase;
+  }
+
+  const { error: uploadError } = await storageClient.storage
     .from('business-assets')
     .upload(path, await file.arrayBuffer(), {
       contentType: file.type,
@@ -77,12 +87,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ code: 'ASSET_UPLOAD_FAILED' }, { status: 502 });
   }
 
-  const { data: signedAsset, error: signedAssetError } = await supabase.storage
+  const { data: signedAsset, error: signedAssetError } = await storageClient.storage
     .from('business-assets')
-    .createSignedUrl(path, 60 * 60);
+    .createSignedUrl(path, 60 * 60 * 24 * 365); // 1 year signed URL
   if (signedAssetError || !signedAsset) {
     console.error('Failed to create a private business asset URL:', signedAssetError);
-    const { error: cleanupError } = await supabase.storage.from('business-assets').remove([path]);
+    const { error: cleanupError } = await storageClient.storage.from('business-assets').remove([path]);
     if (cleanupError) {
       console.error('Failed to clean up branding asset after URL signing failed:', cleanupError);
     }
