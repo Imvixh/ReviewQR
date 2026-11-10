@@ -67,14 +67,26 @@ async function toResponseBusiness(
 
   const [logo, thumbnail] = await Promise.all([
     row.logo_path
-      ? storageClient.storage.from('business-assets').createSignedUrl(row.logo_path, 60 * 60 * 24 * 365)
+      ? storageClient.storage
+          .from('business-assets')
+          .createSignedUrl(row.logo_path, 60 * 60 * 24 * 365)
+          .catch((err) => {
+            console.warn('Failed to sign logo URL:', err);
+            return { data: null, error: null };
+          })
       : Promise.resolve({ data: null, error: null }),
     row.thumbnail_path
-      ? storageClient.storage.from('business-assets').createSignedUrl(row.thumbnail_path, 60 * 60 * 24 * 365)
+      ? storageClient.storage
+          .from('business-assets')
+          .createSignedUrl(row.thumbnail_path, 60 * 60 * 24 * 365)
+          .catch((err) => {
+            console.warn('Failed to sign thumbnail URL:', err);
+            return { data: null, error: null };
+          })
       : Promise.resolve({ data: null, error: null }),
   ]);
   if (logo.error || thumbnail.error) {
-    throw new Error('Could not create an authorized business asset URL.');
+    console.warn('Signing returned error, continuing without asset URLs:', logo.error || thumbnail.error);
   }
 
   return {
