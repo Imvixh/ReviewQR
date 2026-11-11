@@ -223,11 +223,13 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   if (!parsedItemsData) {
+    // Any failure to obtain a valid set of three suggestions is treated as a provider error.
     return NextResponse.json(
-      { code: 'AI_RESPONSE_INVALID', message: 'Suggestions could not be generated. Please retry.' },
+      { code: 'AI_PROVIDER_ERROR', message: 'Suggestions could not be generated. Please retry.' },
       { status: 502 }
     );
   }
+
 
   return NextResponse.json({
     suggestions: parsedItemsData.map((item) => item.text),

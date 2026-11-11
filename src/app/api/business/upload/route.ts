@@ -12,6 +12,67 @@ const FILE_TYPES = {
 const BUSINESS_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+export async function DELETE(request: NextRequest) {
+  if (!isSupabaseConfigured) {
+    return NextResponse.json({ code: 'SUPABASE_NOT_CONFIGURED' }, { status: 503 });
+  }
+
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return NextResponse.json({ code: 'UNAUTHENTICATED' }, { status: 401 });
+  }
+
+  const { searchParams } = request.nextUrl;
+  const businessId = searchParams.get('orgId');
+  const type = searchParams.get('type');
+
+  if (!businessId || (type !== 'logo' && type !== 'thumbnail')) {
+    return NextResponse.json({ code: 'INVALID_DELETE_PARAMS' }, { status: 400 });
+  }
+
+  // Verify ownership
+  const { data: business, error: businessError } = await supabase
+    .from('businesses')
+    .select('id, logo_path, thumbnail_path')
+    .eq('id', businessId)
+    .eq('owner_id', user.id)
+    .maybeSingle();
+
+  if (businessError) {
+    console.error('Failed to authorize business branding delete:', businessError);
+    return NextResponse.json({ code: 'BUSINESS_LOOKUP_FAILED' }, { status: 500 });
+  }
+  if (!business) {
+    return NextResponse.json({ code: 'BUSINESS_NOT_FOUND' }, { status: 404 });
+  }
+
+  const path = type === 'logo' ? business.logo_path : business.thumbnail_path;
+  if (!path) {
+    return NextResponse.json({ code: 'ASSET_NOT_FOUND' }, { status: 404 });
+  }
+
+  let adminClient;
+  try { adminClient = createAdminClient(); } catch (e) { console.error('Failed to init admin client:', e); }
+  const storageClient = adminClient || supabase;
+  const dbClient = adminClient || supabase;
+
+  const { error: deleteError } = await storageClient.storage.from('business-assets').remove([path]);
+  if (deleteError) {
+    console.error('Failed to delete asset from storage:', deleteError);
+    return NextResponse.json({ code: 'ASSET_DELETE_FAILED', message: deleteError.message }, { status: 502 });
+  }
+
+  const update = type === 'logo' ? { logo_url: null, logo_path: null } : { thumbnail_url: null, thumbnail_path: null };
+  const { error: saveError } = await dbClient.from('businesses').update(update).eq('id', business.id).eq('owner_id', user.id);
+  if (saveError) {
+    console.error('Failed to clear asset metadata:', saveError);
+    return NextResponse.json({ code: 'ASSET_METADATA_CLEAR_FAILED', message: saveError.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true, type, path }, { status: 200 });
+}
+
 export async function POST(request: NextRequest) {
   if (!isSupabaseConfigured) {
     return NextResponse.json({ code: 'SUPABASE_NOT_CONFIGURED' }, { status: 503 });

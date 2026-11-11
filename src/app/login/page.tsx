@@ -22,7 +22,9 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showRecoveryBanner, setShowRecoveryBanner] = useState(false);
   const [recoveryMessage, setRecoveryMessage] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [emailTouched, setEmailTouched] = useState(false);
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const [error, setError] = useState<string | null>(null);
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
@@ -33,7 +35,7 @@ function LoginForm() {
       return;
     }
 
-    setIsLoading(true);
+    setIsSubmitting(true);
     try {
       if (!isSupabaseConfigured) {
         throw new Error('Sign-in is unavailable because Supabase is not configured.');
@@ -60,7 +62,7 @@ function LoginForm() {
     } catch (authError) {
       setError(authError instanceof Error ? authError.message : 'Could not sign in. Please try again.');
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -70,7 +72,7 @@ function LoginForm() {
       return;
     }
 
-    setIsLoading(true);
+    setIsSubmitting(true);
     setError(null);
     try {
       const supabase = createClient();
@@ -81,7 +83,7 @@ function LoginForm() {
       if (authError) throw authError;
     } catch (authError) {
       setError(authError instanceof Error ? authError.message : 'Could not start Google sign-in.');
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -97,7 +99,7 @@ function LoginForm() {
       return;
     }
 
-    setIsLoading(true);
+    setIsSubmitting(true);
     try {
       const supabase = createClient();
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
@@ -109,7 +111,7 @@ function LoginForm() {
     } catch (resetError) {
       setError(resetError instanceof Error ? resetError.message : 'Could not request a password reset.');
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -279,13 +281,15 @@ function LoginForm() {
                         type="email"
                         required
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onBlur={() => { setEmail(email.trim()); setEmailTouched(true); }}
                         placeholder="name@business.com"
                         className="w-full h-11 pl-10 pr-10 rounded-xl bg-slate-50 border border-slate-200 text-sm text-[#0B1C30] focus:outline-none focus:bg-white focus:border-[#1A73E8] focus:ring-1 focus:ring-[#1A73E8] transition-all"
                       />
-                      <span className="material-symbols-outlined text-green-600 text-lg absolute right-3 pointer-events-none">
-                        check_circle
-                      </span>
+                      {isEmailValid && emailTouched && (
+            <span className="material-symbols-outlined text-green-600 text-lg absolute right-3 pointer-events-none">
+              check_circle
+            </span>
+          )}
                     </div>
                   </div>
 
@@ -297,7 +301,7 @@ function LoginForm() {
                       <button
                         type="button"
                         onClick={handlePasswordReset}
-                        disabled={isLoading}
+                        disabled={isSubmitting}
                         className="text-xs text-[#1A73E8] font-semibold hover:underline"
                       >
                         Forgot password?
@@ -337,10 +341,10 @@ function LoginForm() {
 
                   <button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isSubmitting}
                     className="w-full h-12 rounded-xl bg-[#005BBF] hover:bg-[#1A73E8] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.98] disabled:opacity-50"
                   >
-                    {isLoading ? (
+                    {isSubmitting ? (
                       <span>Signing in...</span>
                     ) : (
                       <>
@@ -363,7 +367,7 @@ function LoginForm() {
                 <button
                   type="button"
                   onClick={handleGoogleSSO}
-                  disabled={isLoading}
+                  disabled={isSubmitting}
                   className="w-full h-11 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-[#0B1C30] font-semibold text-xs flex items-center justify-center gap-2.5 transition-all shadow-sm active:scale-[0.99]"
                 >
                   <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
