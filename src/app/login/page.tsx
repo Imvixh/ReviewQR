@@ -281,6 +281,7 @@ function LoginForm() {
                         type="email"
                         required
                         value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         onBlur={() => { setEmail(email.trim()); setEmailTouched(true); }}
                         placeholder="name@business.com"
                         className="w-full h-11 pl-10 pr-10 rounded-xl bg-slate-50 border border-slate-200 text-sm text-[#0B1C30] focus:outline-none focus:bg-white focus:border-[#1A73E8] focus:ring-1 focus:ring-[#1A73E8] transition-all"
