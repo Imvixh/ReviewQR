@@ -26,7 +26,7 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
 
   const navItems = [
     { label: 'Overview', href: '/dashboard', icon: 'grid_view' },
-    { label: 'Create Review QR', href: '/qr-studio', icon: 'add_circle' },
+    { label: 'Create Review QR', href: '/qr-studio?mode=create', icon: 'add_circle' },
     { label: 'My QR Codes', href: '/my-qr-codes', icon: 'qr_code_2' },
     { label: 'Analytics', href: '/analytics', icon: 'insights' },
     { label: 'Settings', href: '/settings', icon: 'settings' },
@@ -103,7 +103,9 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({ children }) => {
           {/* Navigation Links */}
           <nav className="p-3 space-y-1 flex flex-col">
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = item.href.startsWith('/qr-studio')
+                ? pathname === '/qr-studio' || pathname === '/create-qr'
+                : pathname === item.href;
               return (
                 <Link
                   key={item.href}

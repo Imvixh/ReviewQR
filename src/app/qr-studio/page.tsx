@@ -29,6 +29,12 @@ interface PosterPreset {
   subtitleColor: string;
   finderColor: string;
   defaultAccent: string;
+  /** Hex value of previewBg – used in PNG export to avoid Tailwind class resolution */
+  bgHex: string;
+  /** Hex value of textColor – used in PNG export */
+  textHex: string;
+  /** Hex value of subtitleColor – used in PNG export */
+  subtitleHex: string;
 }
 
 export default function QRDesignStudioPage() {
@@ -42,8 +48,9 @@ export default function QRDesignStudioPage() {
 function QRDesignStudioInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const isCreateMode = searchParams.get('mode') === 'create';
   const editQrId = searchParams.get('edit') || '';
+  const isEditMode = Boolean(editQrId);
+  const isCreateMode = !isEditMode;
   const [activeTab, setActiveTab] = useState<'branding' | 'qrstyle' | 'templates' | 'copy'>('branding');
   const [org, setOrg] = useState<Organization | null>(null);
   const [qrList, setQrList] = useState<QRCode[]>([]);
@@ -68,8 +75,6 @@ function QRDesignStudioInner() {
   const [subcategory, setSubcategory] = useState('');
   const [location, setLocation] = useState('');
   const [accentColor, setAccentColor] = useState('#1A73E8');
-  const [customFinderColor, setCustomFinderColor] = useState<string>('#1A73E8');
-  const [syncQrWithAccent, setSyncQrWithAccent] = useState(true);
   const [logoUrl, setLogoUrl] = useState<string>('');
   const [logoName, setLogoName] = useState('');
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
@@ -128,6 +133,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#565E74]',
       finderColor: '#0B1C30',
       defaultAccent: '#0B1C30',
+      bgHex: '#ffffff', textHex: '#0B1C30', subtitleHex: '#565E74',
     },
     {
       id: 'google-classic',
@@ -142,6 +148,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#565E74]',
       finderColor: '#1A73E8',
       defaultAccent: '#1A73E8',
+      bgHex: '#ffffff', textHex: '#0B1C30', subtitleHex: '#565E74',
     },
     {
       id: 'royal-gold',
@@ -154,6 +161,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#B45309]',
       finderColor: '#D97706',
       defaultAccent: '#D97706',
+      bgHex: '#FFFDF5', textHex: '#78350F', subtitleHex: '#B45309',
     },
     {
       id: 'modern-navy',
@@ -166,6 +174,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-slate-300',
       finderColor: '#38BDF8',
       defaultAccent: '#1A73E8',
+      bgHex: '#0F172A', textHex: '#ffffff', subtitleHex: '#CBD5E1',
     },
     {
       id: 'bistro-green',
@@ -178,6 +187,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#047857]',
       finderColor: '#059669',
       defaultAccent: '#34A853',
+      bgHex: '#F0FDF4', textHex: '#064E3B', subtitleHex: '#047857',
     },
     {
       id: 'dark-luxury',
@@ -190,6 +200,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-zinc-400',
       finderColor: '#F59E0B',
       defaultAccent: '#F59E0B',
+      bgHex: '#18181B', textHex: '#ffffff', subtitleHex: '#A1A1AA',
     },
     /* ---------- 15 new presets ---------- */
     {
@@ -203,6 +214,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#94D3F2]',
       finderColor: '#0F172A',
       defaultAccent: '#0E7490',
+      bgHex: '#0E7490', textHex: '#ffffff', subtitleHex: '#94D3F2',
     },
     {
       id: 'sunset-orange',
@@ -215,6 +227,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#FED7AA]',
       finderColor: '#0F172A',
       defaultAccent: '#F97316',
+      bgHex: '#FEF3C7', textHex: '#ffffff', subtitleHex: '#FED7AA',
     },
     {
       id: 'forest-deep',
@@ -227,6 +240,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#A7F3D0]',
       finderColor: '#0F172A',
       defaultAccent: '#15803D',
+      bgHex: '#ECFDF5', textHex: '#ffffff', subtitleHex: '#A7F3D0',
     },
     {
       id: 'midnight-purple',
@@ -239,6 +253,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#E9D5FF]',
       finderColor: '#0F172A',
       defaultAccent: '#7C3AED',
+      bgHex: '#FAF5FF', textHex: '#ffffff', subtitleHex: '#E9D5FF',
     },
     {
       id: 'rose-gold',
@@ -251,6 +266,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#BE185D]',
       finderColor: '#F43F5E',
       defaultAccent: '#F43F5E',
+      bgHex: '#FFF1F2', textHex: '#881337', subtitleHex: '#BE185D',
     },
     {
       id: 'cherry-blossom',
@@ -263,6 +279,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#C026D3]',
       finderColor: '#DB2777',
       defaultAccent: '#EC4899',
+      bgHex: '#FDF2F8', textHex: '#831843', subtitleHex: '#C026D3',
     },
     {
       id: 'steel-blue',
@@ -275,6 +292,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#BFDBFE]',
       finderColor: '#1E40AF',
       defaultAccent: '#1D4ED8',
+      bgHex: '#EFF6FF', textHex: '#ffffff', subtitleHex: '#BFDBFE',
     },
     {
       id: 'coral-reef',
@@ -287,6 +305,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#FCD34D]',
       finderColor: '#0F172A',
       defaultAccent: '#EA580C',
+      bgHex: '#FFF1E6', textHex: '#ffffff', subtitleHex: '#FCD34D',
     },
     {
       id: 'lavender-mist',
@@ -299,6 +318,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#E0E7FF]',
       finderColor: '#0F172A',
       defaultAccent: '#6366F1',
+      bgHex: '#F5F3FF', textHex: '#ffffff', subtitleHex: '#E0E7FF',
     },
     {
       id: 'emerald-city',
@@ -311,6 +331,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#A7F3D0]',
       finderColor: '#0F172A',
       defaultAccent: '#10B981',
+      bgHex: '#D1FAE5', textHex: '#ffffff', subtitleHex: '#A7F3D0',
     },
     {
       id: 'charcoal-slate',
@@ -323,6 +344,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#CBD5E1]',
       finderColor: '#F1F5F9',
       defaultAccent: '#475569',
+      bgHex: '#0F172A', textHex: '#ffffff', subtitleHex: '#CBD5E1',
     },
     {
       id: 'sunrise-yellow',
@@ -335,6 +357,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#A16207]',
       finderColor: '#0F172A',
       defaultAccent: '#FACC15',
+      bgHex: '#FEF9C3', textHex: '#713F12', subtitleHex: '#A16207',
     },
     {
       id: 'frost-mint',
@@ -347,6 +370,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#0F766E]',
       finderColor: '#059669',
       defaultAccent: '#10B981',
+      bgHex: '#ECFDF5', textHex: '#047857', subtitleHex: '#0F766E',
     },
     {
       id: 'burgundy-wine',
@@ -359,6 +383,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#FCA5A5]',
       finderColor: '#0F172A',
       defaultAccent: '#B91C1C',
+      bgHex: '#FEF2F2', textHex: '#ffffff', subtitleHex: '#FCA5A5',
     },
     {
       id: 'arctic-white',
@@ -371,6 +396,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#64748B]',
       finderColor: '#0F172A',
       defaultAccent: '#005BBF',
+      bgHex: '#F8FAFC', textHex: '#0F172A', subtitleHex: '#64748B',
     },
     {
       id: 'coastal-sand',
@@ -383,6 +409,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#80634C]',
       finderColor: '#6B4F3A',
       defaultAccent: '#A66B3F',
+      bgHex: '#FFF9F0', textHex: '#4A3425', subtitleHex: '#80634C',
     },
     {
       id: 'terracotta',
@@ -395,6 +422,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#C2410C]',
       finderColor: '#9A3412',
       defaultAccent: '#C2410C',
+      bgHex: '#FFF7ED', textHex: '#7C2D12', subtitleHex: '#C2410C',
     },
     {
       id: 'sage-garden',
@@ -407,6 +435,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#5B7553]',
       finderColor: '#45603F',
       defaultAccent: '#5B7553',
+      bgHex: '#F5F8F1', textHex: '#344532', subtitleHex: '#5B7553',
     },
     {
       id: 'sapphire-night',
@@ -419,6 +448,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#1E40AF]',
       finderColor: '#1E40AF',
       defaultAccent: '#1D4ED8',
+      bgHex: '#EFF6FF', textHex: '#172554', subtitleHex: '#1E40AF',
     },
     {
       id: 'plum-velvet',
@@ -431,6 +461,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#86198F]',
       finderColor: '#701A75',
       defaultAccent: '#86198F',
+      bgHex: '#FDF4FF', textHex: '#581C4B', subtitleHex: '#86198F',
     },
     {
       id: 'rosewood',
@@ -443,6 +474,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#BE123C]',
       finderColor: '#9F1239',
       defaultAccent: '#BE123C',
+      bgHex: '#FFF1F2', textHex: '#881337', subtitleHex: '#BE123C',
     },
     {
       id: 'copper-craft',
@@ -455,6 +487,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#92400E]',
       finderColor: '#92400E',
       defaultAccent: '#B45309',
+      bgHex: '#FFFBEB', textHex: '#78350F', subtitleHex: '#92400E',
     },
     {
       id: 'ice-blue',
@@ -467,6 +500,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#0E7490]',
       finderColor: '#155E75',
       defaultAccent: '#0891B2',
+      bgHex: '#F0FAFC', textHex: '#164E63', subtitleHex: '#0E7490',
     },
     {
       id: 'citrus-fresh',
@@ -479,6 +513,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#4D7C0F]',
       finderColor: '#3F6212',
       defaultAccent: '#4D7C0F',
+      bgHex: '#F7FEE7', textHex: '#365314', subtitleHex: '#4D7C0F',
     },
     {
       id: 'olive-heritage',
@@ -491,6 +526,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#667744]',
       finderColor: '#4B5D31',
       defaultAccent: '#667744',
+      bgHex: '#F4F5EE', textHex: '#3F4A2A', subtitleHex: '#667744',
     },
     {
       id: 'monochrome-ink',
@@ -503,6 +539,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#4B5563]',
       finderColor: '#111827',
       defaultAccent: '#374151',
+      bgHex: '#F9FAFB', textHex: '#111827', subtitleHex: '#4B5563',
     },
     {
       id: 'blush-pearl',
@@ -515,6 +552,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#BE185D]',
       finderColor: '#9D174D',
       defaultAccent: '#BE185D',
+      bgHex: '#FFFAFC', textHex: '#831843', subtitleHex: '#BE185D',
     },
     {
       id: 'turquoise-bay',
@@ -527,6 +565,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#0F766E]',
       finderColor: '#115E59',
       defaultAccent: '#0F766E',
+      bgHex: '#F0FDFA', textHex: '#134E4A', subtitleHex: '#0F766E',
     },
     {
       id: 'slate-silver',
@@ -539,6 +578,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#475569]',
       finderColor: '#334155',
       defaultAccent: '#475569',
+      bgHex: '#F8FAFC', textHex: '#1E293B', subtitleHex: '#475569',
     },
     {
       id: 'lavender-luxe',
@@ -551,6 +591,7 @@ function QRDesignStudioInner() {
       subtitleColor: 'text-[#6D28D9]',
       finderColor: '#5B21B6',
       defaultAccent: '#6D28D9',
+      bgHex: '#FAF9FF', textHex: '#4C1D95', subtitleHex: '#6D28D9',
     },
   ];
 
@@ -583,7 +624,6 @@ function QRDesignStudioInner() {
       setSupportingText(qr.supportingText || '');
       if (qr.accentColor) {
         setAccentColor(qr.accentColor);
-        setCustomFinderColor(qr.accentColor);
       }
       if (qr.preset) setSelectedPreset(qr.preset);
       if (qr.geometry) setGeometry(qr.geometry);
@@ -593,7 +633,7 @@ function QRDesignStudioInner() {
     const loadedOrg = getStoredOrg();
     setOrg(loadedOrg);
 
-    // In create mode: load org/business data for context but don't load any QR fields
+    // In create mode: reset all QR and business form fields to blank
     if (isCreateMode) {
       setSelectedQrId('');
       setPlacementTag('');
@@ -601,33 +641,47 @@ function QRDesignStudioInner() {
       setCtaText('Scan to share your experience');
       setSupportingText('');
       setAccentColor('#1A73E8');
-      setCustomFinderColor('#1A73E8');
       setSelectedPreset('google-classic');
       setGeometry('rounded');
       setCenterEmblem('google-g');
+      // Clear business form fields — user starts fresh
+      setBusinessName('');
+      setLocation('');
+      setGoogleReviewUrl('');
+      setSavedDestinationUrl('');
+      setHasConfirmedDestination(false);
+      setLogoUrl('');
+      setThumbnailUrl('');
     }
 
-    const savedCategory = categorySelectionForSavedValue(loadedOrg.category);
-    setCategory(savedCategory.selection);
-    setCustomCategory(savedCategory.customCategory);
-    setSubcategory(loadedOrg.subcategory || '');
-    if (loadedOrg.accentColor && !isCreateMode) setAccentColor(loadedOrg.accentColor);
-    if (loadedOrg.logoUrl && !isSupabaseConfigured) setLogoUrl(loadedOrg.logoUrl);
-    if (isSupabaseConfigured) setLogoUrl('');
+    if (isEditMode) {
+      const savedCategory = categorySelectionForSavedValue(loadedOrg.category);
+      setCategory(savedCategory.selection);
+      setCustomCategory(savedCategory.customCategory);
+      setSubcategory(loadedOrg.subcategory || '');
+      if (loadedOrg.accentColor) setAccentColor(loadedOrg.accentColor);
+      if (loadedOrg.logoUrl && !isSupabaseConfigured) setLogoUrl(loadedOrg.logoUrl);
+    } else {
+      setCategory('');
+      setCustomCategory('');
+      setSubcategory('');
+    }
+    if (isSupabaseConfigured && !isEditMode) setLogoUrl('');
 
     if (!isSupabaseConfigured) {
-      if (loadedOrg.name) setBusinessName(loadedOrg.name);
-      if (loadedOrg.city) setLocation(loadedOrg.city);
-      if (loadedOrg.googleReviewUrl) {
-        setGoogleReviewUrl(loadedOrg.googleReviewUrl);
-        setSavedDestinationUrl(loadedOrg.googleReviewUrl);
-        setHasConfirmedDestination(true);
+      if (isEditMode) {
+        if (loadedOrg.name) setBusinessName(loadedOrg.name);
+        if (loadedOrg.city) setLocation(loadedOrg.city);
+        if (loadedOrg.googleReviewUrl) {
+          setGoogleReviewUrl(loadedOrg.googleReviewUrl);
+          setSavedDestinationUrl(loadedOrg.googleReviewUrl);
+          setHasConfirmedDestination(true);
+        }
       }
       const localQrs = getStoredQRCodes();
       setQrList(localQrs);
-      if (!isCreateMode) {
-        // In edit mode, find the specific QR by editQrId; otherwise load first
-        const target = editQrId ? localQrs.find((q) => q.id === editQrId) : localQrs[0];
+      if (isEditMode) {
+        const target = localQrs.find((q) => q.id === editQrId);
         if (target) applyQrToState(target);
       }
       setIsLoadingDestination(false);
@@ -657,25 +711,26 @@ function QRDesignStudioInner() {
         if (cancelled) return;
         const qrs = qrResult.qrs as QRCode[];
         setQrList(qrs);
-        if (!isCreateMode) {
-          // Edit mode: prefer the QR matching editQrId, else first QR
-          const target = editQrId ? qrs.find((q) => q.id === editQrId) : qrs[0];
+        if (isEditMode) {
+          const target = qrs.find((q) => q.id === editQrId);
           if (target) applyQrToState(target);
         }
 
         if (destinationResult.business) {
           const business = destinationResult.business;
-          const savedCategory = categorySelectionForSavedValue(business.category);
-          setCategory(savedCategory.selection);
-          setCustomCategory(savedCategory.customCategory);
-          setSubcategory(business.subcategory || '');
-          setGoogleReviewUrl(business.googleReviewUrl || '');
-          setSavedDestinationUrl(business.googleReviewUrl || '');
-          setHasConfirmedDestination(Boolean(business.googleReviewUrl));
-          setBusinessName(business.name || '');
-          setLocation(business.city || '');
-          if (business.logoUrl) setLogoUrl(business.logoUrl);
-          if (business.thumbnailUrl) setThumbnailUrl(business.thumbnailUrl);
+          if (isEditMode) {
+            const savedCategory = categorySelectionForSavedValue(business.category);
+            setCategory(savedCategory.selection);
+            setCustomCategory(savedCategory.customCategory);
+            setSubcategory(business.subcategory || '');
+            setGoogleReviewUrl(business.googleReviewUrl || '');
+            setSavedDestinationUrl(business.googleReviewUrl || '');
+            setHasConfirmedDestination(Boolean(business.googleReviewUrl));
+            setBusinessName(business.name || '');
+            setLocation(business.city || '');
+            if (business.logoUrl) setLogoUrl(business.logoUrl);
+            if (business.thumbnailUrl) setThumbnailUrl(business.thumbnailUrl);
+          }
           const updatedOrg = setStoredOrg({
             id: business.id,
             name: business.name,
@@ -747,7 +802,7 @@ function QRDesignStudioInner() {
         generateQrSvg(
           target.url,
           geometry,
-          customFinderColor || currentPresetData.finderColor
+          currentPresetData.finderColor
         )
       );
       setGeneratedQrTarget(target.url);
@@ -762,7 +817,6 @@ function QRDesignStudioInner() {
     destinationValidation,
     canPreviewQr,
     currentPresetData.finderColor,
-    customFinderColor,
     geometry,
     qrMode,
     selectedQrToken,
@@ -785,7 +839,6 @@ function QRDesignStudioInner() {
       setSupportingText(found.supportingText || '');
       if (found.accentColor) {
         setAccentColor(found.accentColor);
-        setCustomFinderColor(found.accentColor);
       }
       if (found.preset) setSelectedPreset(found.preset);
       if (found.geometry) setGeometry(found.geometry);
@@ -798,16 +851,10 @@ function QRDesignStudioInner() {
     let formatted = newColor.trim();
     if (!formatted.startsWith('#')) formatted = `#${formatted}`;
     setAccentColor(formatted);
-    if (syncQrWithAccent) {
-      setCustomFinderColor(formatted);
-    }
   };
 
-  const handleFinderColorChange = (newColor: string) => {
-    let formatted = newColor.trim();
-    if (!formatted.startsWith('#')) formatted = `#${formatted}`;
-    setCustomFinderColor(formatted);
-    setSyncQrWithAccent(false);
+  const handleFinderColorChange = (_newColor: string) => {
+    // QR color is controlled by preset only; this handler is kept for type-safety
   };
 
   const handleConfirmDestination = async () => {
@@ -1189,39 +1236,91 @@ function QRDesignStudioInner() {
           };
           return entities[character];
         });
+
+      // Use actual hex values from the preset (not Tailwind classes)
+      const bgHex = currentPresetData.bgHex || '#ffffff';
+      const textHex = currentPresetData.textHex || '#0B1C30';
+      const subtitleHex = currentPresetData.subtitleHex || '#565E74';
+
+      const starPoints = (cx: number, cy: number, rOut = 11, rIn = 5) => {
+        const points: string[] = [];
+        for (let i = 0; i < 10; i++) {
+          const angle = (i * Math.PI) / 5 - Math.PI / 2;
+          const r = i % 2 === 0 ? rOut : rIn;
+          points.push(`${(cx + r * Math.cos(angle)).toFixed(1)},${(cy + r * Math.sin(angle)).toFixed(1)}`);
+        }
+        return points.join(' ');
+      };
+
+      const starsSvg = [236, 268, 300, 332, 364]
+        .map((cx) => `<polygon points="${starPoints(cx, 612)}" fill="#FBBC04"/>`)
+        .join('');
+
+      const ctaY = supportingText.trim() ? 675 : 655;
+
       const svg = `
         <svg xmlns="http://www.w3.org/2000/svg" width="600" height="850" viewBox="0 0 600 850">
-          <rect width="600" height="850" rx="24" fill="${
-            selectedPreset === 'modern-navy'
-              ? '#0f172a'
-              : selectedPreset === 'dark-luxury'
-              ? '#18181b'
-              : selectedPreset === 'royal-gold'
-              ? '#fffdf5'
-              : selectedPreset === 'bistro-green'
-              ? '#f0fdf4'
-              : '#ffffff'
-          }"/>
+          <defs>
+            <linearGradient id="googleGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#4285F4"/>
+              <stop offset="33%" stop-color="#EA4335"/>
+              <stop offset="66%" stop-color="#FBBC05"/>
+              <stop offset="100%" stop-color="#34A853"/>
+            </linearGradient>
+            <clipPath id="logoCrestClip">
+              <circle cx="300" cy="100" r="28"/>
+            </clipPath>
+            <clipPath id="centerEmblemClip">
+              <circle cx="300" cy="370" r="24"/>
+            </clipPath>
+          </defs>
+          <rect width="600" height="850" rx="32" fill="${bgHex}"/>
+          ${selectedPreset === 'google-classic' ? '<rect width="600" height="8" fill="url(#googleGrad)"/>' : ''}
+          
+          <!-- Top Pill -->
+          <rect x="180" y="30" width="240" height="28" rx="14" fill="#0F172A"/>
+          <text x="300" y="48" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="700" font-size="11" letter-spacing="1.5" fill="#FFFFFF">SHARE YOUR EXPERIENCE</text>
+          
+          <!-- Brand Crest Badge -->
+          <circle cx="300" cy="100" r="28" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5"/>
           ${
-            selectedPreset === 'google-classic'
-              ? '<rect width="600" height="8" fill="url(#googleGrad)"/>'
-              : ''
+            logoUrl
+              ? `<image x="272" y="72" width="56" height="56" clip-path="url(#logoCrestClip)" href="${logoUrl}" preserveAspectRatio="xMidYMid slice"/>`
+              : `<circle cx="300" cy="100" r="26" fill="#0F172A"/><path d="M290 98 h20 v8 h-20 z M292 94 h5 v4 h-5 z" fill="#FFFFFF"/>`
           }
-          <text x="300" y="80" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="28" fill="${
-            selectedPreset === 'modern-navy' || selectedPreset === 'dark-luxury' ? '#ffffff' : '#0b1c30'
-          }">${escapeXml(businessName.toUpperCase())}</text>
-          <text x="300" y="115" text-anchor="middle" font-family="Inter, sans-serif" font-weight="600" font-size="14" fill="${
-            selectedPreset === 'modern-navy' || selectedPreset === 'dark-luxury' ? '#94a3b8' : '#565e74'
-          }">${escapeXml(businessDetails.toUpperCase())}</text>
-          <rect x="150" y="160" width="300" height="300" rx="16" fill="#ffffff" stroke="#e5eeff" stroke-width="2"/>
-          <image x="160" y="170" width="280" height="280" href="${realQrDataUrl}"/>
-          <text x="300" y="520" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="700" font-size="24" fill="${
-            selectedPreset === 'modern-navy' || selectedPreset === 'dark-luxury' ? '#ffffff' : '#0b1c30'
-          }">${escapeXml(headline)}</text>
-          <text x="300" y="560" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#FBBC04">★★★★★</text>
-          ${supportingText.trim() ? `<text x="300" y="590" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" fill="${selectedPreset === 'modern-navy' || selectedPreset === 'dark-luxury' ? '#cbd5e1' : '#565e74'}">${escapeXml(supportingText.trim())}</text>` : ''}
-          <rect x="100" y="620" width="400" height="50" rx="12" fill="${accentColor}"/>
-          <text x="300" y="652" text-anchor="middle" font-family="Inter, sans-serif" font-weight="600" font-size="16" fill="#ffffff">${escapeXml(ctaText)}</text>
+
+          <!-- Business Title & Category/Location -->
+          <text x="300" y="156" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="22" letter-spacing="1" fill="${textHex}">${escapeXml(businessName ? businessName.toUpperCase() : 'YOUR BUSINESS NAME')}</text>
+          <text x="300" y="180" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="11" letter-spacing="1.5" fill="${subtitleHex}">${escapeXml(businessDetails.toUpperCase())}</text>
+
+          <!-- Central Scannable QR Card -->
+          <rect x="140" y="210" width="320" height="320" rx="24" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+          <image x="155" y="225" width="290" height="290" href="${realQrDataUrl}"/>
+
+          <!-- Centered Floating Emblem inside QR -->
+          <circle cx="300" cy="370" r="26" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+          ${
+            centerEmblem === 'business-logo' && logoUrl
+              ? `<image x="276" y="346" width="48" height="48" clip-path="url(#centerEmblemClip)" href="${logoUrl}" preserveAspectRatio="xMidYMid slice"/>`
+              : `<g transform="translate(286, 356) scale(1.15)">
+                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+                </g>`
+          }
+
+          <!-- Headline & Stars -->
+          <text x="300" y="580" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="700" font-size="22" fill="${textHex}">${escapeXml(headline)}</text>
+          ${starsSvg}
+          ${supportingText.trim() ? `<text x="300" y="646" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="${subtitleHex}">${escapeXml(supportingText.trim())}</text>` : ''}
+
+          <!-- CTA Box (Scan to share your experience) -->
+          <rect x="90" y="${ctaY}" width="420" height="52" rx="14" fill="${accentColor}"/>
+          <g transform="translate(142, ${ctaY + 16}) scale(0.85)">
+            <path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" fill="#FFFFFF"/>
+          </g>
+          <text x="310" y="${ctaY + 32}" text-anchor="middle" font-family="Inter, sans-serif" font-weight="600" font-size="15" fill="#FFFFFF">${escapeXml(ctaText)}</text>
         </svg>
       `;
       const svgUrl = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
@@ -1331,22 +1430,25 @@ function QRDesignStudioInner() {
             <select
               className="h-10 px-3 pr-8 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 border border-slate-200 cursor-pointer font-medium"
               value={selectedQrId}
-              onChange={(e) => handleTouchpointChange(e.target.value)}
-              disabled={qrList.length === 0}
-              aria-label="Select a saved QR design"
+              onChange={(e) => {
+                const val = e.target.value;
+                if (!val) {
+                  router.push('/qr-studio?mode=create');
+                } else {
+                  router.push(`/qr-studio?edit=${encodeURIComponent(val)}`);
+                }
+              }}
+              aria-label="Select a saved QR design or create new"
             >
-              {qrList.length === 0 ? (
-                <option value="">No saved QR designs</option>
-              ) : (
-                qrList.map((qr) => {
-                  const placement = qr.placementName || qr.placementType || qr.slug;
-                  return (
-                    <option key={qr.id} value={qr.id}>
-                      {placement}
-                    </option>
-                  );
-                })
-              )}
+              <option value="">+ New Blank QR Design</option>
+              {qrList.map((qr) => {
+                const placement = qr.placementName || qr.placementType || qr.slug;
+                return (
+                  <option key={qr.id} value={qr.id}>
+                    {placement}
+                  </option>
+                );
+              })}
             </select>
 
             <button
@@ -2070,10 +2172,7 @@ function QRDesignStudioInner() {
                         }`}
                         onClick={() => {
                           setSelectedPreset(preset.id);
-                          handleAccentColorChange(preset.defaultAccent);
-                          if (!syncQrWithAccent) {
-                            setCustomFinderColor(preset.finderColor || preset.defaultAccent);
-                          }
+                          setAccentColor(preset.defaultAccent);
                           showToast(`Switched to preset: ${preset.name}`);
                         }}
                       >
@@ -2143,7 +2242,6 @@ function QRDesignStudioInner() {
                         type="button"
                         onClick={() => {
                           handleAccentColorChange(currentPresetData.defaultAccent);
-                          setCustomFinderColor(currentPresetData.finderColor);
                           showToast(`Reset to ${currentPresetData.name} default color`);
                         }}
                         className="h-10 px-3 rounded-xl bg-white border border-slate-200 text-[11px] font-semibold text-slate-700 hover:bg-slate-100 transition-colors shadow-2xs shrink-0"
@@ -2188,37 +2286,6 @@ function QRDesignStudioInner() {
                     </div>
                   </div>
 
-                  {/* QR Code Color Option */}
-                  <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between">
-                    <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-[#0B1C30]">
-                      <input
-                        type="checkbox"
-                        checked={syncQrWithAccent}
-                        onChange={(e) => {
-                          const checked = e.target.checked;
-                          setSyncQrWithAccent(checked);
-                          if (checked) {
-                            setCustomFinderColor(accentColor);
-                          }
-                        }}
-                        className="w-4 h-4 rounded text-[#1A73E8] focus:ring-0 cursor-pointer"
-                      />
-                      <span>Match QR code color with preset accent</span>
-                    </label>
-
-                    {!syncQrWithAccent && (
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] text-[#565E74] font-medium">QR Color:</span>
-                        <input
-                          type="color"
-                          value={customFinderColor.startsWith('#') && customFinderColor.length === 7 ? customFinderColor : '#0B1C30'}
-                          onChange={(e) => handleFinderColorChange(e.target.value)}
-                          className="w-7 h-7 rounded-lg border border-slate-200 cursor-pointer p-0.5 bg-white shadow-2xs"
-                          title="Custom QR pattern color"
-                        />
-                      </div>
-                    )}
-                  </div>
                 </div>
 
                 <button

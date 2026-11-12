@@ -440,7 +440,7 @@ export default function SettingsPage() {
                         Find, confirm, and save the review destination in the unified QR editor.
                       </p>
                       <Link
-                        href="/qr-studio"
+                        href="/qr-studio?mode=create"
                         className="mt-3 inline-flex min-h-10 items-center rounded-lg bg-[#EFF4FF] px-3 py-2 text-xs font-bold text-[#005BBF] hover:bg-[#DCE9FF]"
                       >
                         Manage review destination

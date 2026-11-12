@@ -1,6 +1,20 @@
 # Progress — ReviewQR
 
-Last updated: 2026-11-09
+Last updated: 2026-11-12
+
+## Create QR isolation, My QR Edit flow, Logo removal, Accent color isolation & Pixel-perfect PNG artwork (2026-11-12)
+
+- **Completely Blank Create QR Flow**: Navigating to Create QR (via sidebar, dashboard, or My QR Codes) starts 100% clean and blank. Form fields (`businessName`, `location`, `googleReviewUrl`, `savedDestinationUrl`, `category`, `logoUrl`, etc.) are never pre-populated with previously created businesses or QRs.
+- **Dedicated Edit Mode with Touchpoint Selector**: QR Studio now loads existing details only when an explicit `edit=<id>` parameter is in the URL. A dropdown selector at the top lets users switch between "+ New Blank QR Design" and their saved touchpoints.
+- **Accent Color Isolated to CTA Box**: Changing the poster accent color strictly affects the "Scan to share your experience" button bar in the preview and export artwork. The QR code geometry and pattern color are independently controlled by the chosen preset's finder color.
+- **Pixel-Perfect PNG Export**: SVG artwork generation for `Download PNG` now maps 100% to the live stand preview, rendering real hex colors across all presets, the top "SHARE YOUR EXPERIENCE" pill, brand crest/logo, business headers, central QR with emblem, vector star rating, supporting copy, and CTA camera bar.
+- **Logo Removal**: Remove button allows removing custom logos from storage and database, resetting back to the default crest.
+
+| Latest check | Result |
+|---|---|
+| `npm test -- --run` | PASS — 71 tests across 10 files |
+| `npm run typecheck` | PASS |
+| `npm run lint` | PASS |
 
 ## Business category and review suggestion implementation (2026-11-09)
 

@@ -131,7 +131,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex w-full flex-wrap items-center gap-3 xl:w-auto">
             <Link
-              href="/qr-studio"
+              href="/qr-studio?mode=create"
               className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#1A73E8] px-5 text-xs font-semibold text-white shadow-sm transition-all hover:bg-[#1557B0]"
             >
               <span className="material-symbols-outlined text-[20px]">add_circle</span>
@@ -218,7 +218,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <Link
-                      href="/qr-studio"
+                      href={`/qr-studio?edit=${encodeURIComponent(qr.id)}`}
                       className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-white px-3 text-xs font-semibold text-[#005BBF] shadow-sm hover:bg-slate-50"
                     >
                       Open QR Studio
@@ -237,7 +237,7 @@ export default function DashboardPage() {
                     : 'Create a design in QR Studio. It will be saved in this browser.'}
                 </p>
                 <Link
-                  href="/qr-studio"
+                  href="/qr-studio?mode=create"
                   className="mt-4 inline-flex h-9 items-center rounded-lg bg-[#1A73E8] px-4 text-xs font-semibold text-white"
                 >
                   Create a QR design
@@ -274,7 +274,7 @@ export default function DashboardPage() {
               {destinationMessage}
             </p>
             <Link
-              href="/qr-studio"
+              href="/qr-studio?mode=create"
               className="inline-flex h-10 items-center justify-center rounded-lg border border-[#DCE9FF] bg-white px-4 text-xs font-semibold text-[#005BBF] hover:bg-[#EFF4FF]"
             >
               Open QR Design Studio

@@ -363,7 +363,7 @@ export default function MyQRCodesPage() {
             </p>
             {qrs.length === 0 && (
               <Link
-                href="/qr-studio"
+                href="/qr-studio?mode=create"
                 className="mt-5 inline-flex h-10 items-center rounded-xl bg-[#1A73E8] px-4 text-xs font-semibold text-white"
               >
                 Create a QR design
