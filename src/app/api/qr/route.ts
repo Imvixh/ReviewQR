@@ -10,34 +10,27 @@ import {
   QrRecord,
 } from '@/lib/qr-mapper';
 
-const businessFields = 'id, name, city, google_review_url';
+const businessFields = 'id, name, city, google_review_url, category, subcategory, logo_path, thumbnail_path';
 
 export async function GET(): Promise<NextResponse> {
   const auth = await getAuthenticatedClient();
   if (!auth.ok) return auth.response;
 
-  const { data: business, error: businessError } = await auth.supabase
+  const { data: businesses, error: businessError } = await auth.supabase
     .from('businesses')
     .select(businessFields)
-    .eq('owner_id', auth.user.id)
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .maybeSingle();
+    .eq('owner_id', auth.user.id);
 
   if (businessError) {
-    console.error('Failed to load the authenticated business for QR listing:', businessError);
+    console.error('Failed to load authenticated businesses for QR listing:', businessError);
     return NextResponse.json({ code: 'QR_LIST_FAILED' }, { status: 500 });
   }
-  if (!business) return NextResponse.json({ qrs: [] });
-  if (!safeHttpsUrlSchema.safeParse(business.google_review_url).success) {
-    return NextResponse.json({ code: 'INVALID_STORED_DESTINATION' }, { status: 500 });
-  }
+  if (!businesses || businesses.length === 0) return NextResponse.json({ qrs: [] });
 
   const qrResult = await auth.supabase
     .from('qr_codes')
     .select(qrDatabaseFields)
     .eq('owner_id', auth.user.id)
-    .eq('business_id', business.id)
     .order('created_at', { ascending: false });
 
   let rows = qrResult.data as QrRecord[] | null;
@@ -47,19 +40,25 @@ export async function GET(): Promise<NextResponse> {
       .from('qr_codes')
       .select(qrDatabaseFieldsLegacy)
       .eq('owner_id', auth.user.id)
-      .eq('business_id', business.id)
       .order('created_at', { ascending: false });
     rows = legacyResult.data as QrRecord[] | null;
     queryError = legacyResult.error;
   }
 
   if (queryError) {
-    console.error('Failed to load QR designs for the authenticated business:', queryError);
+    console.error('Failed to load QR designs for the authenticated owner:', queryError);
     return NextResponse.json({ code: 'QR_LIST_FAILED' }, { status: 500 });
   }
 
+  const businessMap = new Map<string, BusinessRecord>(
+    (businesses as BusinessRecord[]).map((b) => [b.id, b])
+  );
+  const fallbackBusiness = businesses[0] as BusinessRecord;
+
   return NextResponse.json({
-    qrs: (rows || []).map((row) => mapQrRecord(row, business as BusinessRecord)),
+    qrs: (rows || []).map((row) =>
+      mapQrRecord(row, businessMap.get(row.business_id) || fallbackBusiness)
+    ),
   });
 }
 
@@ -82,18 +81,35 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const { data: business, error: businessError } = await auth.supabase
-    .from('businesses')
-    .select(businessFields)
-    .eq('owner_id', auth.user.id)
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .maybeSingle();
-
-  if (businessError) {
-    console.error('Failed to resolve the QR owner business:', businessError);
-    return NextResponse.json({ code: 'QR_CREATE_FAILED' }, { status: 500 });
+  let business: BusinessRecord | null = null;
+  if (parsed.data.businessId) {
+    const { data: specificBusiness } = await auth.supabase
+      .from('businesses')
+      .select(businessFields)
+      .eq('id', parsed.data.businessId)
+      .eq('owner_id', auth.user.id)
+      .maybeSingle();
+    if (specificBusiness) {
+      business = specificBusiness as BusinessRecord;
+    }
   }
+
+  if (!business) {
+    const { data: latestBusiness, error: businessError } = await auth.supabase
+      .from('businesses')
+      .select(businessFields)
+      .eq('owner_id', auth.user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (businessError) {
+      console.error('Failed to resolve the QR owner business:', businessError);
+      return NextResponse.json({ code: 'QR_CREATE_FAILED' }, { status: 500 });
+    }
+    business = latestBusiness as BusinessRecord | null;
+  }
+
   if (!business) {
     return NextResponse.json({ code: 'BUSINESS_NOT_FOUND' }, { status: 404 });
   }

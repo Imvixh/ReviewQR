@@ -19,6 +19,10 @@ export interface BusinessRecord {
   name: string;
   city: string;
   google_review_url: string;
+  category?: string;
+  subcategory?: string | null;
+  logo_path?: string | null;
+  thumbnail_path?: string | null;
 }
 
 export interface QrRecord {
@@ -46,6 +50,9 @@ export function mapQrRecord(row: QrRecord, business: BusinessRecord): QRCode {
     slug: row.token,
     publicToken: row.token,
     businessName: business.name,
+    city: business.city,
+    category: business.category,
+    subcategory: business.subcategory || undefined,
     destinationUrl: business.google_review_url,
     destinationMode: row.destination_mode || 'guided',
     placementName: row.placement_name,

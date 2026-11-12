@@ -4,6 +4,17 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { reviewDestinationSchema, safeHttpsUrlSchema } from '../../../../lib/validation';
 
+type BusinessRow = {
+  id: string;
+  name: string;
+  city: string;
+  google_review_url: string;
+  category: string | null;
+  subcategory?: string | null;
+  logo_path: string | null;
+  thumbnail_path: string | null;
+};
+
 const businessFields =
   'id, name, city, google_review_url, category, subcategory, logo_path, thumbnail_path';
 const legacyBusinessFields =
@@ -144,24 +155,29 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   try {
-    const {
-      data: existing,
-      error: lookupError,
-      supportsSubcategory,
-    } = await findOwnerBusiness(auth.supabase, auth.user.id);
+    let targetBusiness: BusinessRow | null = null;
+    let supportsSubcategory = true;
 
-    if (lookupError) {
-      console.error('Failed to find the authenticated owner business:', lookupError);
-      return NextResponse.json(
-        {
-          code: 'DESTINATION_SAVE_FAILED',
-          message: lookupError.message || 'Failed to locate business record.',
-        },
-        { status: 500 }
-      );
+    if (!parsed.data.createNewBusiness) {
+      if (parsed.data.businessId) {
+        const { data, error } = await auth.supabase
+          .from('businesses')
+          .select(businessFields)
+          .eq('id', parsed.data.businessId)
+          .eq('owner_id', auth.user.id)
+          .maybeSingle();
+        if (!error && data) {
+          targetBusiness = data as BusinessRow;
+        }
+      } else {
+        const fallbackLookup = await findOwnerBusiness(auth.supabase, auth.user.id);
+        targetBusiness = fallbackLookup.data;
+        supportsSubcategory = fallbackLookup.supportsSubcategory;
+      }
     }
+
     const categoryForValidation =
-      parsed.data.category ?? existing?.category ?? 'Restaurant & Lounge';
+      parsed.data.category ?? targetBusiness?.category ?? 'Restaurant & Lounge';
     if (parsed.data.subcategory && categoryForValidation.toLowerCase() !== 'hotel') {
       return NextResponse.json(
         {
@@ -182,20 +198,22 @@ export async function POST(request: Request): Promise<NextResponse> {
       );
     }
 
-    if (existing) {
+    if (targetBusiness) {
       const update = {
         google_review_url: parsed.data.destinationUrl,
+        ...(parsed.data.businessName?.trim() && { name: parsed.data.businessName.trim() }),
+        ...(parsed.data.city?.trim() && { city: parsed.data.city.trim() }),
         ...(parsed.data.category !== undefined && { category: parsed.data.category }),
         ...(supportsSubcategory &&
           (parsed.data.subcategory !== undefined ||
-            (parsed.data.category !== undefined && parsed.data.category !== existing.category)) && {
+            (parsed.data.category !== undefined && parsed.data.category !== targetBusiness.category)) && {
             subcategory: parsed.data.subcategory || null,
           }),
       };
       const updateQuery = auth.supabase
         .from('businesses')
         .update(update)
-        .eq('id', existing.id)
+        .eq('id', targetBusiness.id)
         .eq('owner_id', auth.user.id);
       const updateResult = supportsSubcategory
         ? await updateQuery
@@ -241,17 +259,17 @@ export async function POST(request: Request): Promise<NextResponse> {
     const slug = `${baseSlug}-${crypto.randomUUID().slice(0, 8)}`;
 
     const insertPayload = {
-        owner_id: auth.user.id,
-        name: parsed.data.businessName,
-        city: parsed.data.city,
-        slug,
-        google_review_url: parsed.data.destinationUrl,
-        category: parsed.data.category || 'Restaurant & Lounge',
-        ...(supportsSubcategory &&
-          parsed.data.subcategory !== undefined && {
-            subcategory: parsed.data.subcategory || null,
-          }),
-      };
+      owner_id: auth.user.id,
+      name: parsed.data.businessName.trim(),
+      city: parsed.data.city.trim(),
+      slug,
+      google_review_url: parsed.data.destinationUrl,
+      category: parsed.data.category || 'Restaurant & Lounge',
+      ...(supportsSubcategory &&
+        parsed.data.subcategory !== undefined && {
+          subcategory: parsed.data.subcategory || null,
+        }),
+    };
     const insertQuery = auth.supabase.from('businesses').insert(insertPayload);
     const insertResult = supportsSubcategory
       ? await insertQuery

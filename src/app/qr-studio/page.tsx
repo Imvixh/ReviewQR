@@ -628,6 +628,33 @@ function QRDesignStudioInner() {
       if (qr.preset) setSelectedPreset(qr.preset);
       if (qr.geometry) setGeometry(qr.geometry);
       if (qr.centerEmblem) setCenterEmblem(qr.centerEmblem);
+
+      // Business & Location for this specific QR
+      if (qr.businessName) setBusinessName(qr.businessName);
+      if (qr.city) setLocation(qr.city);
+      if (qr.category) {
+        const cat = categorySelectionForSavedValue(qr.category);
+        setCategory(cat.selection);
+        setCustomCategory(cat.customCategory);
+      }
+      if (qr.subcategory) setSubcategory(qr.subcategory);
+      if (qr.destinationUrl) {
+        setGoogleReviewUrl(qr.destinationUrl);
+        setSavedDestinationUrl(qr.destinationUrl);
+        setHasConfirmedDestination(true);
+      }
+      if (qr.logoUrl) setLogoUrl(qr.logoUrl);
+      if (qr.thumbnailUrl) setThumbnailUrl(qr.thumbnailUrl);
+
+      setOrg({
+        id: qr.orgId,
+        slug: qr.slug,
+        name: qr.businessName,
+        city: qr.city || '',
+        googleReviewUrl: qr.destinationUrl,
+        category: qr.category,
+        subcategory: qr.subcategory,
+      });
     };
 
     const loadedOrg = getStoredOrg();
@@ -716,21 +743,8 @@ function QRDesignStudioInner() {
           if (target) applyQrToState(target);
         }
 
-        if (destinationResult.business) {
+        if (destinationResult.business && !isEditMode) {
           const business = destinationResult.business;
-          if (isEditMode) {
-            const savedCategory = categorySelectionForSavedValue(business.category);
-            setCategory(savedCategory.selection);
-            setCustomCategory(savedCategory.customCategory);
-            setSubcategory(business.subcategory || '');
-            setGoogleReviewUrl(business.googleReviewUrl || '');
-            setSavedDestinationUrl(business.googleReviewUrl || '');
-            setHasConfirmedDestination(Boolean(business.googleReviewUrl));
-            setBusinessName(business.name || '');
-            setLocation(business.city || '');
-            if (business.logoUrl) setLogoUrl(business.logoUrl);
-            if (business.thumbnailUrl) setThumbnailUrl(business.thumbnailUrl);
-          }
           const updatedOrg = setStoredOrg({
             id: business.id,
             name: business.name,
@@ -925,6 +939,8 @@ function QRDesignStudioInner() {
           city: location,
           category: categoryValue,
           subcategory,
+          businessId: isEditMode ? org?.id : undefined,
+          createNewBusiness: isCreateMode,
         }),
       });
       const result = await response.json();
@@ -1171,6 +1187,7 @@ function QRDesignStudioInner() {
           geometry,
           centerEmblem,
           destinationMode: qrMode,
+          businessId: org?.id,
         }),
       });
       const result = await response.json();

@@ -96,6 +96,7 @@ export const qrDesignSchema = z.object({
   geometry: z.enum(['classic', 'rounded', 'dots', 'premium-eye']),
   centerEmblem: z.enum(['google-g', 'business-logo']),
   destinationMode: z.enum(['direct', 'guided']).default('guided'),
+  businessId: z.string().uuid().optional(),
 });
 
 export const reviewDestinationSchema = z.object({
@@ -105,6 +106,8 @@ export const reviewDestinationSchema = z.object({
   city: z.string().trim().max(120).optional().default(''),
   category: businessCategorySchema.optional(),
   subcategory: z.enum(['Accommodation', 'Dining', 'Banquet Services']).or(z.literal('')).optional(),
+  businessId: z.string().uuid().optional(),
+  createNewBusiness: z.boolean().optional(),
 }).superRefine((value, context) => {
   if (value.subcategory && value.category && value.category !== 'Hotel') {
     context.addIssue({

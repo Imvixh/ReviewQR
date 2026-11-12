@@ -277,7 +277,7 @@ export default function MyQRCodesPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-sm text-[#0B1C30] leading-snug">{qr.placementName}</h3>
-                    <p className="text-xs text-[#565E74] mt-0.5">{qr.businessName}</p>
+                    <p className="text-xs text-[#565E74] mt-0.5">{qr.businessName}{qr.city ? ` · ${qr.city}` : ''}</p>
                     <p className="text-[11px] text-slate-400 truncate mt-1">
                       {qr.headline || 'Review us on Google'}
                     </p>

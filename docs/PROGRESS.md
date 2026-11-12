@@ -2,13 +2,15 @@
 
 Last updated: 2026-11-12
 
-## Create QR isolation, My QR Edit flow, Logo removal, Accent color isolation & Pixel-perfect PNG artwork (2026-11-12)
+## Multi-Business QR Architecture, Create QR isolation, My QR Edit flow, Accent color isolation & Pixel-perfect PNG artwork (2026-11-12)
 
-- **Completely Blank Create QR Flow**: Navigating to Create QR (via sidebar, dashboard, or My QR Codes) starts 100% clean and blank. Form fields (`businessName`, `location`, `googleReviewUrl`, `savedDestinationUrl`, `category`, `logoUrl`, etc.) are never pre-populated with previously created businesses or QRs.
-- **Dedicated Edit Mode with Touchpoint Selector**: QR Studio now loads existing details only when an explicit `edit=<id>` parameter is in the URL. A dropdown selector at the top lets users switch between "+ New Blank QR Design" and their saved touchpoints.
-- **Accent Color Isolated to CTA Box**: Changing the poster accent color strictly affects the "Scan to share your experience" button bar in the preview and export artwork. The QR code geometry and pattern color are independently controlled by the chosen preset's finder color.
-- **Pixel-Perfect PNG Export**: SVG artwork generation for `Download PNG` now maps 100% to the live stand preview, rendering real hex colors across all presets, the top "SHARE YOUR EXPERIENCE" pill, brand crest/logo, business headers, central QR with emblem, vector star rating, supporting copy, and CTA camera bar.
-- **Logo Removal**: Remove button allows removing custom logos from storage and database, resetting back to the default crest.
+- **Independent Multi-Business Creation**: One user account can now create multiple QR codes for completely different businesses, addresses/cities, review links, and colors. Creating a new QR now saves its own business entity instead of overwriting previous ones.
+- **My QR Codes Multi-Business Display**: `/my-qr-codes` lists all QR designs across all of the owner's businesses, each displaying its own specific business name, city, review URL, preset colors, and analytics.
+- **Dedicated Edit Mode with Touchpoint Selector**: QR Studio loads existing details only when an explicit `edit=<id>` parameter is in the URL, correctly restoring that specific QR's business name, location, destination, and styling.
+- **Completely Blank Create QR Flow**: Navigating to Create QR starts 100% clean and blank. Form fields are never contaminated with previously created businesses or QRs.
+- **Accent Color Isolated to CTA Box**: Changing the poster accent color strictly affects the "Scan to share your experience" button bar in the preview and export artwork.
+- **Pixel-Perfect PNG Export**: SVG artwork generation for `Download PNG` maps 100% to the live stand preview.
+- **Logo Removal**: Remove button allows removing custom logos from storage and database.
 
 | Latest check | Result |
 |---|---|

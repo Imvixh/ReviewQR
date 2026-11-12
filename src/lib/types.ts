@@ -30,6 +30,9 @@ export interface QRCode {
   slug: string;
   publicToken?: string;
   businessName: string;
+  city?: string;
+  category?: string;
+  subcategory?: string;
   destinationUrl?: string;
   destinationMode?: 'direct' | 'guided';
   destinationPlaceId?: string;
