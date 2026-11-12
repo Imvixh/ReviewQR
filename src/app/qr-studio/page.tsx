@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { DashboardShell } from '@/components/layout/DashboardShell';
 import { getStoredOrg, getStoredQRCodes, saveQRCode, setStoredOrg } from '@/lib/data-store';
 import { Organization, QRCode } from '@/lib/types';
@@ -31,6 +32,18 @@ interface PosterPreset {
 }
 
 export default function QRDesignStudioPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#F8F9FF]" />}>
+      <QRDesignStudioInner />
+    </Suspense>
+  );
+}
+
+function QRDesignStudioInner() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const isCreateMode = searchParams.get('mode') === 'create';
+  const editQrId = searchParams.get('edit') || '';
   const [activeTab, setActiveTab] = useState<'branding' | 'qrstyle' | 'templates' | 'copy'>('branding');
   const [org, setOrg] = useState<Organization | null>(null);
   const [qrList, setQrList] = useState<QRCode[]>([]);
@@ -55,9 +68,12 @@ export default function QRDesignStudioPage() {
   const [subcategory, setSubcategory] = useState('');
   const [location, setLocation] = useState('');
   const [accentColor, setAccentColor] = useState('#1A73E8');
+  const [customFinderColor, setCustomFinderColor] = useState<string>('#1A73E8');
+  const [syncQrWithAccent, setSyncQrWithAccent] = useState(true);
   const [logoUrl, setLogoUrl] = useState<string>('');
   const [logoName, setLogoName] = useState('');
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isRemovingLogo, setIsRemovingLogo] = useState(false);
   const [thumbnailUrl, setThumbnailUrl] = useState<string>('');
   const [thumbnailName, setThumbnailName] = useState('');
   const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
@@ -557,13 +573,45 @@ export default function QRDesignStudioPage() {
 
   // Load Initial Org and QRs
   useEffect(() => {
+    // Helper to apply a specific QR's settings to state
+    const applyQrToState = (qr: QRCode) => {
+      setSelectedQrId(qr.id);
+      setQrMode(getQrDestinationMode(qr));
+      setPlacementTag(qr.placementName || qr.placementType || '');
+      setHeadline(qr.headline || 'Review us on Google');
+      setCtaText(qr.tagline || 'Scan to share your experience');
+      setSupportingText(qr.supportingText || '');
+      if (qr.accentColor) {
+        setAccentColor(qr.accentColor);
+        setCustomFinderColor(qr.accentColor);
+      }
+      if (qr.preset) setSelectedPreset(qr.preset);
+      if (qr.geometry) setGeometry(qr.geometry);
+      if (qr.centerEmblem) setCenterEmblem(qr.centerEmblem);
+    };
+
     const loadedOrg = getStoredOrg();
     setOrg(loadedOrg);
+
+    // In create mode: load org/business data for context but don't load any QR fields
+    if (isCreateMode) {
+      setSelectedQrId('');
+      setPlacementTag('');
+      setHeadline('Review us on Google');
+      setCtaText('Scan to share your experience');
+      setSupportingText('');
+      setAccentColor('#1A73E8');
+      setCustomFinderColor('#1A73E8');
+      setSelectedPreset('google-classic');
+      setGeometry('rounded');
+      setCenterEmblem('google-g');
+    }
+
     const savedCategory = categorySelectionForSavedValue(loadedOrg.category);
     setCategory(savedCategory.selection);
     setCustomCategory(savedCategory.customCategory);
     setSubcategory(loadedOrg.subcategory || '');
-    if (loadedOrg.accentColor) setAccentColor(loadedOrg.accentColor);
+    if (loadedOrg.accentColor && !isCreateMode) setAccentColor(loadedOrg.accentColor);
     if (loadedOrg.logoUrl && !isSupabaseConfigured) setLogoUrl(loadedOrg.logoUrl);
     if (isSupabaseConfigured) setLogoUrl('');
 
@@ -577,18 +625,10 @@ export default function QRDesignStudioPage() {
       }
       const localQrs = getStoredQRCodes();
       setQrList(localQrs);
-      if (localQrs[0]) {
-        const first = localQrs[0];
-        setSelectedQrId(first.id);
-        setQrMode(getQrDestinationMode(first));
-        setPlacementTag(first.placementName || first.placementType || '');
-        if (first.headline) setHeadline(first.headline);
-        if (first.tagline) setCtaText(first.tagline);
-        if (first.supportingText) setSupportingText(first.supportingText);
-        if (first.accentColor) setAccentColor(first.accentColor);
-        if (first.preset) setSelectedPreset(first.preset);
-        if (first.geometry) setGeometry(first.geometry);
-        if (first.centerEmblem) setCenterEmblem(first.centerEmblem);
+      if (!isCreateMode) {
+        // In edit mode, find the specific QR by editQrId; otherwise load first
+        const target = editQrId ? localQrs.find((q) => q.id === editQrId) : localQrs[0];
+        if (target) applyQrToState(target);
       }
       setIsLoadingDestination(false);
       return;
@@ -617,18 +657,10 @@ export default function QRDesignStudioPage() {
         if (cancelled) return;
         const qrs = qrResult.qrs as QRCode[];
         setQrList(qrs);
-        if (qrs[0]) {
-          const first = qrs[0];
-          setSelectedQrId(first.id);
-          setQrMode(getQrDestinationMode(first));
-          setPlacementTag(first.placementName || first.placementType || '');
-          if (first.headline) setHeadline(first.headline);
-          if (first.tagline) setCtaText(first.tagline);
-          if (first.supportingText) setSupportingText(first.supportingText);
-          if (first.accentColor) setAccentColor(first.accentColor);
-          if (first.preset) setSelectedPreset(first.preset);
-          if (first.geometry) setGeometry(first.geometry);
-          if (first.centerEmblem) setCenterEmblem(first.centerEmblem);
+        if (!isCreateMode) {
+          // Edit mode: prefer the QR matching editQrId, else first QR
+          const target = editQrId ? qrs.find((q) => q.id === editQrId) : qrs[0];
+          if (target) applyQrToState(target);
         }
 
         if (destinationResult.business) {
@@ -672,7 +704,8 @@ export default function QRDesignStudioPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCreateMode, editQrId]);
 
   // Both the preview and exports use this resolved destination.
   useEffect(() => {
@@ -714,7 +747,7 @@ export default function QRDesignStudioPage() {
         generateQrSvg(
           target.url,
           geometry,
-          currentPresetData.finderColor
+          customFinderColor || currentPresetData.finderColor
         )
       );
       setGeneratedQrTarget(target.url);
@@ -729,6 +762,7 @@ export default function QRDesignStudioPage() {
     destinationValidation,
     canPreviewQr,
     currentPresetData.finderColor,
+    customFinderColor,
     geometry,
     qrMode,
     selectedQrToken,
@@ -749,12 +783,31 @@ export default function QRDesignStudioPage() {
       if (found.headline) setHeadline(found.headline);
       if (found.tagline) setCtaText(found.tagline);
       setSupportingText(found.supportingText || '');
-      if (found.accentColor) setAccentColor(found.accentColor);
+      if (found.accentColor) {
+        setAccentColor(found.accentColor);
+        setCustomFinderColor(found.accentColor);
+      }
       if (found.preset) setSelectedPreset(found.preset);
       if (found.geometry) setGeometry(found.geometry);
       if (found.centerEmblem) setCenterEmblem(found.centerEmblem);
       showToast(`Loaded settings for: ${found.placementName || found.placementType || found.slug}`);
     }
+  };
+
+  const handleAccentColorChange = (newColor: string) => {
+    let formatted = newColor.trim();
+    if (!formatted.startsWith('#')) formatted = `#${formatted}`;
+    setAccentColor(formatted);
+    if (syncQrWithAccent) {
+      setCustomFinderColor(formatted);
+    }
+  };
+
+  const handleFinderColorChange = (newColor: string) => {
+    let formatted = newColor.trim();
+    if (!formatted.startsWith('#')) formatted = `#${formatted}`;
+    setCustomFinderColor(formatted);
+    setSyncQrWithAccent(false);
   };
 
   const handleConfirmDestination = async () => {
@@ -917,6 +970,33 @@ export default function QRDesignStudioPage() {
     }
   };
 
+  const handleRemoveLogo = async () => {
+    if (!logoUrl) return;
+    setIsRemovingLogo(true);
+    try {
+      if (isSupabaseConfigured && org?.id) {
+        const res = await fetch(
+          `/api/business/upload?orgId=${encodeURIComponent(org.id)}&type=logo`,
+          { method: 'DELETE' }
+        );
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.message || data.code || 'Logo removal failed.');
+        }
+      }
+      setLogoUrl('');
+      setLogoName('');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (centerEmblem === 'business-logo') setCenterEmblem('google-g');
+      setStoredOrg({ logoUrl: '', logoPath: '' });
+      showToast('Logo removed.');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Logo removal failed.');
+    } finally {
+      setIsRemovingLogo(false);
+    }
+  };
+
   const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1026,6 +1106,7 @@ export default function QRDesignStudioPage() {
           logoUrl,
         });
         showToast('Direct QR design saved in this browser. Its code opens the exact review URL.');
+        setTimeout(() => router.push('/my-qr-codes'), 1000);
         return;
       }
 
@@ -1068,6 +1149,7 @@ export default function QRDesignStudioPage() {
         logoUrl,
       });
       showToast('QR design saved to your account. The customer QR is ready to scan.');
+      setTimeout(() => router.push('/my-qr-codes'), 1000);
     } catch (error) {
       showToast(error instanceof Error ? error.message : 'Could not save this QR design.');
     } finally {
@@ -1698,14 +1780,26 @@ export default function QRDesignStudioPage() {
                         <span className="text-[11px] text-[#565E74]">PNG, WebP, JPG up to 5MB</span>
                       </div>
                     </div>
-                    <button
-                      className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-xs font-semibold text-[#005BBF] border border-slate-200 shadow-2xs transition-all"
-                      type="button"
-                      disabled={isUploadingLogo}
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      {isUploadingLogo ? 'Uploading...' : logoUrl ? 'Change' : 'Upload'}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-xs font-semibold text-[#005BBF] border border-slate-200 shadow-2xs transition-all"
+                        type="button"
+                        disabled={isUploadingLogo || isRemovingLogo}
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        {isUploadingLogo ? 'Uploading...' : logoUrl ? 'Change' : 'Upload'}
+                      </button>
+                      {logoUrl && (
+                        <button
+                          className="px-3 py-1.5 rounded-lg bg-white hover:bg-red-50 text-xs font-semibold text-red-500 border border-slate-200 shadow-2xs transition-all"
+                          type="button"
+                          disabled={isRemovingLogo || isUploadingLogo}
+                          onClick={handleRemoveLogo}
+                        >
+                          {isRemovingLogo ? 'Removing...' : 'Remove'}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -1745,7 +1839,7 @@ export default function QRDesignStudioPage() {
                     <label className="text-xs font-semibold text-[#414754]">Poster Accent Palette</label>
                     <span className="text-xs font-mono text-[#565E74]">{accentColor}</span>
                   </div>
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-2.5 flex-wrap">
                     {accentPalette.map((col) => {
                       const isSelected = accentColor.toLowerCase() === col.hex.toLowerCase();
                       return (
@@ -1758,7 +1852,7 @@ export default function QRDesignStudioPage() {
                           title={col.name}
                           type="button"
                           onClick={() => {
-                            setAccentColor(col.hex);
+                            handleAccentColorChange(col.hex);
                             showToast(`Accent set to ${col.name}`);
                           }}
                         >
@@ -1766,8 +1860,17 @@ export default function QRDesignStudioPage() {
                         </button>
                       );
                     })}
-                    <div className="flex items-center h-9 px-2.5 rounded-lg bg-slate-50 text-xs font-mono text-[#565E74] ml-auto border border-slate-200">
-                      {accentColor}
+                    <div className="flex items-center gap-1.5 ml-auto">
+                      <input
+                        type="color"
+                        value={accentColor.startsWith('#') && accentColor.length === 7 ? accentColor : '#1A73E8'}
+                        onChange={(e) => handleAccentColorChange(e.target.value)}
+                        className="w-9 h-9 rounded-full border border-slate-200 cursor-pointer p-0.5 bg-white shadow-2xs"
+                        title="Pick custom color"
+                      />
+                      <div className="flex items-center h-9 px-2 rounded-lg bg-slate-50 text-xs font-mono text-[#565E74] border border-slate-200">
+                        {accentColor}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1967,7 +2070,10 @@ export default function QRDesignStudioPage() {
                         }`}
                         onClick={() => {
                           setSelectedPreset(preset.id);
-                          setAccentColor(preset.defaultAccent);
+                          handleAccentColorChange(preset.defaultAccent);
+                          if (!syncQrWithAccent) {
+                            setCustomFinderColor(preset.finderColor || preset.defaultAccent);
+                          }
                           showToast(`Switched to preset: ${preset.name}`);
                         }}
                       >
@@ -1990,6 +2096,129 @@ export default function QRDesignStudioPage() {
                       </div>
                     );
                   })}
+                </div>
+
+                {/* Adjust Preset Colors Section */}
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col gap-3.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-[#1A73E8] text-base">palette</span>
+                      <span className="text-xs font-bold text-[#0B1C30]">
+                        Adjust Preset Color ({currentPresetData.name})
+                      </span>
+                    </div>
+                    <span className="text-xs font-mono font-semibold text-[#565E74]">{accentColor}</span>
+                  </div>
+
+                  {/* Primary Color Picker & Hex Input */}
+                  <div className="flex items-center gap-3">
+                    <div className="relative flex items-center">
+                      <input
+                        type="color"
+                        id="preset-color-picker"
+                        value={accentColor.startsWith('#') && accentColor.length === 7 ? accentColor : '#1A73E8'}
+                        onChange={(e) => handleAccentColorChange(e.target.value)}
+                        className="w-10 h-10 rounded-xl border border-slate-200 cursor-pointer p-0.5 bg-white shadow-2xs"
+                        title="Pick custom preset color"
+                      />
+                    </div>
+                    <div className="flex-1 flex items-center gap-2">
+                      <div className="relative flex-1">
+                        <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-mono">#</span>
+                        <input
+                          type="text"
+                          maxLength={7}
+                          value={accentColor.replace('#', '')}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/[^0-9a-fA-F]/g, '');
+                            if (val.length <= 6) {
+                              handleAccentColorChange(`#${val}`);
+                            }
+                          }}
+                          placeholder="1A73E8"
+                          className="w-full h-10 pl-7 pr-3 rounded-xl bg-white border border-slate-200 text-xs font-mono font-semibold text-[#0B1C30] uppercase focus:outline-none focus:border-[#1A73E8]"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleAccentColorChange(currentPresetData.defaultAccent);
+                          setCustomFinderColor(currentPresetData.finderColor);
+                          showToast(`Reset to ${currentPresetData.name} default color`);
+                        }}
+                        className="h-10 px-3 rounded-xl bg-white border border-slate-200 text-[11px] font-semibold text-slate-700 hover:bg-slate-100 transition-colors shadow-2xs shrink-0"
+                        title="Reset to preset default"
+                      >
+                        Reset Default
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Quick Color Swatches */}
+                  <div className="space-y-1.5">
+                    <span className="text-[11px] font-semibold text-[#565E74]">Preset &amp; Theme Swatches</span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {[
+                        { name: 'Preset Default', hex: currentPresetData.defaultAccent },
+                        { name: 'Google Blue', hex: '#1A73E8' },
+                        { name: 'Warm Amber', hex: '#FBBC04' },
+                        { name: 'Google Red', hex: '#EA4335' },
+                        { name: 'Bistro Green', hex: '#34A853' },
+                        { name: 'Deep Purple', hex: '#7C3AED' },
+                        { name: 'Sunset Orange', hex: '#F97316' },
+                        { name: 'Rose Gold', hex: '#F43F5E' },
+                        { name: 'Obsidian Slate', hex: '#0F172A' },
+                      ].map((swatch, idx) => {
+                        const isMatch = accentColor.toLowerCase() === swatch.hex.toLowerCase();
+                        return (
+                          <button
+                            key={`${swatch.hex}-${idx}`}
+                            type="button"
+                            onClick={() => handleAccentColorChange(swatch.hex)}
+                            title={swatch.name}
+                            className={`w-7 h-7 rounded-full transition-transform flex items-center justify-center text-white ${
+                              isMatch ? 'ring-2 ring-offset-1 ring-[#005BBF] scale-110' : 'hover:scale-105'
+                            }`}
+                            style={{ backgroundColor: swatch.hex }}
+                          >
+                            {isMatch && <span className="material-symbols-outlined text-[14px]">check</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* QR Code Color Option */}
+                  <div className="pt-2 border-t border-slate-200/80 flex items-center justify-between">
+                    <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-[#0B1C30]">
+                      <input
+                        type="checkbox"
+                        checked={syncQrWithAccent}
+                        onChange={(e) => {
+                          const checked = e.target.checked;
+                          setSyncQrWithAccent(checked);
+                          if (checked) {
+                            setCustomFinderColor(accentColor);
+                          }
+                        }}
+                        className="w-4 h-4 rounded text-[#1A73E8] focus:ring-0 cursor-pointer"
+                      />
+                      <span>Match QR code color with preset accent</span>
+                    </label>
+
+                    {!syncQrWithAccent && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[11px] text-[#565E74] font-medium">QR Color:</span>
+                        <input
+                          type="color"
+                          value={customFinderColor.startsWith('#') && customFinderColor.length === 7 ? customFinderColor : '#0B1C30'}
+                          onChange={(e) => handleFinderColorChange(e.target.value)}
+                          className="w-7 h-7 rounded-lg border border-slate-200 cursor-pointer p-0.5 bg-white shadow-2xs"
+                          title="Custom QR pattern color"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <button

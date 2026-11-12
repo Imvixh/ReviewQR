@@ -120,8 +120,7 @@ export default function MyQRCodesPage() {
             >
               <span className="material-symbols-outlined text-lg">add</span>
               <span>+ Create New QR Code</span>
-            </Link>
-          </div>
+            </Link>          </div>
         </div>
 
         {/* 4 Bento KPI Stats */}
@@ -331,9 +330,9 @@ export default function MyQRCodesPage() {
 
                 <div className="flex items-center gap-2">
                   <Link
-                    href="/qr-studio"
+                    href={`/qr-studio?edit=${encodeURIComponent(qr.id)}`}
                     className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800"
-                    title="Customize in Studio"
+                    title="Edit in Studio"
                   >
                     <span className="material-symbols-outlined text-base">tune</span>
                   </Link>

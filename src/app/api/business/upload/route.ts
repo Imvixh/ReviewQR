@@ -48,29 +48,26 @@ export async function DELETE(request: NextRequest) {
   }
 
   const path = type === 'logo' ? business.logo_path : business.thumbnail_path;
-  if (!path) {
-    return NextResponse.json({ code: 'ASSET_NOT_FOUND' }, { status: 404 });
-  }
-
   let adminClient;
   try { adminClient = createAdminClient(); } catch (e) { console.error('Failed to init admin client:', e); }
   const storageClient = adminClient || supabase;
   const dbClient = adminClient || supabase;
 
-  const { error: deleteError } = await storageClient.storage.from('business-assets').remove([path]);
-  if (deleteError) {
-    console.error('Failed to delete asset from storage:', deleteError);
-    return NextResponse.json({ code: 'ASSET_DELETE_FAILED', message: deleteError.message }, { status: 502 });
+  if (path) {
+    const { error: deleteError } = await storageClient.storage.from('business-assets').remove([path]);
+    if (deleteError) {
+      console.warn('Failed to delete asset from storage (may already be deleted):', deleteError);
+    }
   }
 
-  const update = type === 'logo' ? { logo_url: null, logo_path: null } : { thumbnail_url: null, thumbnail_path: null };
+  const update = type === 'logo' ? { logo_path: null } : { thumbnail_url: null, thumbnail_path: null };
   const { error: saveError } = await dbClient.from('businesses').update(update).eq('id', business.id).eq('owner_id', user.id);
   if (saveError) {
     console.error('Failed to clear asset metadata:', saveError);
     return NextResponse.json({ code: 'ASSET_METADATA_CLEAR_FAILED', message: saveError.message }, { status: 500 });
   }
 
-  return NextResponse.json({ success: true, type, path }, { status: 200 });
+  return NextResponse.json({ success: true, type, path: path || null }, { status: 200 });
 }
 
 export async function POST(request: NextRequest) {
@@ -175,8 +172,8 @@ export async function POST(request: NextRequest) {
   }
 
   const update = type === 'logo'
-    ? { logo_url: null, logo_path: path }
-    : { thumbnail_url: null, thumbnail_path: path };
+    ? { logo_path: path }
+    : { thumbnail_url: assetUrl, thumbnail_path: path };
   const { error: saveError } = await dbClient
     .from('businesses')
     .update(update)
