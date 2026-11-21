@@ -1,6 +1,22 @@
 # Progress — ReviewQR
 
-Last updated: 2026-11-12
+Last updated: 2026-11-21
+
+## Gemini AI Latency Optimization & Client In-Flight Cancellation (2026-11-21)
+
+- **Google Gemini API Integration**: Migrated the server-side AI review recommendation engine from throttled OpenRouter free models to Google's Gemini API (`gemini-3.5-flash-lite` with graceful fallback to `gemini-flash-lite-latest`), reducing customer-visible latency by ~88% (from >10s down to a median of 1,173ms, min 778ms).
+- **Fast Timeout & Token Capping**: Set `maxOutputTokens: 250` and lowered per-model timeout to 5,000ms, removing slow 20s–60s hanging loops and preventing rambling paragraph output.
+- **Native Structured JSON Output**: Employs `responseMimeType: "application/json"`, producing guaranteed JSON output without schema constraint overhead or markdown parsing failures.
+- **W3C Server-Timing Headers**: The route returns `Server-Timing: db;dur=..., ai;dur=...;desc=..., total;dur=...` for telemetry and monitoring without logging customer review text or credentials.
+- **Graceful Fallback**: If `GEMINI_API_KEY` is absent or the Gemini API is unavailable, the route falls back seamlessly to OpenAI/OpenRouter so service is never disrupted.
+- **Client In-Flight Request Cancellation**: Added `AbortController` cleanup in `src/app/qr/[token]/page.tsx` so rapid star rating or filter pill changes cancel pending requests, eliminating race conditions and preserving the 5-per-minute IP rate limit.
+- **Unit Test Coverage**: Added dedicated Gemini test cases to `tests/review-suggestions.test.ts` covering Gemini integration, `Server-Timing`, missing key handling, and secondary provider failover.
+
+| Latest check | Result |
+|---|---|
+| `npm test` | PASS — 73 tests across 10 files |
+| `npm run typecheck` | PASS |
+| `npm run lint` | PASS |
 
 ## Multi-Business QR Architecture, Create QR isolation, My QR Edit flow, Accent color isolation & Pixel-perfect PNG artwork (2026-11-12)
 

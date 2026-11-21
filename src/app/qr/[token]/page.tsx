@@ -160,6 +160,7 @@ export default function CustomerReviewJourneyPage() {
   const [eventMessage, setEventMessage] = useState<string | null>(null);
 
   const reviewTextRef = useRef<HTMLTextAreaElement>(null);
+  const suggestionsAbortRef = useRef<AbortController | null>(null);
   const copy = journeyText[language];
 
   useEffect(() => {
@@ -196,6 +197,9 @@ export default function CustomerReviewJourneyPage() {
     void loadPublicQr();
     return () => {
       cancelled = true;
+      if (suggestionsAbortRef.current) {
+        suggestionsAbortRef.current.abort();
+      }
     };
   }, [token]);
 
@@ -204,6 +208,12 @@ export default function CustomerReviewJourneyPage() {
     (suggestionItems[selectedSuggestionIndex]?.text ?? suggestions[selectedSuggestionIndex] ?? '');
 
   const handleGenerateSuggestions = async (filterName: string, targetRating: number) => {
+    if (suggestionsAbortRef.current) {
+      suggestionsAbortRef.current.abort();
+    }
+    const controller = new AbortController();
+    suggestionsAbortRef.current = controller;
+
     setIsGeneratingSuggestions(true);
     setSuggestionError(null);
 
@@ -232,6 +242,7 @@ export default function CustomerReviewJourneyPage() {
       const response = await fetch('/api/public/review-suggestions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           token,
           rating: targetRating,
@@ -260,7 +271,10 @@ export default function CustomerReviewJourneyPage() {
       } else {
         throw new Error(result.message || 'Suggestions could not be generated. Please retry.');
       }
-    } catch (err) {
+    } catch (err: unknown) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        return;
+      }
       console.warn('Realtime generation error, using curated contextual fallback:', err);
       // Clean fallback if completely blocked
       const fallbackItems: SuggestionItem[] = [

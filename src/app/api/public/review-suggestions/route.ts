@@ -41,6 +41,7 @@ function getClientKey(request: Request): string {
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
+  const startTime = performance.now();
   let body: unknown;
   try {
     const bodyText = await request.text();
@@ -95,96 +96,149 @@ export async function POST(request: Request): Promise<NextResponse> {
       ? qr.business_category
       : '';
 
-  const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY;
-  if (!apiKey) {
+  const dbDuration = Math.round(performance.now() - startTime);
+
+  const geminiApiKey = process.env.GEMINI_API_KEY;
+  const fallbackApiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY;
+
+  if (!geminiApiKey && !fallbackApiKey) {
     return NextResponse.json({ code: 'AI_NOT_CONFIGURED' }, { status: 503 });
   }
 
-  const isRouter = Boolean(process.env.OPENROUTER_API_KEY || apiKey.startsWith('sk-or-'));
-  const apiUrl = isRouter
-    ? (process.env.AI_BASE_URL || 'https://openrouter.ai/api/v1/chat/completions')
-    : (process.env.AI_BASE_URL || 'https://api.openai.com/v1/chat/completions');
+  const systemPrompt =
+    'Rephrase only the customer-provided experience into exactly three distinct, natural review phrasings in the requested language. For each suggestion, provide a short topic pill label (2-4 words, such as "Hospitality & Staff", "Food & Ambience", "Overall Impression", or matching the specific theme of what the customer discussed) and the review text. Treat the rating, business category, and optional topic filter as context, never evidence. Do not add any service, event, product, feeling, or fact that the customer did not state. Do not infer a positive or negative experience from the rating. Keep the same meaning and sentiment as the customer. Return ONLY a valid JSON object with the key "items", containing an array of 3 objects with "topic" and "text".';
 
-  // Candidate free models in order of response speed & quality
-  const candidateModels = isRouter
-    ? [
-        process.env.OPENROUTER_MODEL || 'liquid/lfm-3-1.7b:free',
-        'liquid/lfm-3-1.7b:free',
-        'nvidia/nemotron-3.5-lightning:free',
-        'liquid/lfm-2.5-2.6b:free',
-      ].filter((v, i, a) => Boolean(v) && a.indexOf(v) === i)
-    : [process.env.OPENAI_MODEL || 'gpt-4o-mini'];
-
-  const headers: Record<string, string> = {
-    Authorization: `Bearer ${apiKey}`,
-    'Content-Type': 'application/json',
-  };
-  if (isRouter) {
-    headers['HTTP-Referer'] = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    headers['X-Title'] = 'ReviewQR';
-  }
+  const userPrompt = JSON.stringify({
+    language: parsed.data.language === 'hi' ? 'Hindi' : 'English',
+    rating: parsed.data.rating,
+    businessCategory: businessCategory || 'not provided',
+    topicFilter: parsed.data.filter || undefined,
+    customerExperience: parsed.data.experience,
+  });
 
   let completionContent: string | null = null;
+  let usedModel = 'unknown';
+  const aiStartTime = performance.now();
 
-  for (const model of candidateModels) {
-    const requestBody: Record<string, unknown> = {
-      model,
-      temperature: 0.6,
-      messages: [
-        {
-          role: 'system',
-          content:
-            'Rephrase only the customer-provided experience into exactly three distinct, natural review phrasings in the requested language. For each suggestion, provide a short topic pill label (2-4 words, such as "Hospitality & Staff", "Food & Ambience", "Overall Impression", or matching the specific theme of what the customer discussed) and the review text. Treat the rating, business category, and optional topic filter as context, never evidence. Do not add any service, event, product, feeling, or fact that the customer did not state. Do not infer a positive or negative experience from the rating. Keep the same meaning and sentiment as the customer. Return ONLY a valid JSON object with the key "items", containing an array of 3 objects with "topic" and "text".',
-        },
-        {
-          role: 'user',
-          content: JSON.stringify({
-            language: parsed.data.language === 'hi' ? 'Hindi' : 'English',
-            rating: parsed.data.rating,
-            businessCategory: businessCategory || 'not provided',
-            topicFilter: parsed.data.filter || undefined,
-            customerExperience: parsed.data.experience,
+  if (geminiApiKey) {
+    const geminiModels = [
+      process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite',
+      'gemini-flash-lite-latest',
+    ].filter((v, i, a) => Boolean(v) && a.indexOf(v) === i);
+
+    for (const model of geminiModels) {
+      try {
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiApiKey}`;
+        const response = await fetch(geminiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: AbortSignal.timeout(5_000),
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+            contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+            generationConfig: {
+              maxOutputTokens: 250,
+              temperature: 0.6,
+              responseMimeType: 'application/json',
+            },
           }),
-        },
-      ],
-    };
+        });
 
-    if (!isRouter) {
-      requestBody.response_format = {
-        type: 'json_schema',
-        json_schema: {
-          name: 'review_suggestions',
-          strict: true,
-          schema: suggestionResponseSchema,
-        },
-      };
-    }
+        if (!response.ok) {
+          console.warn(`Gemini model ${model} returned HTTP ${response.status}, attempting fallback if available...`);
+          continue;
+        }
 
-    try {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers,
-        signal: AbortSignal.timeout(20_000),
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        console.warn(`Model ${model} returned HTTP ${response.status}, attempting fallback if available...`);
-        continue;
+        const data = (await response.json()) as {
+          candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+        };
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text && text.trim().length > 10) {
+          completionContent = text;
+          usedModel = model;
+          break;
+        }
+      } catch (geminiErr) {
+        console.warn(`Gemini model ${model} request failed or timed out:`, geminiErr);
       }
-
-      const json = (await response.json()) as {
-        choices?: Array<{ message?: { content?: string | null } }>;
-      };
-      const text = json.choices?.[0]?.message?.content;
-      if (text && text.trim().length > 10) {
-        completionContent = text;
-        break;
-      }
-    } catch (modelErr) {
-      console.warn(`Model ${model} request failed or timed out:`, modelErr);
     }
   }
+
+  // Graceful fallback to OpenRouter / OpenAI if Gemini failed or is not configured
+  if (!completionContent && fallbackApiKey) {
+    const isRouter = Boolean(process.env.OPENROUTER_API_KEY || fallbackApiKey.startsWith('sk-or-'));
+    const apiUrl = isRouter
+      ? (process.env.AI_BASE_URL || 'https://openrouter.ai/api/v1/chat/completions')
+      : (process.env.AI_BASE_URL || 'https://api.openai.com/v1/chat/completions');
+
+    const candidateModels = isRouter
+      ? [
+          process.env.OPENROUTER_MODEL || 'liquid/lfm-3-1.7b:free',
+          'liquid/lfm-3-1.7b:free',
+          'nvidia/nemotron-3.5-lightning:free',
+        ].filter((v, i, a) => Boolean(v) && a.indexOf(v) === i)
+      : [process.env.OPENAI_MODEL || 'gpt-4o-mini'];
+
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${fallbackApiKey}`,
+      'Content-Type': 'application/json',
+    };
+    if (isRouter) {
+      headers['HTTP-Referer'] = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      headers['X-Title'] = 'ReviewQR';
+    }
+
+    for (const model of candidateModels) {
+      const requestBody: Record<string, unknown> = {
+        model,
+        temperature: 0.6,
+        max_tokens: 250,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+      };
+
+      if (!isRouter) {
+        requestBody.response_format = {
+          type: 'json_schema',
+          json_schema: {
+            name: 'review_suggestions',
+            strict: true,
+            schema: suggestionResponseSchema,
+          },
+        };
+      }
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers,
+          signal: AbortSignal.timeout(6_000),
+          body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+          console.warn(`Fallback model ${model} returned HTTP ${response.status}, attempting next...`);
+          continue;
+        }
+
+        const json = (await response.json()) as {
+          choices?: Array<{ message?: { content?: string | null } }>;
+        };
+        const text = json.choices?.[0]?.message?.content;
+        if (text && text.trim().length > 10) {
+          completionContent = text;
+          usedModel = model;
+          break;
+        }
+      } catch (modelErr) {
+        console.warn(`Fallback model ${model} failed or timed out:`, modelErr);
+      }
+    }
+  }
+
+  const aiDuration = Math.round(performance.now() - aiStartTime);
 
   if (!completionContent) {
     return NextResponse.json(
@@ -231,8 +285,17 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
 
-  return NextResponse.json({
-    suggestions: parsedItemsData.map((item) => item.text),
-    items: parsedItemsData,
-  });
+  const totalDuration = Math.round(performance.now() - startTime);
+
+  return NextResponse.json(
+    {
+      suggestions: parsedItemsData.map((item) => item.text),
+      items: parsedItemsData,
+    },
+    {
+      headers: {
+        'Server-Timing': `db;dur=${dbDuration}, ai;dur=${aiDuration};desc="${usedModel}", total;dur=${totalDuration}`,
+      },
+    }
+  );
 }

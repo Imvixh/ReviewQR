@@ -24,6 +24,7 @@ const feedback = {
 
 describe('Public review suggestions API', () => {
   beforeEach(() => {
+    vi.stubEnv('GEMINI_API_KEY', '');
     vi.stubEnv('OPENROUTER_API_KEY', '');
     vi.stubEnv('OPENAI_API_KEY', 'test-server-key');
     vi.stubGlobal(
@@ -117,5 +118,75 @@ describe('Public review suggestions API', () => {
     expect(limited.status).toBe(429);
     expect(result.code).toBe('RATE_LIMITED');
     expect(limited.headers.get('Retry-After')).toBe('60');
+  });
+
+  it('uses Google Gemini API with Server-Timing when GEMINI_API_KEY is configured', async () => {
+    vi.stubEnv('GEMINI_API_KEY', 'test-gemini-key');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(JSON.stringify({
+        candidates: [{
+          content: {
+            parts: [{
+              text: JSON.stringify({
+                items: [
+                  { topic: 'Staff & Welcome', text: 'The staff was attentive and quick to guide us.' },
+                  { topic: 'Service', text: 'Finding our way was easy thanks to helpful team members.' },
+                  { topic: 'Overall Impression', text: 'Excellent hospitality and prompt directions from staff.' },
+                ],
+              }),
+            }],
+          },
+        }],
+      }), { status: 200 }))
+    );
+
+    const response = await POST(requestFor(feedback, '198.51.100.20'));
+    const result = await response.json();
+    const calls = vi.mocked(fetch).mock.calls;
+
+    expect(response.status).toBe(200);
+    expect(calls[0][0]).toContain('generativelanguage.googleapis.com');
+    expect(calls[0][0]).toContain('key=test-gemini-key');
+    expect(result.items).toHaveLength(3);
+    expect(result.suggestions).toHaveLength(3);
+    expect(response.headers.get('Server-Timing')).toContain('ai;dur=');
+  });
+
+  it('falls back to secondary provider if Gemini returns an error', async () => {
+    vi.stubEnv('GEMINI_API_KEY', 'test-gemini-key');
+    vi.stubEnv('OPENAI_API_KEY', 'test-openai-key');
+
+    let callCount = 0;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string | URL | Request) => {
+        callCount++;
+        const urlStr = String(url);
+        if (urlStr.includes('generativelanguage.googleapis.com')) {
+          return new Response('Rate limited', { status: 429 });
+        }
+        return new Response(JSON.stringify({
+          choices: [{
+            message: {
+              content: JSON.stringify({
+                suggestions: [
+                  'Great fallback suggestion one.',
+                  'Great fallback suggestion two.',
+                  'Great fallback suggestion three.',
+                ],
+              }),
+            },
+          }],
+        }), { status: 200 });
+      })
+    );
+
+    const response = await POST(requestFor(feedback, '198.51.100.21'));
+    const result = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(result.items).toHaveLength(3);
+    expect(callCount).toBeGreaterThan(1);
   });
 });
