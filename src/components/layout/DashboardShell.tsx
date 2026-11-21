@@ -48,7 +48,7 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
       }
 
       setStoredUser(null);
-      router.push('/login');
+      router.push('/');
     } catch (error) {
       setLogoutError(error instanceof Error ? error.message : 'Could not log out. Please try again.');
     } finally {
@@ -74,7 +74,7 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
               </button>
             )}
             <Link href="/" className="font-bold text-lg tracking-tight text-[#0B1C30]">
-              REVELY
+              Revvly
             </Link>
           </div>
           <div className="flex items-center gap-2">
@@ -84,10 +84,10 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
               </div>
             ) : (
               <Link
-                href="/login"
+                href="/create-qr"
                 className="px-3 py-1 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-[#005BBF]"
               >
-                Sign In
+                Create QR
               </Link>
             )}
           </div>
@@ -257,10 +257,10 @@ export const DashboardShell: React.FC<DashboardShellProps> = ({
             ) : (
               <div className="flex items-center gap-2">
                 <Link
-                  href="/login"
+                  href="/create-qr"
                   className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#005BBF] hover:bg-slate-100 transition-colors"
                 >
-                  Sign In
+                  Create QR
                 </Link>
               </div>
             )}

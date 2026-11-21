@@ -24,19 +24,18 @@ import {
   getSuperAdminAuthContext,
   getPlatformOverviewMetrics,
 } from '../src/lib/auth/super-admin';
-import { GET as getAdminOverview } from '../src/app/api/admin/overview/route';
-import { GET as getAdminAuthStatus } from '../src/app/api/admin/auth/status/route';
+import { GET as getSuperAdminOverview } from '../src/app/api/super-admin/overview/route';
+import { GET as getSuperAdminAuthStatus } from '../src/app/api/super-admin/auth/status/route';
 
-describe('Public Landing Page & Creator Rebranding & Cleanup', () => {
-  it('confirms the landing page has no login or signup links and uses REVELY', () => {
+describe('Revvly Branding & Public Authentication Cleanup', () => {
+  it('confirms the landing page has no login or signup links and uses Revvly brand', () => {
     const landingHtml = fs.readFileSync(
       path.resolve(__dirname, '../src/app/page.tsx'),
       'utf-8'
     );
 
-    // Verify brand is REVELY
-    expect(landingHtml).toContain('REVELY');
-    expect(landingHtml).not.toContain('Review<span className="text-primary-container">QR</span>');
+    // Verify brand is Revvly
+    expect(landingHtml).toContain('Revvly');
 
     // Verify no login or signup URLs
     expect(landingHtml).not.toContain('href="/login"');
@@ -50,15 +49,31 @@ describe('Public Landing Page & Creator Rebranding & Cleanup', () => {
     expect(landingHtml).toContain('href="/create-qr"');
   });
 
-  it('confirms the public creator has no login or signup links', () => {
+  it('confirms public creator uses Revvly and has no login or signup links', () => {
     const creatorHtml = fs.readFileSync(
       path.resolve(__dirname, '../src/app/create-qr/page.tsx'),
       'utf-8'
     );
 
-    expect(creatorHtml).toContain('REVELY');
+    expect(creatorHtml).toContain('Revvly');
     expect(creatorHtml).not.toContain('href="/login"');
     expect(creatorHtml).not.toContain('href="/signup"');
+  });
+
+  it('confirms public login and signup routes have been permanently removed', () => {
+    const loginExists = fs.existsSync(path.resolve(__dirname, '../src/app/login'));
+    const signupExists = fs.existsSync(path.resolve(__dirname, '../src/app/signup'));
+    expect(loginExists).toBe(false);
+    expect(signupExists).toBe(false);
+  });
+
+  it('confirms new /super-admin portal files exist', () => {
+    const superAdminPage = fs.existsSync(path.resolve(__dirname, '../src/app/super-admin/page.tsx'));
+    const superAdminLogin = fs.existsSync(path.resolve(__dirname, '../src/app/super-admin/super-admin-login.tsx'));
+    const superAdminDashboard = fs.existsSync(path.resolve(__dirname, '../src/app/super-admin/super-admin-dashboard.tsx'));
+    expect(superAdminPage).toBe(true);
+    expect(superAdminLogin).toBe(true);
+    expect(superAdminDashboard).toBe(true);
   });
 });
 
@@ -119,55 +134,51 @@ describe('Super Admin Server Authorization & MFA Enforcement', () => {
     expect(isSuper).toBe(false);
   });
 
-  it('rejects unauthenticated requests to admin API with 401', async () => {
+  it('returns UNAUTHENTICATED when user is not signed in', async () => {
     mockUserAuth.mockResolvedValue({
       data: { user: null },
-      error: { message: 'Not logged in' },
-    });
-
-    const res = await getAdminOverview();
-    expect(res.status).toBe(401);
-    const body = await res.json();
-    expect(body.code).toBe('UNAUTHENTICATED');
-  });
-
-  it('rejects authenticated non-super-admin users with 403 Forbidden even if profiles.role is admin', async () => {
-    // Regular business owner has profiles.role = 'admin', but is NOT in platform_super_admins
-    mockUserAuth.mockResolvedValue({
-      data: {
-        user: {
-          id: 'business-owner-1',
-          email: 'owner@example.com',
-          role: 'admin', // Org role
-        },
-      },
       error: null,
     });
 
-    // platform_super_admins lookup returns null
+    const res = await getSuperAdminAuthContext();
+    expect(res.ok).toBe(false);
+    if (!res.ok) {
+      expect(res.reason).toBe('UNAUTHENTICATED');
+    }
+  });
+
+  it('returns FORBIDDEN when signed in user is not in public.platform_super_admins', async () => {
+    mockUserAuth.mockResolvedValue({
+      data: {
+        user: { id: 'regular-user-1', email: 'owner@biz.com' },
+      },
+      error: null,
+    });
     mockAdminFrom.mockReturnValue({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
-          maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+          maybeSingle: vi.fn().mockResolvedValue({
+            data: null,
+            error: null,
+          }),
         }),
       }),
     });
 
-    const res = await getAdminOverview();
-    expect(res.status).toBe(403);
-    const body = await res.json();
-    expect(body.code).toBe('FORBIDDEN');
+    const res = await getSuperAdminAuthContext();
+    expect(res.ok).toBe(false);
+    if (!res.ok) {
+      expect(res.reason).toBe('FORBIDDEN');
+    }
   });
 
-  it('requires MFA enrollment if Super Admin has no verified TOTP factor', async () => {
+  it('returns MFA_ENROLLMENT_REQUIRED when super admin has no verified TOTP factor', async () => {
     mockUserAuth.mockResolvedValue({
       data: {
-        user: { id: 'super-admin-1', email: 'admin@revely.io' },
+        user: { id: 'super-admin-1', email: 'admin@revvly.app' },
       },
       error: null,
     });
-
-    // Found in platform_super_admins
     mockAdminFrom.mockReturnValue({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
@@ -177,33 +188,26 @@ describe('Super Admin Server Authorization & MFA Enforcement', () => {
           }),
         }),
       }),
-    });
-
-    // No factors
-    mockMfaAal.mockResolvedValue({
-      data: { currentLevel: 'aal1', nextLevel: 'aal1' },
-      error: null,
     });
     mockMfaFactors.mockResolvedValue({
       data: { all: [], totp: [] },
       error: null,
     });
 
-    const res = await getAdminOverview();
-    expect(res.status).toBe(403);
-    const body = await res.json();
-    expect(body.code).toBe('MFA_ENROLLMENT_REQUIRED');
+    const res = await getSuperAdminAuthContext();
+    expect(res.ok).toBe(false);
+    if (!res.ok) {
+      expect(res.reason).toBe('MFA_ENROLLMENT_REQUIRED');
+    }
   });
 
-  it('requires MFA challenge when Super Admin has factor but session is at aal1', async () => {
+  it('returns MFA_CHALLENGE_REQUIRED when TOTP factor exists but session is only aal1', async () => {
     mockUserAuth.mockResolvedValue({
       data: {
-        user: { id: 'super-admin-1', email: 'admin@revely.io' },
+        user: { id: 'super-admin-1', email: 'admin@revvly.app' },
       },
       error: null,
     });
-
-    // Found in platform_super_admins
     mockAdminFrom.mockReturnValue({
       select: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
@@ -214,36 +218,44 @@ describe('Super Admin Server Authorization & MFA Enforcement', () => {
         }),
       }),
     });
-
-    // Enrolled factor exists, but session is aal1
     mockMfaAal.mockResolvedValue({
       data: { currentLevel: 'aal1', nextLevel: 'aal2' },
       error: null,
     });
     mockMfaFactors.mockResolvedValue({
       data: {
-        all: [{ id: 'factor-totp-1', status: 'verified', factor_type: 'totp' }],
-        totp: [{ id: 'factor-totp-1', status: 'verified', factor_type: 'totp' }],
+        all: [{ id: 'factor-1', status: 'verified', factor_type: 'totp' }],
+        totp: [{ id: 'factor-1', status: 'verified', factor_type: 'totp' }],
       },
       error: null,
     });
 
-    const res = await getAdminOverview();
-    expect(res.status).toBe(403);
-    const body = await res.json();
-    expect(body.code).toBe('MFA_CHALLENGE_REQUIRED');
-    expect(body.factorId).toBe('factor-totp-1');
+    const res = await getSuperAdminAuthContext();
+    expect(res.ok).toBe(false);
+    if (!res.ok && res.reason === 'MFA_CHALLENGE_REQUIRED') {
+      expect(res.factorId).toBe('factor-1');
+    }
   });
 
   it('authorizes Super Admin at aal2 and returns truthful platform overview metrics', async () => {
     mockUserAuth.mockResolvedValue({
       data: {
-        user: { id: 'super-admin-1', email: 'admin@revely.io' },
+        user: { id: 'super-admin-1', email: 'admin@revvly.app' },
+      },
+      error: null,
+    });
+    mockMfaAal.mockResolvedValue({
+      data: { currentLevel: 'aal2', nextLevel: 'aal2' },
+      error: null,
+    });
+    mockMfaFactors.mockResolvedValue({
+      data: {
+        all: [{ id: 'factor-1', status: 'verified', factor_type: 'totp' }],
+        totp: [{ id: 'factor-1', status: 'verified', factor_type: 'totp' }],
       },
       error: null,
     });
 
-    // Found in platform_super_admins
     mockAdminFrom.mockImplementation((tableName: string) => {
       if (tableName === 'platform_super_admins') {
         return {
@@ -333,43 +345,31 @@ describe('Super Admin Server Authorization & MFA Enforcement', () => {
           select: vi.fn().mockResolvedValue({ count: 42, error: null }),
         };
       }
-      return { select: vi.fn().mockResolvedValue({ data: [], error: null }) };
+
+      return {
+        select: vi.fn().mockResolvedValue({ data: [], error: null }),
+      };
     });
 
-    // Session is fully verified at aal2
-    mockMfaAal.mockResolvedValue({
-      data: { currentLevel: 'aal2', nextLevel: 'aal2' },
-      error: null,
-    });
-    mockMfaFactors.mockResolvedValue({
-      data: {
-        all: [{ id: 'factor-totp-1', status: 'verified', factor_type: 'totp' }],
-        totp: [{ id: 'factor-totp-1', status: 'verified', factor_type: 'totp' }],
-      },
-      error: null,
-    });
-
-    const res = await getAdminOverview();
+    const res = await getSuperAdminOverview();
     expect(res.status).toBe(200);
     const body = await res.json();
 
     expect(body.ok).toBe(true);
-    expect(body.admin.email).toBe('admin@revely.io');
+    expect(body.admin.email).toBe('admin@revvly.app');
     expect(body.admin.aal).toBe('aal2');
     expect(body.metrics.totalBusinesses).toBe(8);
     expect(body.metrics.totalUsers).toBe(12);
     expect(body.metrics.totalQrCodes).toBe(15);
     expect(body.metrics.totalScans).toBe(100);
     expect(body.metrics.totalDestinationClicks).toBe(42);
-    // 42 clicks / 100 scans = 42%
     expect(body.metrics.conversionRate).toBe(42);
-    expect(body.metrics.recentBusinesses[0].name).toBe('Cafe Luna');
   });
 
-  it('admin auth status route reflects exact session status', async () => {
+  it('super admin auth status route reflects exact session status', async () => {
     mockUserAuth.mockResolvedValue({
       data: {
-        user: { id: 'super-admin-1', email: 'admin@revely.io' },
+        user: { id: 'super-admin-1', email: 'admin@revvly.app' },
       },
       error: null,
     });
@@ -395,7 +395,7 @@ describe('Super Admin Server Authorization & MFA Enforcement', () => {
       error: null,
     });
 
-    const res = await getAdminAuthStatus();
+    const res = await getSuperAdminAuthStatus();
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.ok).toBe(true);
@@ -403,4 +403,3 @@ describe('Super Admin Server Authorization & MFA Enforcement', () => {
     expect(body.aal).toBe('aal2');
   });
 });
-

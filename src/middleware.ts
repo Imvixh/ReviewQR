@@ -3,31 +3,43 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { isSupabaseConfigured, supabasePublishableKey, supabaseUrl } from '@/lib/supabase/env';
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // 1. Any legacy attempt to access public login or signup permanently redirects to home
+  if (pathname === '/login' || pathname === '/signup' || pathname.startsWith('/login/') || pathname.startsWith('/signup/')) {
+    return NextResponse.redirect(new URL('/', request.url), 307);
+  }
+
+  // 2. Legacy /admin redirects to /super-admin
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    return NextResponse.redirect(new URL('/super-admin', request.url), 308);
+  }
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   });
 
-  const isAuthRoute =
-    request.nextUrl.pathname.startsWith('/login') ||
-    request.nextUrl.pathname.startsWith('/signup');
+  // 3. /super-admin manages its own authentication directly inside the page component
+  if (pathname.startsWith('/super-admin')) {
+    return response;
+  }
 
-  const isProtectedRoute =
-    request.nextUrl.pathname.startsWith('/dashboard') ||
-    request.nextUrl.pathname.startsWith('/business-profile') ||
-    request.nextUrl.pathname.startsWith('/my-qr-codes') ||
-    request.nextUrl.pathname.startsWith('/analytics') ||
-    request.nextUrl.pathname.startsWith('/settings') ||
-    request.nextUrl.pathname.startsWith('/admin');
+  // 4. Protected legacy business routes
+  const isProtectedLegacyRoute =
+    pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/business-profile') ||
+    pathname.startsWith('/my-qr-codes') ||
+    pathname.startsWith('/analytics') ||
+    pathname.startsWith('/settings');
+
+  if (!isProtectedLegacyRoute) {
+    return response;
+  }
 
   if (!isSupabaseConfigured) {
-    if (!isProtectedRoute) return response;
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = '/login';
-    loginUrl.search = '';
-    loginUrl.searchParams.set('error', 'auth_not_configured');
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   const supabase = createServerClient(supabaseUrl, supabasePublishableKey, {
@@ -50,28 +62,8 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  if (authError && isProtectedRoute) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = '/login';
-    loginUrl.search = '';
-    loginUrl.searchParams.set('error', 'session_unavailable');
-    return NextResponse.redirect(loginUrl);
-  }
-
-  if (isProtectedRoute && !user) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = '/login';
-    redirectUrl.searchParams.set('redirectTo', request.nextUrl.pathname);
-    return NextResponse.redirect(redirectUrl);
-  }
-
-  if (isAuthRoute && user) {
-    const requested = request.nextUrl.searchParams.get('redirectTo');
-    const destination =
-      requested?.startsWith('/') && !requested.startsWith('//')
-        ? requested
-        : '/dashboard';
-    return NextResponse.redirect(new URL(destination, request.url));
+  if (authError || !user) {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   return response;

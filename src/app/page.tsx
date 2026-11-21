@@ -17,7 +17,7 @@ export default function LandingPage() {
             </div>
             <div className="flex flex-col">
               <span className="font-headline-sm text-headline-sm text-on-surface leading-none tracking-tight font-extrabold">
-                REVELY
+                Revvly
               </span>
             </div>
           </Link>
@@ -233,7 +233,7 @@ export default function LandingPage() {
                       <div className="mb-4 rounded-lg bg-surface-container-low p-3 text-left">
                         <p className="font-label-caps text-label-caps uppercase text-secondary">Customer-authored feedback</p>
                         <p className="mt-1 font-body-sm text-body-sm text-secondary">
-                          REVELY does not provide prewritten review suggestions.
+                          Revvly does not provide prewritten review suggestions.
                         </p>
                       </div>
 
@@ -285,7 +285,7 @@ export default function LandingPage() {
               <span className="font-label-caps text-label-caps uppercase text-primary tracking-wider block mb-2">Frictionless Feedback</span>
               <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">Getting customer reviews shouldn’t be complicated.</h2>
               <p className="font-body-lg text-body-lg text-secondary">
-                Most happy customers want to praise your staff, but hunting down your Google listing or facing a blank text box stops them. REVELY fixes both.
+                Most happy customers want to praise your staff, but hunting down your Google listing or facing a blank text box stops them. Revvly fixes both.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -311,7 +311,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-3">Remove the Blank Page</h3>
                 <p className="font-body-md text-body-md text-secondary leading-relaxed mb-6">
-                  Customers should describe their own experience. REVELY does not currently provide prewritten review prompts or a working public customer flow.
+                  Customers should describe their own experience. Revvly does not currently provide prewritten review prompts or a working public customer flow.
                 </p>
                 <div className="mt-auto pt-4 border-t border-surface-container flex items-center gap-2 font-label-md text-label-md text-tertiary">
                   <span className="material-symbols-outlined text-[18px]">thumb_up</span>
@@ -415,7 +415,7 @@ export default function LandingPage() {
                 <div>
                   <h4 className="font-headline-sm text-headline-sm text-on-surface font-bold">Customer submission</h4>
                   <p className="font-body-sm text-body-sm text-secondary">
-                    REVELY does not submit reviews on a customer&apos;s behalf or claim Google policy certification. Live QR use requires configured Supabase and the secure QR migration.
+                    Revvly does not submit reviews on a customer&apos;s behalf or claim Google policy certification. Live QR use requires configured Supabase and the secure QR migration.
                   </p>
                 </div>
               </div>
@@ -540,7 +540,7 @@ export default function LandingPage() {
                 <span className="font-label-caps text-label-caps uppercase text-primary tracking-wider block mb-2">Mobile Ergonomics</span>
                 <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">A Guided, Respectful Customer Journey</h2>
                 <p className="font-body-lg text-body-lg text-secondary mb-6">
-                  Guests don&apos;t like confusing forms. REVELY provides a fast, one-thumb interface that lets customers express what they genuinely appreciated without friction.
+                  Guests don&apos;t like confusing forms. Revvly provides a fast, one-thumb interface that lets customers express what they genuinely appreciated without friction.
                 </p>
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-center gap-3 font-body-md text-body-md text-on-surface">
@@ -645,9 +645,9 @@ export default function LandingPage() {
                     <span className="w-3 h-3 rounded-full bg-error/70"></span>
                     <span className="w-3 h-3 rounded-full bg-[#FBBC04]/70"></span>
                     <span className="w-3 h-3 rounded-full bg-tertiary/70"></span>
-                    <span className="font-mono text-body-sm text-body-sm text-secondary ml-3">revely.app/studio</span>
+                    <span className="font-mono text-body-sm text-body-sm text-secondary ml-3">Revvly.app/studio</span>
                   </div>
-                  <span className="font-label-caps text-label-caps text-secondary uppercase">REVELY Studio</span>
+                  <span className="font-label-caps text-label-caps text-secondary uppercase">Revvly Studio</span>
                 </div>
 
                 {/* Dashboard App Internal Layout */}
@@ -657,7 +657,7 @@ export default function LandingPage() {
                     <div className="space-y-6">
                       <div className="flex items-center gap-2 px-2">
                         <div className="w-7 h-7 rounded-md bg-primary-container flex items-center justify-center text-on-primary-container text-xs font-bold">R</div>
-                        <span className="font-headline-sm text-headline-sm text-on-surface font-extrabold">REVELY</span>
+                        <span className="font-headline-sm text-headline-sm text-on-surface font-extrabold">Revvly</span>
                       </div>
                       <nav className="space-y-1">
                         <Link className="flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-container text-primary font-label-md text-label-md font-semibold" href="/qr-studio">
@@ -862,11 +862,11 @@ export default function LandingPage() {
                 {/* FAQ item 1 */}
                 <details className="group bg-surface-container-lowest rounded-xl p-5 shadow-sm">
                   <summary className="flex items-center justify-between cursor-pointer list-none">
-                    <span className="font-headline-sm text-headline-sm text-on-surface font-bold">What is REVELY?</span>
+                    <span className="font-headline-sm text-headline-sm text-on-surface font-bold">What is Revvly?</span>
                     <span className="material-symbols-outlined text-secondary transition-transform group-open:rotate-180">expand_more</span>
                   </summary>
                   <div className="mt-4 pt-3 border-t border-surface-container font-body-md text-body-md text-secondary leading-relaxed">
-                    REVELY is a tool for designing high-conversion physical QR posters that direct customers straight to a business-selected review destination.
+                    Revvly is a tool for designing high-conversion physical QR posters that direct customers straight to a business-selected review destination.
                   </div>
                 </details>
 
@@ -888,18 +888,18 @@ export default function LandingPage() {
                     <span className="material-symbols-outlined text-secondary transition-transform group-open:rotate-180">expand_more</span>
                   </summary>
                   <div className="mt-4 pt-3 border-t border-surface-container font-body-md text-body-md text-secondary leading-relaxed">
-                    REVELY does not submit reviews. Customers choose whether to edit their own text and submit feedback directly through the external destination.
+                    Revvly does not submit reviews. Customers choose whether to edit their own text and submit feedback directly through the external destination.
                   </div>
                 </details>
 
                 {/* FAQ item 4 */}
                 <details className="group bg-surface-container-lowest rounded-xl p-5 shadow-sm">
                   <summary className="flex items-center justify-between cursor-pointer list-none">
-                    <span className="font-headline-sm text-headline-sm text-on-surface font-bold">Does REVELY automatically post reviews on Google?</span>
+                    <span className="font-headline-sm text-headline-sm text-on-surface font-bold">Does Revvly automatically post reviews on Google?</span>
                     <span className="material-symbols-outlined text-secondary transition-transform group-open:rotate-180">expand_more</span>
                   </summary>
                   <div className="mt-4 pt-3 border-t border-surface-container font-body-md text-body-md text-secondary leading-relaxed">
-                    REVELY does not submit reviews on a customer&apos;s behalf. Customers follow Google&apos;s policies and submit their own authentic reviews directly on Google.
+                    Revvly does not submit reviews on a customer&apos;s behalf. Customers follow Google&apos;s policies and submit their own authentic reviews directly on Google.
                   </div>
                 </details>
 
@@ -962,7 +962,7 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <span className="font-headline-sm text-headline-sm text-on-surface tracking-tight font-black">
-                  REVELY
+                  Revvly
                 </span>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">
@@ -1006,7 +1006,7 @@ export default function LandingPage() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-between pt-space-xl text-on-surface-variant border-t border-surface-container">
-            <p className="font-body-sm text-body-sm">© REVELY</p>
+            <p className="font-body-sm text-body-sm">© Revvly</p>
             <p className="font-body-sm text-body-sm flex items-center gap-space-xs mt-space-sm sm:mt-0">
               <span className="material-symbols-outlined text-[16px] text-tertiary-container">info</span>
               Independent prototype; not affiliated with Google

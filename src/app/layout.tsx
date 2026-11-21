@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'REVELY — Direct Google Review QR Posters',
+  title: 'Revvly — Direct Google Review QR Posters',
   description:
     'Create high-converting tabletop QR posters that connect customers directly to your Google Business Profile for real reviews.',
 };

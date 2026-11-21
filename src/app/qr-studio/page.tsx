@@ -910,7 +910,7 @@ function QRDesignStudioInner() {
         const origin =
           typeof window !== 'undefined' && window.location.origin
             ? window.location.origin
-            : process.env.NEXT_PUBLIC_APP_URL || 'https://revely.app';
+            : process.env.NEXT_PUBLIC_APP_URL || 'https://revvly.app';
 
         if (selectedQrToken) {
           targetUrl = `${origin}/qr/${encodeURIComponent(selectedQrToken)}`;
