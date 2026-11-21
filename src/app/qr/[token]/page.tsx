@@ -168,6 +168,35 @@ export default function CustomerReviewJourneyPage() {
     const loadPublicQr = async () => {
       try {
         setLoadError(null);
+
+        // Client-side decoding for guest guided review assistant tokens
+        if (token.startsWith('guest_')) {
+          try {
+            const raw = token.slice(6).replace(/-/g, '+').replace(/_/g, '/');
+            const padded = raw.padEnd(raw.length + ((4 - (raw.length % 4)) % 4), '=');
+            const jsonStr = decodeURIComponent(escape(atob(padded)));
+            const payload = JSON.parse(jsonStr);
+            if (payload.u && safeHttpsUrlSchema.safeParse(payload.u).success) {
+              if (cancelled) return;
+              setQrCode({
+                businessName: payload.n || 'Business',
+                city: payload.c || '',
+                googleReviewUrl: payload.u,
+                businessCategory: payload.cat || 'Business',
+                businessSubcategory: '',
+                headline: payload.h || 'Review us on Google',
+                tagline: payload.t || 'Scan to share your experience',
+                supportingText: '',
+                accentColor: payload.a || '#1A73E8',
+              });
+              setIsLoading(false);
+              return;
+            }
+          } catch (decodeErr) {
+            console.warn('Could not decode guest token, falling back to API lookup:', decodeErr);
+          }
+        }
+
         const response = await fetch(`/api/public/qr/${encodeURIComponent(token)}`);
         const result = await response.json();
         if (!response.ok || !result.qr) {

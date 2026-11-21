@@ -1,5 +1,8 @@
-import { redirect } from 'next/navigation';
+'use client';
 
-export default function CreateQrRedirect() {
-  redirect('/qr-studio?mode=create');
+// REVELY — Instant Public QR Design Studio
+import QRDesignStudioPage from '@/app/qr-studio/page';
+
+export default function CreateQrPage() {
+  return <QRDesignStudioPage />;
 }

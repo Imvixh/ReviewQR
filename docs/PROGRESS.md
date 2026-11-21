@@ -2,6 +2,161 @@
 
 Last updated: 2026-11-21
 
+## Public Creation Flow Streamlining & Guided QR Fix (2026-11-21)
+
+- **Removed Extraneous Top Bar UI**:
+  - Removed "REVELY workspace", "Business Dashboard" button, and "Sign In" button from the top of the creation page via `hideHeader={true}` in `DashboardShell`.
+  - Removed the `STEP 2 OF 3` badge from the "QR Design Studio" heading.
+  - Removed the touchpoint selector (`+ New Blank QR Design` dropdown) so no previous user QR history is shown.
+- **Fresh Slate on Every Page Visit**:
+  - Visiting the creation flow starts completely clean with blank fields.
+  - Does not pre-fill any names, cities, or links from previous user sessions in `localStorage`.
+- **4-Step Streamlined Navigation Flow**:
+  - **Step 1 (Branding)**: User fills business details and review link; clicking "Confirm destination & continue to QR editor" saves destination and moves to Step 2. Removed the extraneous "Save Studio Configuration" button that caused placement tag validation errors.
+  - **Step 2 (QR Code)**: Customize geometry and center emblem; button advances to Step 3.
+  - **Step 3 (Templates)**: Choose from 24+ presets or 7 custom colors; button advances to Step 4.
+  - **Step 4 (Copy & Export)**: Customize headlines and microcopy; shows prominent "Download PNG" and "Print / PDF" export actions after completing all four steps.
+  - Made `placementTag` optional (auto-defaults to business name or Tabletop Standee) so users are never blocked by placement tag errors.
+- **Fixed Guided QR Generation**:
+  - Resolved issue where Guided Review Assistant mode displayed "Guided QR is unavailable" or blank preview.
+  - Implemented client-side guest token generator (`guest_<base64url>`) encoding business details and review link.
+  - Customer review assistant (`/qr/[token]`) decodes guest tokens client-side, enabling full 3-step review assistant flow (5-star rating -> AI suggestions -> 1-tap Google handoff) without requiring prior cloud registration.
+  - Both Direct Google Review and Guided Review Assistant modes generate active, scannable QR codes immediately on screen and in exports.
+- **Verification Suite**:
+  - `npm run typecheck`: PASS (exit code 0)
+  - `npm run lint`: PASS (exit code 0)
+  - `npm test`: PASS (83/83 tests passed across 11 test files, exit code 0)
+  - `npm run build`: PASS (26 routes generated, exit code 0)
+
+- **100% Visual and Functional Restoration to Attached Reference Images**:
+  - Restored the exact original 2-column QR Design Studio layout matching the 4 user-supplied reference images (`media_1795263331397_c1f085ad.jpg`, `media_1795263331404_b36a033c.jpg`, `media_1795263331364_de656d86.png`, `media_1795263331323_e976fe22.png`).
+  - Top Bar: Full-width `REVELY workspace` header, Business Dashboard link, and user avatar / subtle sign-in.
+  - Studio Flow Bar: Palette badge, `QR Design Studio`, green `STEP 2 OF 3` badge, subtitle, `+ New Blank QR Design` touchpoint selector, `Print / Save PDF`, and solid blue `Download PNG` button.
+  - 4 Pill Tabs: `[Branding]` (Business & Identity, Manual Setup badge, Placement tag, Business Name, City/location, Review destination selector with Maps search/Paste link and verification checkbox, Category, Brand Crest / Logo upload, Venue Cover Photo upload, Poster Accent Palette, and Save Studio Configuration button).
+  - Tab 2: `[QR Code]` (QR Code Architecture, `LEVEL H (30% ECC)` badge, 4 Geometry options [Classic, Rounded, Dots, Premium Eye], Center Emblem options [Official Google G, Business Logo], and Save QR Architecture button).
+  - Tab 3: `[Templates]` (Display Poster Preset, `Explore 24+`, multi-row preset cards, plus preserved Phase 2 "Adjust Preset Colors" accordion with 7 independent color controls and reset options).
+  - Tab 4: `[Copy]` (Content & Microcopy: Primary Poster Headline, Call-to-Action Footer Text, Optional Supporting Text).
+  - Right Column Live Preview: Viewport toolbar (`Front View`, `Stand Mockup`, `- 100% +`, guidance message, fullscreen), green `• LIVE STAND PREVIEW` indicator, `BROWSER PREVIEW; PRINT RESOLUTION IS NOT CERTIFIED` disclaimer, Tabletop Acrylic Stand card (top gradient strip, `SHARE YOUR EXPERIENCE` pill, circular logo emblem, uppercase business name, location, high-res QR code with Google G emblem, `Review us on Google` headline, 5 yellow stars, scan camera button), and bottom `Download PNG Artwork` / `Print / Save PDF` action buttons.
+- **Zero Mandatory Login / Signup for Creation**:
+  - Visitors can design, preview, and download artwork without having an account or logging in.
+  - Guest logo and venue cover uploads operate client-side via `FileReader.readAsDataURL` without requiring Supabase storage or throwing 401 errors.
+  - Destination confirmation for guests persists locally to browser storage and enables immediate QR preview and export.
+  - Save buttons gracefully save to browser local storage when unauthenticated, with zero disruptive redirects to protected routes.
+- **Zero Advertisement Placeholders**: Removed all ad slots and advertisement placeholders across the studio and public flow.
+- **Consistent REVELY Branding & Protected Management Preservation**:
+  - Landing page (`/`) branded as **REVELY** with all CTAs routing directly to the public creator.
+  - `/admin` dashboard protected by strict `public.platform_super_admins` server-side check and native Supabase TOTP 2FA (`aal2`).
+  - All protected routes (`/dashboard`, `/analytics`, `/settings`, `/business-profile`, `/my-qr-codes`) remain securely protected by middleware.
+- **Automated Verification Suite**:
+  - `npm run typecheck`: PASS — 0 errors (exit code 0)
+  - `npm run lint`: PASS — 0 errors (exit code 0)
+  - `npm test`: PASS — 83/83 tests passed across 11 test files (exit code 0)
+  - `npm run build`: PASS — 26 routes generated successfully (exit code 0)
+
+| Latest check | Result |
+|---|---|
+| `npm run typecheck` | PASS — 0 errors (exit code 0) |
+| `npm run lint` | PASS — 0 errors (exit code 0) |
+| `npm test` | PASS — 83 tests across 11 files (exit code 0) |
+| `npm run build` | PASS — 26 routes generated successfully (exit code 0) |
+
+## Super Admin Dashboard & TOTP 2FA Implementation (2026-11-21)
+
+- **Strict Server-Side Super Admin Authorization**: Created `src/lib/auth/super-admin.ts` verifying authenticated user UUIDs strictly against `public.platform_super_admins` via service role lookup. Explicitly rejects authorization based on `profiles.role = 'admin'` to prevent privilege escalation from business owner accounts.
+- **Supabase Native TOTP Two-Factor Authentication (AAL2)**:
+  - Enforces Supabase Authenticator Assurance Level `aal2` before revealing any administrative data.
+  - Setup Flow (`/admin/setup-2fa`): Generates TOTP SVG QR code and text secret for Google Authenticator, Microsoft Authenticator, and 1Password; requires 6-digit challenge verification to complete enrollment.
+  - Challenge Flow (`/admin/verify-2fa`): Prompts enrolled Super Admins logging in with password (`aal1`) for their 6-digit TOTP code, upgrading session to `aal2`.
+  - Non-super-admins are met with a secure Access Denied (HTTP 403) screen without leaking platform data.
+- **Read-Only Super Admin Console (`/admin`)**:
+  - Displays platform governance metrics: total registered businesses, registered user accounts, active QR touchpoint posters, recorded physical scans, and Google review handoffs.
+  - Computes truthful handoff conversion rate (`(handoffs / scans) * 100`) without fabricating reviews or implying external Google submissions can be verified.
+  - Business directory with search filter and direct destination inspection.
+  - Recent physical touchpoint scan stream.
+  - Super admin account identity and MFA assurance status badge (`AAL2 Verified`).
+- **Protected Admin API Routes**:
+  - `/api/admin/overview`: Guarded by `getSuperAdminAuthContext()`, requiring `aal2` and `platform_super_admins` membership.
+  - `/api/admin/auth/status`: Exposes current authentication, super admin, and AAL level.
+- **Middleware & Route Protection**: Added `/admin` to `isProtectedRoute` in `src/middleware.ts` while preserving `redirectTo` destinations for existing login workflows.
+- **Automated Verification Suite**:
+  - `npm run typecheck`: PASS (exit code 0)
+  - `npm run lint`: PASS (exit code 0)
+  - `npm test`: PASS (83/83 tests passed across 11 test files, exit code 0)
+  - `npm run build`: PASS (26 static and dynamic routes compiled, exit code 0)
+
+| Latest check | Result |
+|---|---|
+| `npm run typecheck` | PASS — 0 errors (exit code 0) |
+| `npm run lint` | PASS — 0 errors (exit code 0) |
+| `npm test` | PASS — 83 tests across 11 files (exit code 0) |
+| `npm run build` | PASS — 26 routes generated successfully (exit code 0) |
+
+## Rebranding to REVELY & Public UI Cleanup (Stage 1) (2026-11-21)
+
+- **Brand Transition to REVELY**: Replaced customer-facing "ReviewQR" branding with **REVELY** across the public landing page (`src/app/page.tsx`), the public creator flow (`src/app/create-qr/page.tsx`), and document metadata (`src/app/layout.tsx`). Kept all internal database identifiers, repositories, environment variables, and package configurations stable.
+- **Removed Public Login / Signup Entrypoints**: Removed all "Log In", "Get Started Free", "Sign In", "Sign Up", and account creation buttons and links from the public landing page and the guest creation experience.
+- **Unified Public Call to Action**: Set the primary call-to-action on the landing page and creator headers to **"Create Your QR"**, routing directly to the distraction-free `/create-qr` flow.
+- **Client-Side Guest Experience**: Emphasized 100% client-side QR generation and direct Google review link encoding with zero account requirements, zero cloud storage fabrication, and zero redirects.
+- **Preserved Backend & Auth Infrastructure**: Maintained all authentication logic, Supabase SSR client configurations, route protection in middleware, and existing APIs intact for authenticated users and future Super Admin administration.
+- **Verified Suite**:
+  - `npm run typecheck`: PASS (exit code 0)
+  - `npm run lint`: PASS (exit code 0)
+  - `npm test`: PASS (73/73 tests passed, exit code 0)
+  - `npm run build`: PASS (22 static & dynamic routes compiled, exit code 0)
+
+| Latest check | Result |
+|---|---|
+| `npm run typecheck` | PASS — 0 errors (exit code 0) |
+| `npm run lint` | PASS — 0 errors (exit code 0) |
+| `npm test` | PASS — 73 tests across 10 files (exit code 0) |
+| `npm run build` | PASS — 22 routes generated successfully (exit code 0) |
+
+## Phase 3: Public QR Creation Experience & AdSense-Ready Layout (2026-11-21)
+
+- **Authorized Middleware Exemption**: Modified `src/middleware.ts` to remove `/create-qr` from `isProtectedRoute`, making the public QR creation flow immediately accessible to unauthenticated guests without mandatory login, while keeping all management and dashboard routes (`/dashboard`, `/qr-studio`, `/my-qr-codes`, `/analytics`, `/settings`, `/business-profile`) strictly protected.
+- **Distraction-Free Public Creation Shell**: Replaced the redirect in `src/app/create-qr/page.tsx` with a clean, dedicated public creation interface. Eliminated the dashboard sidebar, workspace prototype badges, profile dropdown, and logout buttons, replacing them with a minimal ReviewQR top bar, stepper indicator, and subtle "Log in" link for registered users.
+- **Guided 3-Step Creation Sequence**:
+  - *Step 1: Business & Review Link*: Input fields for business name, location, searchable business category (including custom categories & hotel subcategories), and direct Google review link or Google Maps search query with client-side HTTPS validation.
+  - *Step 2: Preset Styles & Color Palette*: 21 poster presets grid plus the full Phase 2 "Adjust Preset Colors" accordion with 7 independent color pickers, hex inputs, swatch pills, per-control reset, and relative luminance contrast warnings.
+  - *Step 3: QR Geometry & Microcopy*: Module geometry selection (Classic, Rounded, Dots, Premium-Eye), custom headline, CTA footer microcopy, optional supporting text, live stand preview (front/mockup, zoom controls), and immediate 2x PNG artwork download and PDF print.
+- **Client-Side Guest Generation & Zero False Persistence**: Direct review QR codes are generated client-side via `generateQrSvg` with zero required database persistence or login wall. Honest messaging informs visitors that the QR is generated in their browser and offers an optional account upgrade for scan analytics and AI review assistance without fabricating cloud storage.
+- **AdSense-Ready Responsive Layout**: Added a clearly demarcated advertisement section below the primary interactive creation workflow, fully isolated from buttons and previews, with zero unapproved third-party scripts or deceptive elements.
+- **Strict Boundary Preservation**: Confirmed zero modifications to the landing page (`src/app/page.tsx`), API routes, database schemas, SQL migrations, or Supabase configurations.
+
+| Latest check | Result |
+|---|---|
+| `npm run typecheck` | PASS — 0 errors (exit code 0) |
+| `npm run lint` | PASS — 0 errors (exit code 0) |
+| `npm test` | PASS — 73 tests across 10 files (exit code 0) |
+| `npm run build` | PASS — 22 routes generated successfully (exit code 0) |
+
+
+
+## Phase 2: Template Color Controls & Live Stand Preview (2026-11-21)
+
+- **Independent Custom Color Controls**: Added a collapsible accordion section named **"Adjust Preset Colors"** within `src/app/qr-studio/page.tsx` with 7 independent color pickers and hex inputs:
+  1. Poster background (`posterBg`)
+  2. QR code modules and finder patterns (`qrColor`)
+  3. Main heading and business name (`businessNameColor`)
+  4. "Scan to share your experience" text (`ctaTextColor`)
+  5. "Review us on Google" text (`headlineColor`)
+  6. Star rating icons (`starsColor`)
+  7. CTA/button background (`ctaBgColor`)
+- **Independent Expansion & Controls**: Each color item expands/collapses independently, includes active color swatch preview, uppercase hex text input, preset default indicator, and an individual reset button. Header provides "Expand All / Collapse All" toggle and a global "Reset Colors" button.
+- **Preset Switching & State Reset**: Selecting any poster preset instantly renders that preset's default palette and resets custom color overrides (`customColors: {}`).
+- **Live Stand Preview Integration**: Bound inline styles to the live stand preview container (`posterRef`), business heading, details, headline, 5-star rating icons, and CTA button/text for instant feedback on every edit.
+- **QR Contrast Safeguard**: Calculated relative luminance for `qrColor`; surfaces a prominent warning notice when low contrast against the white central QR card could impair smartphone scanning.
+- **Export & Print Consistency**: Updated `handleDownloadPNG` and `posterRef` inline styles so downloaded PNG artwork and printed PDF copies reflect all custom colors.
+- **Strict Boundary Preservation**: Confirmed zero changes to the landing page (`src/app/page.tsx`), database schemas, SQL migrations, API routes, or backend/Supabase configurations.
+
+| Latest check | Result |
+|---|---|
+| `npm run typecheck` | PASS — 0 errors |
+| `npm run lint` | PASS — 0 errors |
+| `npm test` | PASS — 73 tests across 10 files |
+| `npm run build` | PASS — 22 routes generated successfully |
+
+
 ## Gemini AI Latency Optimization & Client In-Flight Cancellation (2026-11-21)
 
 - **Google Gemini API Integration**: Migrated the server-side AI review recommendation engine from throttled OpenRouter free models to Google's Gemini API (`gemini-3.5-flash-lite` with graceful fallback to `gemini-flash-lite-latest`), reducing customer-visible latency by ~88% (from >10s down to a median of 1,173ms, min 778ms).

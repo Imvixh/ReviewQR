@@ -91,6 +91,43 @@ function QRDesignStudioInner() {
   // Display Poster Preset (Image 2)
   const [selectedPreset, setSelectedPreset] = useState('google-classic');
 
+  // Independent Custom Color Overrides (Phase 2)
+  const [customColors, setCustomColors] = useState<{
+    posterBg?: string;
+    qrColor?: string;
+    businessNameColor?: string;
+    ctaTextColor?: string;
+    headlineColor?: string;
+    starsColor?: string;
+    ctaBgColor?: string;
+  }>({});
+
+  const [expandedColorKeys, setExpandedColorKeys] = useState<Record<string, boolean>>({
+    posterBg: false,
+    qrColor: false,
+    businessNameColor: false,
+    ctaTextColor: false,
+    headlineColor: false,
+    starsColor: false,
+    ctaBgColor: false,
+  });
+
+  const toggleColorKey = (key: string) => {
+    setExpandedColorKeys((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const setAllColorKeys = (open: boolean) => {
+    setExpandedColorKeys({
+      posterBg: open,
+      qrColor: open,
+      businessNameColor: open,
+      ctaTextColor: open,
+      headlineColor: open,
+      starsColor: open,
+      ctaBgColor: open,
+    });
+  };
+
   // Copywriting & Content
   const [headline, setHeadline] = useState('Review us on Google');
   const [ctaText, setCtaText] = useState('Scan to share your experience');
@@ -112,11 +149,36 @@ function QRDesignStudioInner() {
   );
   const isDestinationSaved =
     Boolean(savedDestinationUrl) && savedDestinationUrl === googleReviewUrl.trim();
-  const canPreviewQr =
-    hasConfirmedDestination &&
-    destinationValidation.valid &&
-    (isDestinationSaved || qrMode === 'direct');
-  const mapsSearchUrl = buildGoogleMapsSearchUrl(businessName, location);
+  const canPreviewQr = destinationValidation.valid;
+  const createGuestToken = (name: string, city: string, url: string, cat?: string, accent?: string) => {
+    try {
+      const payload = {
+        n: name.trim() || 'Business',
+        c: city.trim(),
+        u: url.trim(),
+        cat: cat || '',
+        a: accent || '#1A73E8',
+      };
+      const json = JSON.stringify(payload);
+      const b64 = btoa(unescape(encodeURIComponent(json)))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+      return `guest_${b64}`;
+    } catch {
+      return '';
+    }
+  };
+  const activeMapsSearchUrl = useMemo(() => {
+    const name = businessName.trim();
+    const loc = location.trim();
+    const query = [name, loc].filter(Boolean).join(' ');
+    if (query) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    }
+    return 'https://www.google.com/maps';
+  }, [businessName, location]);
+  const mapsSearchUrl = buildGoogleMapsSearchUrl(businessName, location) || activeMapsSearchUrl;
   const selectedQr = qrList.find((qr) => qr.id === selectedQrId);
   const selectedQrToken = selectedQr?.publicToken || '';
 
@@ -657,10 +719,7 @@ function QRDesignStudioInner() {
       });
     };
 
-    const loadedOrg = getStoredOrg();
-    setOrg(loadedOrg);
-
-    // In create mode: reset all QR and business form fields to blank
+    // In create mode: reset all QR and business form fields to blank — clean fresh start on every visit
     if (isCreateMode) {
       setSelectedQrId('');
       setPlacementTag('');
@@ -671,15 +730,24 @@ function QRDesignStudioInner() {
       setSelectedPreset('google-classic');
       setGeometry('rounded');
       setCenterEmblem('google-g');
-      // Clear business form fields — user starts fresh
       setBusinessName('');
       setLocation('');
+      setCategory('');
+      setCustomCategory('');
+      setSubcategory('');
       setGoogleReviewUrl('');
       setSavedDestinationUrl('');
       setHasConfirmedDestination(false);
       setLogoUrl('');
       setThumbnailUrl('');
+      setOrg(null);
+      setQrList([]);
+      setIsLoadingDestination(false);
+      return;
     }
+
+    const loadedOrg = getStoredOrg();
+    setOrg(loadedOrg);
 
     if (isEditMode) {
       const savedCategory = categorySelectionForSavedValue(loadedOrg.category);
@@ -726,6 +794,38 @@ function QRDesignStudioInner() {
           destinationResponse.json(),
           qrResponse.json(),
         ]);
+        if (destinationResponse.status === 401 || qrResponse.status === 401) {
+          // Unauthenticated guest user: load from local storage if available, don't show error banner
+          const loadedOrg = getStoredOrg();
+          if (loadedOrg) {
+            setOrg(loadedOrg);
+            if (loadedOrg.name) setBusinessName(loadedOrg.name);
+            if (loadedOrg.city) setLocation(loadedOrg.city);
+            const savedCategory = categorySelectionForSavedValue(loadedOrg.category);
+            setCategory(savedCategory.selection);
+            setCustomCategory(savedCategory.customCategory);
+            setSubcategory(loadedOrg.subcategory || '');
+            if (loadedOrg.accentColor) setAccentColor(loadedOrg.accentColor);
+            if (loadedOrg.logoUrl) setLogoUrl(loadedOrg.logoUrl);
+            if (loadedOrg.googleReviewUrl) {
+              setGoogleReviewUrl(loadedOrg.googleReviewUrl);
+              setSavedDestinationUrl(loadedOrg.googleReviewUrl);
+              setHasConfirmedDestination(true);
+            }
+          }
+          const localQrs = getStoredQRCodes();
+          setQrList(localQrs);
+          if (isEditMode) {
+            const target = localQrs.find((q) => q.id === editQrId);
+            if (target) applyQrToState(target);
+          }
+          if (!cancelled) {
+            setIsLoadingDestination(false);
+            setDestinationMessage(null);
+          }
+          return;
+        }
+
         if (!destinationResponse.ok) {
           throw new Error(
             destinationResult.message || 'Could not load the saved review destination. Sign in and try again.'
@@ -778,20 +878,7 @@ function QRDesignStudioInner() {
 
   // Both the preview and exports use this resolved destination.
   useEffect(() => {
-    if (qrMode === 'guided') {
-      const publicOrigin = resolvePublicAppOrigin(
-        process.env.NEXT_PUBLIC_APP_URL,
-        window.location.origin
-      );
-      if (!publicOrigin.ok) {
-        setRealQrDataUrl('');
-        setGeneratedQrTarget(null);
-        setQrGenerationMessage(publicOrigin.message);
-        return;
-      }
-    }
-
-    if (!canPreviewQr || !destinationValidation.valid) {
+    if (!destinationValidation.valid) {
       setRealQrDataUrl('');
       setGeneratedQrTarget(null);
       setQrGenerationMessage(null);
@@ -799,27 +886,38 @@ function QRDesignStudioInner() {
     }
 
     try {
-      const target = resolveQrDestination(
-        qrMode,
-        destinationValidation.url,
-        selectedQrToken || undefined,
-        process.env.NEXT_PUBLIC_APP_URL,
-        window.location.origin
-      );
-      if (!target.ok) {
-        setRealQrDataUrl('');
-        setGeneratedQrTarget(null);
-        setQrGenerationMessage(target.message);
-        return;
+      let targetUrl = '';
+      if (qrMode === 'direct') {
+        targetUrl = destinationValidation.url;
+      } else {
+        // Guided Review Assistant mode: encode guest token if not yet saved in cloud
+        const origin =
+          typeof window !== 'undefined' && window.location.origin
+            ? window.location.origin
+            : process.env.NEXT_PUBLIC_APP_URL || 'https://revely.app';
+
+        if (selectedQrToken) {
+          targetUrl = `${origin}/qr/${encodeURIComponent(selectedQrToken)}`;
+        } else {
+          const gToken = createGuestToken(
+            businessName,
+            location,
+            destinationValidation.url,
+            categoryValue,
+            accentColor
+          );
+          targetUrl = `${origin}/qr/${encodeURIComponent(gToken)}`;
+        }
       }
+
       setRealQrDataUrl(
         generateQrSvg(
-          target.url,
+          targetUrl,
           geometry,
-          currentPresetData.finderColor
+          customColors.qrColor || currentPresetData.finderColor
         )
       );
-      setGeneratedQrTarget(target.url);
+      setGeneratedQrTarget(targetUrl);
       setQrGenerationMessage(null);
     } catch (error) {
       console.error('Failed to generate preview QR:', error);
@@ -830,16 +928,173 @@ function QRDesignStudioInner() {
   }, [
     destinationValidation,
     canPreviewQr,
+    customColors.qrColor,
     currentPresetData.finderColor,
     geometry,
     qrMode,
     selectedQrToken,
+    businessName,
+    location,
+    categoryValue,
+    accentColor,
   ]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
+
+  const isQrContrastLow = useMemo(() => {
+    const raw = (customColors.qrColor || currentPresetData.finderColor || '#0B1C30').replace('#', '');
+    if (raw.length !== 6) return false;
+    const r = parseInt(raw.slice(0, 2), 16) / 255;
+    const g = parseInt(raw.slice(2, 4), 16) / 255;
+    const b = parseInt(raw.slice(4, 6), 16) / 255;
+    const toLinear = (v: number) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4));
+    const lum = 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+    return lum > 0.65;
+  }, [customColors.qrColor, currentPresetData.finderColor]);
+
+  const updateCustomColor = (key: string, newColor: string) => {
+    let formatted = newColor.trim();
+    if (formatted && !formatted.startsWith('#')) formatted = `#${formatted}`;
+    setCustomColors((prev) => ({ ...prev, [key]: formatted }));
+    if (key === 'ctaBgColor') {
+      setAccentColor(formatted);
+    }
+  };
+
+  const resetSingleColor = (key: string) => {
+    setCustomColors((prev) => {
+      const copy = { ...prev };
+      delete (copy as Record<string, unknown>)[key];
+      return copy;
+    });
+    if (key === 'ctaBgColor') {
+      setAccentColor(currentPresetData.defaultAccent);
+    }
+  };
+
+  const handleResetColors = () => {
+    setCustomColors({});
+    setAccentColor(currentPresetData.defaultAccent);
+    showToast(`Restored ${currentPresetData.name} default palette`);
+  };
+
+  type CustomColorKey =
+    | 'posterBg'
+    | 'qrColor'
+    | 'businessNameColor'
+    | 'ctaTextColor'
+    | 'headlineColor'
+    | 'starsColor'
+    | 'ctaBgColor';
+
+  interface ColorControlConfig {
+    key: CustomColorKey;
+    label: string;
+    description: string;
+    defaultHex: string;
+    popularSwatches: string[];
+  }
+
+  const colorControls: ColorControlConfig[] = useMemo(
+    () => [
+      {
+        key: 'posterBg',
+        label: 'Poster Background',
+        description: 'Background color of the physical tent poster card',
+        defaultHex: currentPresetData.bgHex || '#ffffff',
+        popularSwatches: [
+          currentPresetData.bgHex || '#ffffff',
+          '#ffffff',
+          '#0F172A',
+          '#18181B',
+          '#FFFDF5',
+          '#F0FDF4',
+          '#EFF4FF',
+          '#0E7490',
+        ],
+      },
+      {
+        key: 'qrColor',
+        label: 'QR Code Modules & Finder Patterns',
+        description: 'Color of QR pattern modules and finder corners',
+        defaultHex: currentPresetData.finderColor || '#0B1C30',
+        popularSwatches: [
+          currentPresetData.finderColor || '#0B1C30',
+          '#0B1C30',
+          '#1A73E8',
+          '#0F172A',
+          '#D97706',
+          '#059669',
+          '#7C3AED',
+          '#EA4335',
+        ],
+      },
+      {
+        key: 'businessNameColor',
+        label: 'Main Heading & Business Name',
+        description: 'Business title and location/category details',
+        defaultHex: currentPresetData.textHex || '#0B1C30',
+        popularSwatches: [
+          currentPresetData.textHex || '#0B1C30',
+          '#0B1C30',
+          '#ffffff',
+          '#78350F',
+          '#064E3B',
+          '#1E293B',
+          '#1A73E8',
+        ],
+      },
+      {
+        key: 'ctaTextColor',
+        label: '“Scan to share your experience” Text',
+        description: 'CTA button label and camera icon color',
+        defaultHex: '#FFFFFF',
+        popularSwatches: ['#FFFFFF', '#0B1C30', '#0F172A', '#F8FAFC', '#FEF3C7', '#1A73E8'],
+      },
+      {
+        key: 'headlineColor',
+        label: '“Review us on Google” Text',
+        description: 'Primary customer callout headline above the stars',
+        defaultHex: currentPresetData.textHex || '#0B1C30',
+        popularSwatches: [
+          currentPresetData.textHex || '#0B1C30',
+          '#0B1C30',
+          '#ffffff',
+          '#1A73E8',
+          '#78350F',
+          '#064E3B',
+          '#D97706',
+        ],
+      },
+      {
+        key: 'starsColor',
+        label: 'Star Rating Icons',
+        description: 'Color of the 5-star rating icons',
+        defaultHex: '#FBBC04',
+        popularSwatches: ['#FBBC04', '#F59E0B', '#F97316', '#EA4335', '#1A73E8', '#34A853', '#FFFFFF'],
+      },
+      {
+        key: 'ctaBgColor',
+        label: 'CTA Button Background',
+        description: 'Background fill of the scan action pill/button',
+        defaultHex: currentPresetData.defaultAccent || '#1A73E8',
+        popularSwatches: [
+          currentPresetData.defaultAccent || '#1A73E8',
+          '#1A73E8',
+          '#0B1C30',
+          '#34A853',
+          '#D97706',
+          '#EA4335',
+          '#7C3AED',
+          '#0F172A',
+        ],
+      },
+    ],
+    [currentPresetData]
+  );
 
   const handleTouchpointChange = (qrId: string) => {
     setSelectedQrId(qrId);
@@ -865,10 +1120,11 @@ function QRDesignStudioInner() {
     let formatted = newColor.trim();
     if (!formatted.startsWith('#')) formatted = `#${formatted}`;
     setAccentColor(formatted);
+    setCustomColors((prev) => ({ ...prev, ctaBgColor: formatted }));
   };
 
-  const handleFinderColorChange = (_newColor: string) => {
-    // QR color is controlled by preset only; this handler is kept for type-safety
+  const handleFinderColorChange = (newColor: string) => {
+    updateCustomColor('qrColor', newColor);
   };
 
   const handleConfirmDestination = async () => {
@@ -891,13 +1147,6 @@ function QRDesignStudioInner() {
       });
       return;
     }
-    if (!isSupabaseConfigured && qrMode !== 'direct') {
-      setDestinationMessage({
-        type: 'error',
-        text: 'Guided Review Assistant mode requires an authenticated Supabase account. Choose Direct Google Review to create a standalone QR without cloud persistence.',
-      });
-      return;
-    }
     if (!isSupabaseConfigured) {
       const localOrg = setStoredOrg({
         id: org?.id || crypto.randomUUID(),
@@ -915,7 +1164,7 @@ function QRDesignStudioInner() {
       setHasConfirmedDestination(true);
       setDestinationMessage({
         type: 'success',
-        text: 'Review destination saved in this browser. The direct QR can be scanned from any device.',
+        text: 'Review destination confirmed. Your QR code is ready to customize.',
       });
       setActiveTab('qrstyle');
       return;
@@ -944,6 +1193,30 @@ function QRDesignStudioInner() {
         }),
       });
       const result = await response.json();
+      if (response.status === 401) {
+        // Guest user: save locally to browser storage
+        const localOrg = setStoredOrg({
+          id: org?.id || crypto.randomUUID(),
+          name: businessName.trim(),
+          category: categoryValue,
+          subcategory,
+          city: location.trim(),
+          googleReviewUrl: destinationValidation.url,
+          accentColor,
+          logoUrl,
+        });
+        setOrg(localOrg);
+        setGoogleReviewUrl(destinationValidation.url);
+        setSavedDestinationUrl(destinationValidation.url);
+        setHasConfirmedDestination(true);
+        setDestinationMessage({
+          type: 'success',
+          text: 'Review destination confirmed. Your QR code is ready to preview and export.',
+        });
+        setActiveTab('qrstyle');
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(
           result.message || 'Could not save this destination. Check your connection and try again.'
@@ -1005,13 +1278,27 @@ function QRDesignStudioInner() {
     setIsUploadingLogo(true);
     setLogoName(file.name);
 
+    const applyLocalLogo = () => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string;
+        setLogoUrl(dataUrl);
+        setStoredOrg({ logoUrl: dataUrl });
+        showToast('Logo applied to stand artwork.');
+      };
+      reader.readAsDataURL(file);
+    };
+
     try {
+      if (!org?.id) {
+        applyLocalLogo();
+        setIsUploadingLogo(false);
+        return;
+      }
+
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', 'logo');
-      if (!org?.id) {
-        throw new Error('Save your business review destination before uploading a logo.');
-      }
       formData.append('orgId', org.id);
 
       const res = await fetch('/api/business/upload', {
@@ -1019,15 +1306,23 @@ function QRDesignStudioInner() {
         body: formData,
       });
 
+      if (res.status === 401) {
+        applyLocalLogo();
+        setIsUploadingLogo(false);
+        return;
+      }
+
       const data = await res.json();
       if (!res.ok || !data.success || !data.url) {
-        throw new Error(data.message || data.code || 'Logo upload failed.');
+        applyLocalLogo();
+        setIsUploadingLogo(false);
+        return;
       }
       setLogoUrl(data.url);
       setStoredOrg({ logoUrl: data.url, logoPath: data.path });
       showToast('Logo uploaded and applied to stand artwork.');
-    } catch (error) {
-      showToast(error instanceof Error ? error.message : 'Logo upload failed.');
+    } catch {
+      applyLocalLogo();
     } finally {
       setIsUploadingLogo(false);
     }
@@ -1042,7 +1337,7 @@ function QRDesignStudioInner() {
           `/api/business/upload?orgId=${encodeURIComponent(org.id)}&type=logo`,
           { method: 'DELETE' }
         );
-        if (!res.ok) {
+        if (!res.ok && res.status !== 401) {
           const data = await res.json();
           throw new Error(data.message || data.code || 'Logo removal failed.');
         }
@@ -1077,13 +1372,27 @@ function QRDesignStudioInner() {
     setIsUploadingThumbnail(true);
     setThumbnailName(file.name);
 
+    const applyLocalThumbnail = () => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string;
+        setThumbnailUrl(dataUrl);
+        setStoredOrg({ thumbnailUrl: dataUrl });
+        showToast('Venue cover photo applied.');
+      };
+      reader.readAsDataURL(file);
+    };
+
     try {
+      if (!org?.id) {
+        applyLocalThumbnail();
+        setIsUploadingThumbnail(false);
+        return;
+      }
+
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', 'thumbnail');
-      if (!org?.id) {
-        throw new Error('Save your business review destination before uploading a cover image.');
-      }
       formData.append('orgId', org.id);
 
       const res = await fetch('/api/business/upload', {
@@ -1091,15 +1400,23 @@ function QRDesignStudioInner() {
         body: formData,
       });
 
+      if (res.status === 401) {
+        applyLocalThumbnail();
+        setIsUploadingThumbnail(false);
+        return;
+      }
+
       const data = await res.json();
       if (!res.ok || !data.success || !data.url) {
-        throw new Error(data.message || data.code || 'Cover image upload failed.');
+        applyLocalThumbnail();
+        setIsUploadingThumbnail(false);
+        return;
       }
       setThumbnailUrl(data.url);
       setStoredOrg({ thumbnailUrl: data.url, thumbnailPath: data.path });
       showToast('Venue cover photo uploaded successfully.');
-    } catch (error) {
-      showToast(error instanceof Error ? error.message : 'Cover image upload failed.');
+    } catch {
+      applyLocalThumbnail();
     } finally {
       setIsUploadingThumbnail(false);
     }
@@ -1126,26 +1443,24 @@ function QRDesignStudioInner() {
       setActiveTab('branding');
       return;
     }
-    if (!businessName.trim() || !placementTag.trim()) {
-      showToast('Enter a business name and placement tag before saving the QR design.');
+    const effectivePlacementTag = placementTag.trim() || businessName.trim() || 'Tabletop Standee';
+    if (!businessName.trim()) {
+      showToast('Enter a business name before saving the QR design.');
       setActiveTab('branding');
       return;
     }
     setIsSavingQr(true);
     try {
       if (!isSupabaseConfigured) {
-        if (qrMode !== 'direct') {
-          throw new Error('Guided Review Assistant QR codes require Supabase and a public HTTPS app URL.');
-        }
         const savedQr = saveQRCode({
           id: selectedQrId || undefined,
           orgId: org?.id || 'local-business',
           slug: selectedQr?.slug || crypto.randomUUID(),
           businessName: businessName.trim(),
           destinationUrl: destinationValidation.url,
-          destinationMode: 'direct',
-          placementName: placementTag.trim(),
-          placementType: placementTag.trim(),
+          destinationMode: qrMode,
+          placementName: effectivePlacementTag,
+          placementType: effectivePlacementTag,
           headline,
           tagline: ctaText,
           supportingText,
@@ -1191,6 +1506,43 @@ function QRDesignStudioInner() {
         }),
       });
       const result = await response.json();
+      if (response.status === 401) {
+        // Guest user: save locally to browser storage
+        const savedQr = saveQRCode({
+          id: selectedQrId || undefined,
+          orgId: org?.id || 'guest-business',
+          slug: selectedQr?.slug || crypto.randomUUID(),
+          businessName: businessName.trim(),
+          destinationUrl: destinationValidation.url,
+          destinationMode: qrMode,
+          placementName: placementTag.trim(),
+          placementType: placementTag.trim(),
+          headline,
+          tagline: ctaText,
+          supportingText,
+          accentColor,
+          currentTemplate: selectedPreset,
+          preset: selectedPreset,
+          geometry,
+          centerEmblem,
+          status: 'active',
+        });
+        setQrList((current) => [savedQr, ...current.filter((qr) => qr.id !== savedQr.id)]);
+        setSelectedQrId(savedQr.id);
+        setStoredOrg({
+          id: savedQr.orgId,
+          name: businessName.trim(),
+          category: categoryValue,
+          subcategory,
+          city: location.trim(),
+          googleReviewUrl: destinationValidation.url,
+          accentColor,
+          logoUrl,
+        });
+        showToast('QR design saved in your browser. Ready to export PNG or print PDF!');
+        return;
+      }
+
       if (!response.ok || !result.qr) {
         throw new Error(result.message || result.code || 'Could not save this QR design.');
       }
@@ -1222,19 +1574,8 @@ function QRDesignStudioInner() {
   };
 
   const handleDownloadPNG = () => {
-    if (!canPreviewQr || !destinationValidation.valid || !realQrDataUrl) {
-      showToast('Confirm a valid destination before exporting the poster.');
-      return;
-    }
-    const target = resolveQrDestination(
-      qrMode,
-      destinationValidation.url,
-      selectedQrToken || undefined,
-      process.env.NEXT_PUBLIC_APP_URL,
-      window.location.origin
-    );
-    if (!target.ok || target.url !== generatedQrTarget) {
-      showToast(target.ok ? 'The QR preview is updating. Try the export again.' : target.message);
+    if (!destinationValidation.valid || !realQrDataUrl || !generatedQrTarget) {
+      showToast('Enter a valid destination before exporting the poster.');
       return;
     }
 
@@ -1254,10 +1595,16 @@ function QRDesignStudioInner() {
           return entities[character];
         });
 
-      // Use actual hex values from the preset (not Tailwind classes)
-      const bgHex = currentPresetData.bgHex || '#ffffff';
-      const textHex = currentPresetData.textHex || '#0B1C30';
-      const subtitleHex = currentPresetData.subtitleHex || '#565E74';
+      // Use actual hex values with custom overrides taking precedence over preset defaults
+      const bgHex = customColors.posterBg || currentPresetData.bgHex || '#ffffff';
+      const textHex = customColors.businessNameColor || currentPresetData.textHex || '#0B1C30';
+      const subtitleHex = customColors.businessNameColor
+        ? customColors.businessNameColor
+        : (currentPresetData.subtitleHex || '#565E74');
+      const headlineColor = customColors.headlineColor || currentPresetData.textHex || '#0B1C30';
+      const starsColor = customColors.starsColor || '#FBBC04';
+      const ctaBgColor = customColors.ctaBgColor || accentColor || currentPresetData.defaultAccent;
+      const ctaTextColor = customColors.ctaTextColor || '#FFFFFF';
 
       const starPoints = (cx: number, cy: number, rOut = 11, rIn = 5) => {
         const points: string[] = [];
@@ -1270,7 +1617,7 @@ function QRDesignStudioInner() {
       };
 
       const starsSvg = [236, 268, 300, 332, 364]
-        .map((cx) => `<polygon points="${starPoints(cx, 612)}" fill="#FBBC04"/>`)
+        .map((cx) => `<polygon points="${starPoints(cx, 612)}" fill="${starsColor}"/>`)
         .join('');
 
       const ctaY = supportingText.trim() ? 675 : 655;
@@ -1328,16 +1675,16 @@ function QRDesignStudioInner() {
           }
 
           <!-- Headline & Stars -->
-          <text x="300" y="580" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="700" font-size="22" fill="${textHex}">${escapeXml(headline)}</text>
+          <text x="300" y="580" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="700" font-size="22" fill="${headlineColor}">${escapeXml(headline)}</text>
           ${starsSvg}
           ${supportingText.trim() ? `<text x="300" y="646" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="${subtitleHex}">${escapeXml(supportingText.trim())}</text>` : ''}
 
           <!-- CTA Box (Scan to share your experience) -->
-          <rect x="90" y="${ctaY}" width="420" height="52" rx="14" fill="${accentColor}"/>
+          <rect x="90" y="${ctaY}" width="420" height="52" rx="14" fill="${ctaBgColor}"/>
           <g transform="translate(142, ${ctaY + 16}) scale(0.85)">
-            <path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" fill="#FFFFFF"/>
+            <path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 3a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" fill="${ctaTextColor}"/>
           </g>
-          <text x="310" y="${ctaY + 32}" text-anchor="middle" font-family="Inter, sans-serif" font-weight="600" font-size="15" fill="#FFFFFF">${escapeXml(ctaText)}</text>
+          <text x="310" y="${ctaY + 32}" text-anchor="middle" font-family="Inter, sans-serif" font-weight="600" font-size="15" fill="${ctaTextColor}">${escapeXml(ctaText)}</text>
         </svg>
       `;
       const svgUrl = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
@@ -1375,26 +1722,15 @@ function QRDesignStudioInner() {
   };
 
   const handleExportPDF = () => {
-    if (!canPreviewQr || !destinationValidation.valid || !realQrDataUrl) {
-      showToast('Confirm a valid destination before printing the poster.');
-      return;
-    }
-    const target = resolveQrDestination(
-      qrMode,
-      destinationValidation.url,
-      selectedQrToken || undefined,
-      process.env.NEXT_PUBLIC_APP_URL,
-      window.location.origin
-    );
-    if (!target.ok || target.url !== generatedQrTarget) {
-      showToast(target.ok ? 'The QR preview is updating. Try printing again.' : target.message);
+    if (!destinationValidation.valid || !realQrDataUrl || !generatedQrTarget) {
+      showToast('Enter a valid destination before printing the poster.');
       return;
     }
     window.print();
   };
 
   return (
-    <DashboardShell>
+    <DashboardShell hideSidebar={true} hideHeader={true}>
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-[#0B1C30] text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce border border-slate-700">
@@ -1422,7 +1758,7 @@ function QRDesignStudioInner() {
       />
 
       <div className="flex flex-col w-full min-h-screen">
-        {/* Top Studio Context Header / Flow Bar (Image 1) */}
+        {/* Top Studio Context Header */}
         <div className="px-6 py-4 bg-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#D8E2FF] flex items-center justify-center text-[#005BBF]">
@@ -1431,9 +1767,6 @@ function QRDesignStudioInner() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-lg text-[#0B1C30] tracking-tight">QR Design Studio</span>
-                <span className="px-2 py-0.5 rounded-full bg-[#89FA9B]/30 text-[#002108] text-[10px] uppercase font-bold tracking-wider">
-                  Step 2 of 3
-                </span>
               </div>
               <p className="text-xs text-[#565E74]">
                 Live visual customizer for counter displays, table tents, and print standees
@@ -1441,33 +1774,8 @@ function QRDesignStudioInner() {
             </div>
           </div>
 
-          {/* Right Action Suite (Image 1) */}
+          {/* Right Action Suite */}
           <div className="flex items-center gap-2.5 flex-wrap">
-            {/* Touchpoint Placement Selector */}
-            <select
-              className="h-10 px-3 pr-8 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 border border-slate-200 cursor-pointer font-medium"
-              value={selectedQrId}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (!val) {
-                  router.push('/qr-studio?mode=create');
-                } else {
-                  router.push(`/qr-studio?edit=${encodeURIComponent(val)}`);
-                }
-              }}
-              aria-label="Select a saved QR design or create new"
-            >
-              <option value="">+ New Blank QR Design</option>
-              {qrList.map((qr) => {
-                const placement = qr.placementName || qr.placementType || qr.slug;
-                return (
-                  <option key={qr.id} value={qr.id}>
-                    {placement}
-                  </option>
-                );
-              })}
-            </select>
-
             <button
               className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-[#0B1C30] transition-colors flex items-center gap-1.5 shadow-xs active:scale-95"
               onClick={handleExportPDF}
@@ -1654,7 +1962,15 @@ function QRDesignStudioInner() {
                       role="tab"
                       aria-selected={destinationMode === 'maps'}
                       aria-controls="destination-mode-panel"
-                      onClick={() => setDestinationMode('maps')}
+                      onClick={() => {
+                        if (destinationMode === 'maps') {
+                          window.open(activeMapsSearchUrl, '_blank', 'noopener,noreferrer');
+                          const query = [businessName.trim(), location.trim()].filter(Boolean).join(' ');
+                          showToast(query ? `Searching Google Maps for "${query}"…` : 'Opening Google Maps in a new tab…');
+                        } else {
+                          setDestinationMode('maps');
+                        }
+                      }}
                       className={`min-h-11 rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
                         destinationMode === 'maps'
                           ? 'bg-[#005BBF] text-white'
@@ -1685,28 +2001,33 @@ function QRDesignStudioInner() {
                       <div className="space-y-3">
                         <p className="text-xs leading-5 text-[#414754]">
                           Search opens Google Maps in a new tab. Select the correct listing yourself, then copy the
-                          review link from the listing or your Business Profile. ReviewQR does not read or verify Maps
-                          listings.
+                          review link from the listing or your Business Profile.
                         </p>
                         <a
-                          href={mapsSearchUrl || undefined}
+                          href={activeMapsSearchUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          aria-disabled={!mapsSearchUrl}
-                          onClick={(event) => {
-                            if (!mapsSearchUrl) event.preventDefault();
+                          onClick={() => {
+                            const query = [businessName.trim(), location.trim()].filter(Boolean).join(' ');
+                            if (query) {
+                              showToast(`Searching Google Maps for "${query}"…`);
+                            } else {
+                              showToast('Opening Google Maps. Search for your listing and copy the review link.');
+                            }
                           }}
-                          className={`inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-colors ${
-                            mapsSearchUrl
-                              ? 'bg-[#EFF4FF] text-[#005BBF] hover:bg-[#DCE9FF]'
-                              : 'cursor-not-allowed bg-slate-100 text-slate-400'
-                          }`}
+                          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all bg-[#EFF4FF] text-[#005BBF] hover:bg-[#DCE9FF] border border-[#005BBF]/30 shadow-xs cursor-pointer active:scale-95"
                         >
                           <span className="material-symbols-outlined text-[18px]">open_in_new</span>
                           Search on Google Maps
                         </a>
-                        {!mapsSearchUrl && (
-                          <p className="text-xs text-[#565E74]">Enter a business name and city to enable Maps search.</p>
+                        {businessName.trim() || location.trim() ? (
+                          <p className="text-xs text-[#005BBF] font-medium">
+                            Searching for: {[businessName.trim(), location.trim()].filter(Boolean).join(' · ')}
+                          </p>
+                        ) : (
+                          <p className="text-xs text-[#565E74]">
+                            Tip: Enter your business name and city above to search automatically, or click to open Google Maps.
+                          </p>
                         )}
                       </div>
                     ) : (
@@ -1807,18 +2128,18 @@ function QRDesignStudioInner() {
                       !destinationValidation.valid ||
                       !hasConfirmedDestination ||
                       isSavingDestination ||
-                      isLoadingDestination ||
-                      (!isSupabaseConfigured && qrMode !== 'direct')
+                      isLoadingDestination
                     }
-                    className="w-full min-h-11 rounded-xl bg-[#005BBF] px-4 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#1A73E8] disabled:cursor-not-allowed disabled:bg-slate-300"
+                    className="w-full min-h-11 rounded-xl bg-[#005BBF] px-4 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#1A73E8] disabled:cursor-not-allowed disabled:bg-slate-300 flex items-center justify-center gap-2"
                   >
-                    {isSavingDestination
-                      ? 'Saving destination…'
-                      : isDestinationSaved && isBusinessCategorySaved
-                      ? 'Destination saved — continue to QR editor'
-                      : isDestinationSaved
-                      ? 'Save business category & continue'
-                      : 'Confirm destination & continue'}
+                    <span>
+                      {isSavingDestination
+                        ? 'Saving destination…'
+                        : isDestinationSaved
+                        ? 'Destination saved — continue to QR editor'
+                        : 'Confirm destination & continue to QR editor'}
+                    </span>
+                    <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
                   </button>
                 </section>
 
@@ -1997,10 +2318,17 @@ function QRDesignStudioInner() {
                 <button
                   className="w-full mt-2 py-3 px-4 rounded-xl bg-[#005BBF] hover:bg-[#1A73E8] text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
                   type="button"
-                  onClick={handleSaveConfiguration}
+                  onClick={() => {
+                    if (!destinationValidation.valid) {
+                      showToast('Please enter a valid Google review destination link first.');
+                      return;
+                    }
+                    setHasConfirmedDestination(true);
+                    setActiveTab('qrstyle');
+                  }}
                 >
-                  <span className="material-symbols-outlined text-[18px]">save</span>
-                  <span>Save Studio Configuration</span>
+                  <span>Continue to QR Code Styling</span>
+                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                 </button>
               </div>
             )}
@@ -2152,10 +2480,10 @@ function QRDesignStudioInner() {
                 <button
                   className="w-full mt-2 py-3 px-4 rounded-xl bg-[#005BBF] hover:bg-[#1A73E8] text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
                   type="button"
-                  onClick={handleSaveConfiguration}
+                  onClick={() => setActiveTab('templates')}
                 >
-                  <span className="material-symbols-outlined text-[18px]">save</span>
-                  <span>Save QR Architecture</span>
+                  <span>Continue to Poster Templates</span>
+                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                 </button>
               </div>
             )}
@@ -2190,6 +2518,7 @@ function QRDesignStudioInner() {
                         onClick={() => {
                           setSelectedPreset(preset.id);
                           setAccentColor(preset.defaultAccent);
+                          setCustomColors({});
                           showToast(`Switched to preset: ${preset.name}`);
                         }}
                       >
@@ -2214,104 +2543,229 @@ function QRDesignStudioInner() {
                   })}
                 </div>
 
-                {/* Adjust Preset Colors Section */}
+                {/* Adjust Preset Colors Section (Accordion) */}
                 <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col gap-3.5">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2">
                       <span className="material-symbols-outlined text-[#1A73E8] text-base">palette</span>
-                      <span className="text-xs font-bold text-[#0B1C30]">
-                        Adjust Preset Color ({currentPresetData.name})
-                      </span>
-                    </div>
-                    <span className="text-xs font-mono font-semibold text-[#565E74]">{accentColor}</span>
-                  </div>
-
-                  {/* Primary Color Picker & Hex Input */}
-                  <div className="flex items-center gap-3">
-                    <div className="relative flex items-center">
-                      <input
-                        type="color"
-                        id="preset-color-picker"
-                        value={accentColor.startsWith('#') && accentColor.length === 7 ? accentColor : '#1A73E8'}
-                        onChange={(e) => handleAccentColorChange(e.target.value)}
-                        className="w-10 h-10 rounded-xl border border-slate-200 cursor-pointer p-0.5 bg-white shadow-2xs"
-                        title="Pick custom preset color"
-                      />
-                    </div>
-                    <div className="flex-1 flex items-center gap-2">
-                      <div className="relative flex-1">
-                        <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-mono">#</span>
-                        <input
-                          type="text"
-                          maxLength={7}
-                          value={accentColor.replace('#', '')}
-                          onChange={(e) => {
-                            const val = e.target.value.replace(/[^0-9a-fA-F]/g, '');
-                            if (val.length <= 6) {
-                              handleAccentColorChange(`#${val}`);
-                            }
-                          }}
-                          placeholder="1A73E8"
-                          className="w-full h-10 pl-7 pr-3 rounded-xl bg-white border border-slate-200 text-xs font-mono font-semibold text-[#0B1C30] uppercase focus:outline-none focus:border-[#1A73E8]"
-                        />
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-xs font-bold text-[#0B1C30]">Adjust Preset Colors</span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-200/80 text-slate-700 font-semibold">
+                          {currentPresetData.name}
+                        </span>
+                        {Object.keys(customColors).length > 0 && (
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-100 text-[#005BBF] font-bold">
+                            {Object.keys(customColors).length} custom
+                          </span>
+                        )}
                       </div>
+                    </div>
+                    <div className="flex items-center gap-2">
                       <button
                         type="button"
                         onClick={() => {
-                          handleAccentColorChange(currentPresetData.defaultAccent);
-                          showToast(`Reset to ${currentPresetData.name} default color`);
+                          const anyOpen = Object.values(expandedColorKeys).some(Boolean);
+                          setAllColorKeys(!anyOpen);
                         }}
-                        className="h-10 px-3 rounded-xl bg-white border border-slate-200 text-[11px] font-semibold text-slate-700 hover:bg-slate-100 transition-colors shadow-2xs shrink-0"
-                        title="Reset to preset default"
+                        className="text-[11px] text-[#005BBF] hover:underline font-semibold"
                       >
-                        Reset Default
+                        {Object.values(expandedColorKeys).some(Boolean) ? 'Collapse All' : 'Expand All'}
                       </button>
+                      {Object.keys(customColors).length > 0 && (
+                        <button
+                          type="button"
+                          onClick={handleResetColors}
+                          className="px-2 py-0.5 rounded-lg bg-white border border-slate-200 text-[10px] font-semibold text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition-colors shadow-2xs flex items-center gap-0.5"
+                          title="Reset all colors to preset defaults"
+                        >
+                          <span className="material-symbols-outlined text-[12px]">restart_alt</span>
+                          <span>Reset Colors</span>
+                        </button>
+                      )}
                     </div>
                   </div>
 
-                  {/* Quick Color Swatches */}
-                  <div className="space-y-1.5">
-                    <span className="text-[11px] font-semibold text-[#565E74]">Preset &amp; Theme Swatches</span>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {[
-                        { name: 'Preset Default', hex: currentPresetData.defaultAccent },
-                        { name: 'Google Blue', hex: '#1A73E8' },
-                        { name: 'Warm Amber', hex: '#FBBC04' },
-                        { name: 'Google Red', hex: '#EA4335' },
-                        { name: 'Bistro Green', hex: '#34A853' },
-                        { name: 'Deep Purple', hex: '#7C3AED' },
-                        { name: 'Sunset Orange', hex: '#F97316' },
-                        { name: 'Rose Gold', hex: '#F43F5E' },
-                        { name: 'Obsidian Slate', hex: '#0F172A' },
-                      ].map((swatch, idx) => {
-                        const isMatch = accentColor.toLowerCase() === swatch.hex.toLowerCase();
-                        return (
-                          <button
-                            key={`${swatch.hex}-${idx}`}
-                            type="button"
-                            onClick={() => handleAccentColorChange(swatch.hex)}
-                            title={swatch.name}
-                            className={`w-7 h-7 rounded-full transition-transform flex items-center justify-center text-white ${
-                              isMatch ? 'ring-2 ring-offset-1 ring-[#005BBF] scale-110' : 'hover:scale-105'
-                            }`}
-                            style={{ backgroundColor: swatch.hex }}
+                  <p className="text-[11px] text-[#565E74] leading-relaxed">
+                    Independently customize individual template elements. Selecting a new preset will restore its default colors.
+                  </p>
+
+                  {/* 7 Independent Collapsible Color Items */}
+                  <div className="flex flex-col gap-2">
+                    {colorControls.map((ctrl) => {
+                      const activeColor = customColors[ctrl.key] || ctrl.defaultHex;
+                      const isCustomized = Boolean(customColors[ctrl.key]);
+                      const isOpen = Boolean(expandedColorKeys[ctrl.key]);
+
+                      return (
+                        <div
+                          key={ctrl.key}
+                          className="rounded-xl border border-slate-200 bg-white overflow-hidden transition-all shadow-2xs"
+                        >
+                          {/* Accordion Row Header */}
+                          <div
+                            className="flex items-center justify-between p-2.5 cursor-pointer hover:bg-slate-50 transition-colors select-none"
+                            onClick={() => toggleColorKey(ctrl.key)}
                           >
-                            {isMatch && <span className="material-symbols-outlined text-[14px]">check</span>}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span
+                                className="w-5 h-5 rounded-full border border-black/15 shadow-2xs shrink-0"
+                                style={{ backgroundColor: activeColor }}
+                              />
+                              <div className="flex flex-col min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-xs font-semibold text-[#0B1C30] truncate">
+                                    {ctrl.label}
+                                  </span>
+                                  {isCustomized && (
+                                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 font-bold shrink-0">
+                                      Custom
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-[10px] text-slate-400 font-mono">
+                                  {activeColor.toUpperCase()}
+                                  {!isCustomized && ' (Default)'}
+                                </span>
+                              </div>
+                            </div>
 
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              {isCustomized && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    resetSingleColor(ctrl.key);
+                                    showToast(`Reset ${ctrl.label} to default`);
+                                  }}
+                                  className="text-[10px] text-slate-500 hover:text-slate-800 underline px-1 py-0.5 rounded hover:bg-slate-100"
+                                  title="Reset to default"
+                                >
+                                  Reset
+                                </button>
+                              )}
+                              <span
+                                className={`material-symbols-outlined text-[18px] text-slate-400 transition-transform ${
+                                  isOpen ? 'rotate-180' : ''
+                                }`}
+                              >
+                                expand_more
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Accordion Collapsible Panel */}
+                          {isOpen && (
+                            <div className="p-3 pt-1 border-t border-slate-100 bg-slate-50/50 flex flex-col gap-2.5">
+                              <p className="text-[11px] text-[#565E74]">
+                                {ctrl.description}
+                              </p>
+
+                              {/* Low Contrast Warning for QR */}
+                              {ctrl.key === 'qrColor' && isQrContrastLow && (
+                                <div className="p-2 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 flex items-start gap-1.5 text-xs">
+                                  <span className="material-symbols-outlined text-amber-600 text-[16px] shrink-0 mt-0.5">
+                                    warning
+                                  </span>
+                                  <div>
+                                    <span className="font-bold">Contrast notice: </span>
+                                    Light QR colors on a white card may be harder for older phone cameras to scan. Test before printing.
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Color Picker + Hex Input */}
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="color"
+                                  value={activeColor.startsWith('#') && activeColor.length === 7 ? activeColor : ctrl.defaultHex}
+                                  onChange={(e) => updateCustomColor(ctrl.key, e.target.value)}
+                                  className="w-9 h-9 rounded-lg border border-slate-200 cursor-pointer p-0.5 bg-white shadow-2xs shrink-0"
+                                  title={`Pick ${ctrl.label} color`}
+                                />
+                                <div className="relative flex-1">
+                                  <span className="absolute left-2.5 top-2 text-xs text-slate-400 font-mono">#</span>
+                                  <input
+                                    type="text"
+                                    maxLength={7}
+                                    value={activeColor.replace('#', '')}
+                                    onChange={(e) => {
+                                      const val = e.target.value.replace(/[^0-9a-fA-F]/g, '');
+                                      if (val.length <= 6) {
+                                        updateCustomColor(ctrl.key, `#${val}`);
+                                      }
+                                    }}
+                                    placeholder={ctrl.defaultHex.replace('#', '')}
+                                    className="w-full h-9 pl-6 pr-2 rounded-lg bg-white border border-slate-200 text-xs font-mono font-semibold text-[#0B1C30] uppercase focus:outline-none focus:border-[#1A73E8]"
+                                  />
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    resetSingleColor(ctrl.key);
+                                    showToast(`Reset ${ctrl.label} to default`);
+                                  }}
+                                  disabled={!isCustomized}
+                                  className={`h-9 px-2.5 rounded-lg border text-[10px] font-semibold transition-colors shrink-0 ${
+                                    isCustomized
+                                      ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100 shadow-2xs cursor-pointer'
+                                      : 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed'
+                                  }`}
+                                  title="Reset to preset default"
+                                >
+                                  Default
+                                </button>
+                              </div>
+
+                              {/* Quick Swatches */}
+                              <div className="space-y-1">
+                                <span className="text-[10px] font-semibold text-[#565E74]">Suggested Swatches</span>
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  {ctrl.popularSwatches.map((swatchHex, sIdx) => {
+                                    const isMatch = activeColor.toLowerCase() === swatchHex.toLowerCase();
+                                    return (
+                                      <button
+                                        key={`${swatchHex}-${sIdx}`}
+                                        type="button"
+                                        onClick={() => updateCustomColor(ctrl.key, swatchHex)}
+                                        title={swatchHex}
+                                        className={`w-5 h-5 rounded-full border border-black/10 transition-transform flex items-center justify-center ${
+                                          isMatch ? 'ring-2 ring-offset-1 ring-[#005BBF] scale-110' : 'hover:scale-105'
+                                        }`}
+                                        style={{ backgroundColor: swatchHex }}
+                                      >
+                                        {isMatch && (
+                                          <span
+                                            className="material-symbols-outlined text-[10px]"
+                                            style={{
+                                              color: ['#ffffff', '#fffdf5', '#f0fdf4', '#eff4ff'].includes(swatchHex.toLowerCase())
+                                                ? '#000000'
+                                                : '#ffffff',
+                                            }}
+                                          >
+                                            check
+                                          </span>
+                                        )}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <button
                   className="w-full mt-2 py-3 px-4 rounded-xl bg-[#005BBF] hover:bg-[#1A73E8] text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
                   type="button"
-                  onClick={handleSaveConfiguration}
+                  onClick={() => setActiveTab('copy')}
                 >
-                  <span className="material-symbols-outlined text-[18px]">save</span>
-                  <span>Apply Preset</span>
+                  <span>Continue to Copy &amp; Content</span>
+                  <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                 </button>
               </div>
             )}
@@ -2357,18 +2811,43 @@ function QRDesignStudioInner() {
                 />
                 </div>
 
-                <button
-                  className="w-full mt-2 py-3 px-4 rounded-xl bg-[#005BBF] hover:bg-[#1A73E8] text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
-                  type="button"
-                  onClick={handleSaveConfiguration}
-                  disabled={isSavingQr}
-                  aria-busy={isSavingQr}
-                >
-                  <span className="material-symbols-outlined text-[18px]">
-                    {isSavingQr ? 'progress_activity' : 'save'}
-                  </span>
-                  <span>{isSavingQr ? 'Saving QR Design…' : 'Save QR Design'}</span>
-                </button>
+                <div className="pt-2 flex flex-col gap-2.5">
+                  <div className="text-xs font-bold text-[#0B1C30] flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[#005BBF] text-[18px]">verified</span>
+                    <span>Artwork Ready — Export or Print</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <button
+                      className="py-3 px-4 rounded-xl bg-[#005BBF] hover:bg-[#1A73E8] text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
+                      type="button"
+                      onClick={handleDownloadPNG}
+                    >
+                      <span className="material-symbols-outlined text-[18px]">download</span>
+                      <span>Download PNG</span>
+                    </button>
+                    <button
+                      className="py-3 px-4 rounded-xl bg-white hover:bg-slate-50 text-[#0B1C30] text-xs font-bold shadow-sm border border-slate-200 transition-all flex items-center justify-center gap-2 active:scale-95"
+                      type="button"
+                      onClick={handleExportPDF}
+                    >
+                      <span className="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+                      <span>Print / PDF</span>
+                    </button>
+                  </div>
+                  {isSupabaseConfigured && (
+                    <button
+                      className="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all flex items-center justify-center gap-2 active:scale-95 mt-1"
+                      type="button"
+                      onClick={handleSaveConfiguration}
+                      disabled={isSavingQr}
+                    >
+                      <span className="material-symbols-outlined text-[16px]">
+                        {isSavingQr ? 'progress_activity' : 'cloud_upload'}
+                      </span>
+                      <span>{isSavingQr ? 'Saving to Cloud…' : 'Save Design to Cloud (Optional)'}</span>
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -2420,13 +2899,7 @@ function QRDesignStudioInner() {
 
               <div className="flex items-center gap-2">
                 <span className="text-xs text-slate-500">
-                  {qrMode === 'direct'
-                    ? 'Direct review URL QR'
-                    : qrGenerationMessage
-                    ? 'Guided QR is unavailable'
-                    : selectedQrToken
-                    ? 'Guided customer page QR'
-                    : 'Save the guided QR design to create its customer link'}
+                  {qrMode === 'direct' ? 'Direct review URL QR' : 'Guided Review Assistant QR'}
                 </span>
                 <button
                   className="p-1.5 rounded-lg hover:bg-slate-100 text-[#414754]"
@@ -2464,6 +2937,7 @@ function QRDesignStudioInner() {
                 style={{
                   transform: `scale(${zoomLevel / 100})${viewMode === 'mockup' ? ' rotateY(-12deg) rotateX(5deg)' : ''}`,
                   transformStyle: 'preserve-3d',
+                  backgroundColor: customColors.posterBg || currentPresetData.bgHex,
                 }}
                 className={`relative w-full max-w-[380px] rounded-3xl shadow-[0_25px_50px_-12px_rgba(15,23,42,0.18)] overflow-hidden flex flex-col items-center transition-all duration-300 border border-black/5 ${
                   currentPresetData.previewBg
@@ -2495,11 +2969,17 @@ function QRDesignStudioInner() {
                   {/* Dynamic Business Title */}
                   <h1
                     className={`text-lg font-extrabold tracking-wider uppercase leading-tight ${currentPresetData.textColor}`}
+                    style={{ color: customColors.businessNameColor || currentPresetData.textHex }}
                   >
                     {businessName || 'YOUR BUSINESS NAME'}
                   </h1>
                   <p
                     className={`text-[10px] font-bold tracking-widest uppercase mt-1 ${currentPresetData.subtitleColor}`}
+                    style={{
+                      color: customColors.businessNameColor
+                        ? customColors.businessNameColor
+                        : (currentPresetData.subtitleHex || currentPresetData.textHex),
+                    }}
                   >
                     {businessDetails}
                   </p>
@@ -2522,9 +3002,7 @@ function QRDesignStudioInner() {
                       />
                     ) : (
                       <div className="w-52 h-52 bg-slate-50 flex items-center justify-center p-4 text-center text-xs text-[#565E74]">
-                        {qrGenerationMessage || (qrMode === 'direct'
-                          ? 'Confirm your review URL to preview its direct QR.'
-                          : 'Save the QR design after configuring a public HTTPS app URL.')}
+                        {qrGenerationMessage || 'Enter a review destination link to preview your scannable QR code.'}
                       </div>
                     )}
 
@@ -2561,14 +3039,21 @@ function QRDesignStudioInner() {
                 {/* Bottom Poster Callout */}
                 <div className="w-full flex flex-col items-center px-6 pb-6 pt-1 text-center">
                   <div className="flex items-center gap-1.5 my-1">
-                    <span className={`text-base font-bold ${currentPresetData.textColor}`}>
+                    <span
+                      className={`text-base font-bold ${currentPresetData.textColor}`}
+                      style={{ color: customColors.headlineColor || currentPresetData.textHex }}
+                    >
                       {headline}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-center gap-0.5" aria-label="Five yellow stars">
                     {Array.from({ length: 5 }, (_, index) => (
-                      <span key={index} className="material-symbols-outlined text-xl leading-5 text-[#FBBC04]">
+                      <span
+                        key={index}
+                        className="material-symbols-outlined text-xl leading-5"
+                        style={{ color: customColors.starsColor || '#FBBC04' }}
+                      >
                         star
                       </span>
                     ))}
@@ -2580,11 +3065,19 @@ function QRDesignStudioInner() {
 
                   {/* Scan CTA Button (Image 1) */}
                   <div
-                    className="w-full mt-3 py-2.5 px-4 rounded-xl text-white font-semibold text-xs shadow-sm flex items-center justify-center gap-2 cursor-pointer hover:opacity-95 transition-opacity"
-                    style={{ backgroundColor: accentColor }}
+                    className="w-full mt-3 py-2.5 px-4 rounded-xl font-semibold text-xs shadow-sm flex items-center justify-center gap-2 cursor-pointer hover:opacity-95 transition-opacity"
+                    style={{
+                      backgroundColor: customColors.ctaBgColor || accentColor || currentPresetData.defaultAccent,
+                      color: customColors.ctaTextColor || '#FFFFFF',
+                    }}
                   >
-                    <span className="material-symbols-outlined text-[16px]">photo_camera</span>
-                    <span>{ctaText}</span>
+                    <span
+                      className="material-symbols-outlined text-[16px]"
+                      style={{ color: customColors.ctaTextColor || '#FFFFFF' }}
+                    >
+                      photo_camera
+                    </span>
+                    <span style={{ color: customColors.ctaTextColor || '#FFFFFF' }}>{ctaText}</span>
                   </div>
                 </div>
               </div>

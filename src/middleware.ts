@@ -16,11 +16,10 @@ export async function middleware(request: NextRequest) {
   const isProtectedRoute =
     request.nextUrl.pathname.startsWith('/dashboard') ||
     request.nextUrl.pathname.startsWith('/business-profile') ||
-    request.nextUrl.pathname.startsWith('/create-qr') ||
-    request.nextUrl.pathname.startsWith('/qr-studio') ||
     request.nextUrl.pathname.startsWith('/my-qr-codes') ||
     request.nextUrl.pathname.startsWith('/analytics') ||
-    request.nextUrl.pathname.startsWith('/settings');
+    request.nextUrl.pathname.startsWith('/settings') ||
+    request.nextUrl.pathname.startsWith('/admin');
 
   if (!isSupabaseConfigured) {
     if (!isProtectedRoute) return response;
@@ -67,7 +66,12 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isAuthRoute && user) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    const requested = request.nextUrl.searchParams.get('redirectTo');
+    const destination =
+      requested?.startsWith('/') && !requested.startsWith('//')
+        ? requested
+        : '/dashboard';
+    return NextResponse.redirect(new URL(destination, request.url));
   }
 
   return response;

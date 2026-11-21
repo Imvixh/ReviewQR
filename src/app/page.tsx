@@ -16,8 +16,8 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="flex flex-col">
-              <span className="font-headline-sm text-headline-sm text-on-surface leading-none tracking-tight">
-                Review<span className="text-primary-container">QR</span>
+              <span className="font-headline-sm text-headline-sm text-on-surface leading-none tracking-tight font-extrabold">
+                REVELY
               </span>
             </div>
           </Link>
@@ -38,14 +38,11 @@ export default function LandingPage() {
           </nav>
 
           <div className="flex items-center gap-space-md">
-            <Link className="font-label-lg text-label-lg text-on-surface-variant hover:text-on-surface transition-colors px-space-sm py-space-xs" href="/login">
-              Log In
-            </Link>
-            <Link className="font-label-lg text-label-lg bg-primary-container text-on-primary-container px-space-md py-space-xs rounded-lg shadow-[0_1px_3px_rgba(15,23,42,0.05)] hover:bg-primary transition-all active:scale-95" href="/signup">
-              Get Started Free
-            </Link>
-            <Link href="/dashboard" className="w-8 h-8 rounded-full bg-primary flex items-center justify-center hover:opacity-90 transition-opacity">
-              <span className="material-symbols-outlined text-on-primary text-[18px]">person</span>
+            <Link
+              className="font-label-lg text-label-lg bg-primary-container text-on-primary-container px-space-md py-space-xs rounded-lg shadow-[0_1px_3px_rgba(15,23,42,0.05)] hover:bg-primary transition-all active:scale-95 font-bold"
+              href="/create-qr"
+            >
+              Create Your QR
             </Link>
           </div>
         </div>
@@ -87,7 +84,7 @@ export default function LandingPage() {
                     className="w-full sm:w-auto inline-flex items-center justify-center gap-space-sm px-space-lg py-3 rounded-lg bg-primary-container text-on-primary-container font-label-lg text-label-lg shadow-md hover:bg-primary transition-all active:scale-95"
                     href="/create-qr"
                   >
-                    <span>Create Your Free QR</span>
+                    <span>Create Your QR</span>
                     <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                   </Link>
                   <a
@@ -236,7 +233,7 @@ export default function LandingPage() {
                       <div className="mb-4 rounded-lg bg-surface-container-low p-3 text-left">
                         <p className="font-label-caps text-label-caps uppercase text-secondary">Customer-authored feedback</p>
                         <p className="mt-1 font-body-sm text-body-sm text-secondary">
-                          ReviewQR does not provide prewritten review suggestions.
+                          REVELY does not provide prewritten review suggestions.
                         </p>
                       </div>
 
@@ -288,7 +285,7 @@ export default function LandingPage() {
               <span className="font-label-caps text-label-caps uppercase text-primary tracking-wider block mb-2">Frictionless Feedback</span>
               <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">Getting customer reviews shouldn’t be complicated.</h2>
               <p className="font-body-lg text-body-lg text-secondary">
-                Most happy customers want to praise your staff, but hunting down your Google listing or facing a blank text box stops them. ReviewQR fixes both.
+                Most happy customers want to praise your staff, but hunting down your Google listing or facing a blank text box stops them. REVELY fixes both.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -314,7 +311,7 @@ export default function LandingPage() {
                 </div>
                 <h3 className="font-headline-md text-headline-md text-on-surface mb-3">Remove the Blank Page</h3>
                 <p className="font-body-md text-body-md text-secondary leading-relaxed mb-6">
-                  Customers should describe their own experience. ReviewQR does not currently provide prewritten review prompts or a working public customer flow.
+                  Customers should describe their own experience. REVELY does not currently provide prewritten review prompts or a working public customer flow.
                 </p>
                 <div className="mt-auto pt-4 border-t border-surface-container flex items-center gap-2 font-label-md text-label-md text-tertiary">
                   <span className="material-symbols-outlined text-[18px]">thumb_up</span>
@@ -418,7 +415,7 @@ export default function LandingPage() {
                 <div>
                   <h4 className="font-headline-sm text-headline-sm text-on-surface font-bold">Customer submission</h4>
                   <p className="font-body-sm text-body-sm text-secondary">
-                    ReviewQR does not submit reviews on a customer&apos;s behalf or claim Google policy certification. Live QR use requires configured Supabase and the secure QR migration.
+                    REVELY does not submit reviews on a customer&apos;s behalf or claim Google policy certification. Live QR use requires configured Supabase and the secure QR migration.
                   </p>
                 </div>
               </div>
@@ -543,7 +540,7 @@ export default function LandingPage() {
                 <span className="font-label-caps text-label-caps uppercase text-primary tracking-wider block mb-2">Mobile Ergonomics</span>
                 <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">A Guided, Respectful Customer Journey</h2>
                 <p className="font-body-lg text-body-lg text-secondary mb-6">
-                  Guests don&apos;t like confusing forms. ReviewQR provides a fast, one-thumb interface that lets customers express what they genuinely appreciated without friction.
+                  Guests don&apos;t like confusing forms. REVELY provides a fast, one-thumb interface that lets customers express what they genuinely appreciated without friction.
                 </p>
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-center gap-3 font-body-md text-body-md text-on-surface">
@@ -648,9 +645,9 @@ export default function LandingPage() {
                     <span className="w-3 h-3 rounded-full bg-error/70"></span>
                     <span className="w-3 h-3 rounded-full bg-[#FBBC04]/70"></span>
                     <span className="w-3 h-3 rounded-full bg-tertiary/70"></span>
-                    <span className="font-mono text-body-sm text-body-sm text-secondary ml-3">app.reviewqr.io/dashboard</span>
+                    <span className="font-mono text-body-sm text-body-sm text-secondary ml-3">revely.app/studio</span>
                   </div>
-                  <span className="font-label-caps text-label-caps text-secondary uppercase">ReviewQR Studio v2.4</span>
+                  <span className="font-label-caps text-label-caps text-secondary uppercase">REVELY Studio</span>
                 </div>
 
                 {/* Dashboard App Internal Layout */}
@@ -660,29 +657,25 @@ export default function LandingPage() {
                     <div className="space-y-6">
                       <div className="flex items-center gap-2 px-2">
                         <div className="w-7 h-7 rounded-md bg-primary-container flex items-center justify-center text-on-primary-container text-xs font-bold">R</div>
-                        <span className="font-headline-sm text-headline-sm text-on-surface">ReviewQR</span>
+                        <span className="font-headline-sm text-headline-sm text-on-surface font-extrabold">REVELY</span>
                       </div>
                       <nav className="space-y-1">
-                        <Link className="flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-container text-primary font-label-md text-label-md font-semibold" href="/dashboard">
-                          <span className="material-symbols-outlined text-[20px]">dashboard</span>
-                          <span>Overview</span>
-                        </Link>
-                        <Link className="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:bg-surface-container/50 font-label-md text-label-md" href="/create-qr">
+                        <Link className="flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-container text-primary font-label-md text-label-md font-semibold" href="/qr-studio">
                           <span className="material-symbols-outlined text-[20px]">add_box</span>
-                          <span>Create Review QR</span>
+                          <span>Create Your QR</span>
                         </Link>
-                        <Link className="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:bg-surface-container/50 font-label-md text-label-md" href="/my-qr-codes">
+                        <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary/60 font-label-md text-label-md cursor-not-allowed">
                           <span className="material-symbols-outlined text-[20px]">qr_code_2</span>
                           <span>My QR Codes</span>
-                        </Link>
-                        <Link className="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:bg-surface-container/50 font-label-md text-label-md" href="/analytics">
+                        </div>
+                        <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary/60 font-label-md text-label-md cursor-not-allowed">
                           <span className="material-symbols-outlined text-[20px]">insights</span>
                           <span>Analytics</span>
-                        </Link>
-                        <Link className="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary hover:bg-surface-container/50 font-label-md text-label-md" href="/settings">
+                        </div>
+                        <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary/60 font-label-md text-label-md cursor-not-allowed">
                           <span className="material-symbols-outlined text-[20px]">settings</span>
                           <span>Settings</span>
-                        </Link>
+                        </div>
                       </nav>
                     </div>
                     <div className="p-3 bg-surface-container-lowest rounded-xl shadow-sm">
@@ -758,8 +751,8 @@ export default function LandingPage() {
               </div>
 
               <div className="text-center mt-10">
-                <Link className="inline-flex items-center gap-2 px-space-xl py-3 rounded-lg bg-primary-container text-on-primary-container font-label-lg text-label-lg shadow-md hover:bg-primary transition-all font-semibold" href="/dashboard">
-                  <span>Explore ReviewQR Studio</span>
+                <Link className="inline-flex items-center gap-2 px-space-xl py-3 rounded-lg bg-primary-container text-on-primary-container font-label-lg text-label-lg shadow-md hover:bg-primary transition-all font-bold" href="/qr-studio">
+                  <span>Create Your QR</span>
                   <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                 </Link>
               </div>
@@ -869,11 +862,11 @@ export default function LandingPage() {
                 {/* FAQ item 1 */}
                 <details className="group bg-surface-container-lowest rounded-xl p-5 shadow-sm">
                   <summary className="flex items-center justify-between cursor-pointer list-none">
-                    <span className="font-headline-sm text-headline-sm text-on-surface font-bold">What is ReviewQR?</span>
+                    <span className="font-headline-sm text-headline-sm text-on-surface font-bold">What is REVELY?</span>
                     <span className="material-symbols-outlined text-secondary transition-transform group-open:rotate-180">expand_more</span>
                   </summary>
                   <div className="mt-4 pt-3 border-t border-surface-container font-body-md text-body-md text-secondary leading-relaxed">
-                    ReviewQR is a prototype for designing QR posters that point customers to a business-selected destination. QR designs remain browser-local, and public customer QR pages are not currently available.
+                    REVELY is a tool for designing high-conversion physical QR posters that direct customers straight to a business-selected review destination.
                   </div>
                 </details>
 
@@ -884,7 +877,7 @@ export default function LandingPage() {
                     <span className="material-symbols-outlined text-secondary transition-transform group-open:rotate-180">expand_more</span>
                   </summary>
                   <div className="mt-4 pt-3 border-t border-surface-container font-body-md text-body-md text-secondary leading-relaxed">
-                    The public customer QR page is not currently available. The intended flow is to scan a printed QR code and open its destination in a browser.
+                    No. Customers simply scan the printed QR code with their phone camera to instantly open your direct review destination in their browser.
                   </div>
                 </details>
 
@@ -895,18 +888,18 @@ export default function LandingPage() {
                     <span className="material-symbols-outlined text-secondary transition-transform group-open:rotate-180">expand_more</span>
                   </summary>
                   <div className="mt-4 pt-3 border-t border-surface-container font-body-md text-body-md text-secondary leading-relaxed">
-                    ReviewQR does not submit reviews. Customers choose whether to edit their own text and submit feedback through the saved external destination.
+                    REVELY does not submit reviews. Customers choose whether to edit their own text and submit feedback directly through the external destination.
                   </div>
                 </details>
 
                 {/* FAQ item 4 */}
                 <details className="group bg-surface-container-lowest rounded-xl p-5 shadow-sm">
                   <summary className="flex items-center justify-between cursor-pointer list-none">
-                    <span className="font-headline-sm text-headline-sm text-on-surface font-bold">Does ReviewQR automatically post reviews on Google?</span>
+                    <span className="font-headline-sm text-headline-sm text-on-surface font-bold">Does REVELY automatically post reviews on Google?</span>
                     <span className="material-symbols-outlined text-secondary transition-transform group-open:rotate-180">expand_more</span>
                   </summary>
                   <div className="mt-4 pt-3 border-t border-surface-container font-body-md text-body-md text-secondary leading-relaxed">
-                    ReviewQR does not submit reviews on a customer&apos;s behalf. Customers must follow the external provider&apos;s applicable policies and submit their own reviews directly.
+                    REVELY does not submit reviews on a customer&apos;s behalf. Customers follow Google&apos;s policies and submit their own authentic reviews directly on Google.
                   </div>
                 </details>
 
@@ -917,7 +910,7 @@ export default function LandingPage() {
                     <span className="material-symbols-outlined text-secondary transition-transform group-open:rotate-180">expand_more</span>
                   </summary>
                   <div className="mt-4 pt-3 border-t border-surface-container font-body-md text-body-md text-secondary leading-relaxed">
-                    The QR Design Studio has limited local export functionality. Print-ready PDF sizes, crop marks, and export fidelity have not been verified.
+                    You can download print-ready high-resolution PNGs or use browser print / save as PDF with exact preset dimensions for tabletop acrylic stands and posters.
                   </div>
                 </details>
               </div>
@@ -941,20 +934,15 @@ export default function LandingPage() {
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
                   <Link
-                    className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-surface-container-lowest text-primary font-label-lg text-label-lg shadow-xl hover:bg-surface-container-low transition-all active:scale-95 font-bold"
-                    href="/signup"
+                    className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-surface-container-lowest text-primary font-label-lg text-label-lg shadow-xl hover:bg-surface-container-low transition-all active:scale-95 font-bold inline-flex items-center justify-center gap-2"
+                    href="/qr-studio"
                   >
-                    Get Started Free
-                  </Link>
-                  <Link
-                    className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-white/10 text-on-primary font-label-lg text-label-lg hover:bg-white/20 transition-all font-semibold"
-                    href="/login"
-                  >
-                    Already have an account? Log in
+                    <span className="material-symbols-outlined text-lg">qr_code_2</span>
+                    Create Your QR
                   </Link>
                 </div>
                 <p className="font-body-sm text-body-sm text-primary-fixed/80">
-                  Prototype · Business destination requires configured Supabase
+                  Free · Instant download · No account required
                 </p>
               </div>
             </div>
@@ -973,26 +961,26 @@ export default function LandingPage() {
                     <div className="w-2 h-2 bg-on-primary-container rounded-xs"></div>
                   </div>
                 </div>
-                <span className="font-headline-sm text-headline-sm text-on-surface tracking-tight">
-                  Review<span className="text-primary-container">QR</span>
+                <span className="font-headline-sm text-headline-sm text-on-surface tracking-tight font-black">
+                  REVELY
                 </span>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant max-w-sm">
-                Helping local businesses design QR touchpoints for customer-selected feedback destinations.
+                Helping businesses design high-converting QR touchpoints for direct Google reviews.
               </p>
               <div className="inline-flex items-center gap-space-sm px-space-sm py-space-xs rounded-full bg-surface-container">
-                <span className="w-2 h-2 rounded-full bg-slate-400"></span>
-                <span className="font-label-md text-label-md text-on-surface-variant font-medium">Prototype; some features unavailable</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span className="font-label-md text-label-md text-on-surface-variant font-medium">Free Public QR Generator</span>
               </div>
             </div>
 
             <div>
               <h4 className="font-label-caps text-label-caps uppercase text-on-surface mb-space-md tracking-wider font-bold">Product</h4>
               <ul className="space-y-space-sm">
-                <li className="font-body-md text-body-md"><Link className="text-on-surface-variant hover:text-on-surface transition-colors" href="/qr-studio">QR Design Studio</Link></li>
-                <li className="font-body-md text-body-md text-on-surface-variant">Customer QR flow is unavailable.</li>
-                <li className="font-body-md text-body-md text-on-surface-variant">Print via browser; output is not print-certified.</li>
-                <li className="font-body-md text-body-md text-on-surface-variant">Analytics are unavailable.</li>
+                <li className="font-body-md text-body-md"><Link className="text-on-surface-variant hover:text-on-surface transition-colors" href="/qr-studio">Create Your QR</Link></li>
+                <li className="font-body-md text-body-md text-on-surface-variant">Instant Tabletop Posters</li>
+                <li className="font-body-md text-body-md text-on-surface-variant">Print-Ready PNG &amp; PDF</li>
+                <li className="font-body-md text-body-md text-on-surface-variant">Direct Google Links</li>
               </ul>
             </div>
 
@@ -1001,24 +989,24 @@ export default function LandingPage() {
               <ul className="space-y-space-sm">
                 <li className="font-body-md text-body-md"><a className="text-on-surface-variant hover:text-on-surface transition-colors" href="#faq">Help Center &amp; FAQ</a></li>
                 <li className="font-body-md text-body-md"><a className="text-on-surface-variant hover:text-on-surface transition-colors" href="#how-it-works">Implementation Guide</a></li>
-                <li className="font-body-md text-body-md text-on-surface-variant">Customer stories are not available.</li>
-                <li className="font-body-md text-body-md text-on-surface-variant">API documentation is available in the repository.</li>
+                <li className="font-body-md text-body-md"><a className="text-on-surface-variant hover:text-on-surface transition-colors" href="#templates">Poster Presets</a></li>
+                <li className="font-body-md text-body-md text-on-surface-variant">API documentation in repository</li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-label-caps text-label-caps uppercase text-on-surface mb-space-md tracking-wider font-bold">Legal &amp; Trust</h4>
               <ul className="space-y-space-sm">
-                <li className="font-body-md text-body-md text-on-surface-variant">Privacy policy not published</li>
-                <li className="font-body-md text-body-md text-on-surface-variant">Terms of service not published</li>
-                <li className="font-body-md text-body-md text-on-surface-variant">Cookie settings not available</li>
-                <li className="font-body-md text-body-md text-on-surface-variant">Security documentation is in progress</li>
+                <li className="font-body-md text-body-md text-on-surface-variant">Privacy Policy</li>
+                <li className="font-body-md text-body-md text-on-surface-variant">Terms of Service</li>
+                <li className="font-body-md text-body-md text-on-surface-variant">Zero Data Collection for Guests</li>
+                <li className="font-body-md text-body-md text-on-surface-variant">Client-Side QR Generation</li>
               </ul>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-between pt-space-xl text-on-surface-variant border-t border-surface-container">
-            <p className="font-body-sm text-body-sm">© ReviewQR</p>
+            <p className="font-body-sm text-body-sm">© REVELY</p>
             <p className="font-body-sm text-body-sm flex items-center gap-space-xs mt-space-sm sm:mt-0">
               <span className="material-symbols-outlined text-[16px] text-tertiary-container">info</span>
               Independent prototype; not affiliated with Google

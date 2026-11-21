@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'ReviewQR — QR Poster Design for Customer Feedback',
+  title: 'REVELY — Direct Google Review QR Posters',
   description:
-    'ReviewQR is a prototype for designing QR posters that direct customers to a business-selected feedback destination.',
+    'Create high-converting tabletop QR posters that connect customers directly to your Google Business Profile for real reviews.',
 };
 
 export default function RootLayout({
