@@ -10,8 +10,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url), 307);
   }
 
-  // 2. Legacy /admin redirects to /super-admin
-  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+  // 2. Legacy /admin redirects to /super-admin (except setup-2fa and verify-2fa)
+  if (
+    (pathname === '/admin' || pathname.startsWith('/admin/')) &&
+    !pathname.startsWith('/admin/setup-2fa') &&
+    !pathname.startsWith('/admin/verify-2fa')
+  ) {
     return NextResponse.redirect(new URL('/super-admin', request.url), 308);
   }
 
