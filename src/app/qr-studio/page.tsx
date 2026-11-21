@@ -134,7 +134,7 @@ function QRDesignStudioInner() {
   const [supportingText, setSupportingText] = useState('');
 
   // View mode & Canvas state
-  const [viewMode, setViewMode] = useState<'front' | 'mockup'>('front');
+  const [viewMode, setViewMode] = useState<'front' | 'mockup' | 'mobile'>('front');
   const [zoomLevel, setZoomLevel] = useState(100);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [realQrDataUrl, setRealQrDataUrl] = useState<string>('');
@@ -150,15 +150,29 @@ function QRDesignStudioInner() {
   const isDestinationSaved =
     Boolean(savedDestinationUrl) && savedDestinationUrl === googleReviewUrl.trim();
   const canPreviewQr = destinationValidation.valid;
-  const createGuestToken = (name: string, city: string, url: string, cat?: string, accent?: string) => {
+  const createGuestToken = (
+    name: string,
+    city: string,
+    url: string,
+    cat?: string,
+    accent?: string,
+    logo?: string,
+    thumb?: string
+  ) => {
     try {
-      const payload = {
+      const payload: Record<string, string> = {
         n: name.trim() || 'Business',
         c: city.trim(),
         u: url.trim(),
         cat: cat || '',
         a: accent || '#1A73E8',
       };
+      if (logo && (logo.startsWith('http://') || logo.startsWith('https://'))) {
+        payload.l = logo;
+      }
+      if (thumb && (thumb.startsWith('http://') || thumb.startsWith('https://'))) {
+        payload.th = thumb;
+      }
       const json = JSON.stringify(payload);
       const b64 = btoa(unescape(encodeURIComponent(json)))
         .replace(/\+/g, '-')
@@ -904,7 +918,9 @@ function QRDesignStudioInner() {
             location,
             destinationValidation.url,
             categoryValue,
-            accentColor
+            accentColor,
+            logoUrl,
+            thumbnailUrl
           );
           targetUrl = `${origin}/qr/${encodeURIComponent(gToken)}`;
         }
@@ -1284,45 +1300,43 @@ function QRDesignStudioInner() {
         const dataUrl = event.target?.result as string;
         setLogoUrl(dataUrl);
         setStoredOrg({ logoUrl: dataUrl });
+        try {
+          localStorage.setItem('reviewqr_guest_logo', dataUrl);
+        } catch {}
         showToast('Logo applied to stand artwork.');
       };
       reader.readAsDataURL(file);
     };
 
     try {
-      if (!org?.id) {
-        applyLocalLogo();
-        setIsUploadingLogo(false);
-        return;
-      }
+      applyLocalLogo();
 
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', 'logo');
-      formData.append('orgId', org.id);
+      if (org?.id) {
+        formData.append('orgId', org.id);
+      }
 
-      const res = await fetch('/api/business/upload', {
+      const uploadEndpoint = org?.id ? '/api/business/upload' : '/api/public/upload';
+      const res = await fetch(uploadEndpoint, {
         method: 'POST',
         body: formData,
       });
 
-      if (res.status === 401) {
-        applyLocalLogo();
-        setIsUploadingLogo(false);
-        return;
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.url) {
+          setLogoUrl(data.url);
+          setStoredOrg({ logoUrl: data.url, logoPath: data.path });
+          try {
+            localStorage.setItem('reviewqr_guest_logo', data.url);
+          } catch {}
+          showToast('Logo uploaded and applied to stand artwork.');
+        }
       }
-
-      const data = await res.json();
-      if (!res.ok || !data.success || !data.url) {
-        applyLocalLogo();
-        setIsUploadingLogo(false);
-        return;
-      }
-      setLogoUrl(data.url);
-      setStoredOrg({ logoUrl: data.url, logoPath: data.path });
-      showToast('Logo uploaded and applied to stand artwork.');
     } catch {
-      applyLocalLogo();
+      // Keep local preview if network upload fails
     } finally {
       setIsUploadingLogo(false);
     }
@@ -1378,45 +1392,43 @@ function QRDesignStudioInner() {
         const dataUrl = event.target?.result as string;
         setThumbnailUrl(dataUrl);
         setStoredOrg({ thumbnailUrl: dataUrl });
+        try {
+          localStorage.setItem('reviewqr_guest_thumb', dataUrl);
+        } catch {}
         showToast('Venue cover photo applied.');
       };
       reader.readAsDataURL(file);
     };
 
     try {
-      if (!org?.id) {
-        applyLocalThumbnail();
-        setIsUploadingThumbnail(false);
-        return;
-      }
+      applyLocalThumbnail();
 
       const formData = new FormData();
       formData.append('file', file);
       formData.append('type', 'thumbnail');
-      formData.append('orgId', org.id);
+      if (org?.id) {
+        formData.append('orgId', org.id);
+      }
 
-      const res = await fetch('/api/business/upload', {
+      const uploadEndpoint = org?.id ? '/api/business/upload' : '/api/public/upload';
+      const res = await fetch(uploadEndpoint, {
         method: 'POST',
         body: formData,
       });
 
-      if (res.status === 401) {
-        applyLocalThumbnail();
-        setIsUploadingThumbnail(false);
-        return;
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.url) {
+          setThumbnailUrl(data.url);
+          setStoredOrg({ thumbnailUrl: data.url, thumbnailPath: data.path });
+          try {
+            localStorage.setItem('reviewqr_guest_thumb', data.url);
+          } catch {}
+          showToast('Venue cover photo uploaded successfully.');
+        }
       }
-
-      const data = await res.json();
-      if (!res.ok || !data.success || !data.url) {
-        applyLocalThumbnail();
-        setIsUploadingThumbnail(false);
-        return;
-      }
-      setThumbnailUrl(data.url);
-      setStoredOrg({ thumbnailUrl: data.url, thumbnailPath: data.path });
-      showToast('Venue cover photo uploaded successfully.');
     } catch {
-      applyLocalThumbnail();
+      // Keep local preview if network upload fails
     } finally {
       setIsUploadingThumbnail(false);
     }
@@ -1860,19 +1872,6 @@ function QRDesignStudioInner() {
                   </span>
                 </div>
 
-                {/* Touchpoint Placement / Location Name */}
-                <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#414754]">Placement / Campaign Tag</label>
-                  <input
-                    className="w-full h-11 px-3.5 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all"
-                    type="text"
-                    value={placementTag}
-                    onChange={(e) => setPlacementTag(e.target.value)}
-                    placeholder="Enter a label for this placement"
-                    required
-                  />
-                </div>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <label htmlFor="business-name" className="text-xs font-semibold text-[#414754]">
@@ -1900,6 +1899,137 @@ function QRDesignStudioInner() {
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
                     />
+                  </div>
+                </div>
+
+                {/* Business Category (placed after business name & city) */}
+                <div className="space-y-1">
+                  <label htmlFor="business-category" className="text-xs font-semibold text-[#414754]">
+                    Business Category
+                  </label>
+                  <input
+                    id="business-category"
+                    list="business-category-options"
+                    className="w-full h-11 px-3.5 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all"
+                    type="search"
+                    value={category}
+                    onChange={(e) => {
+                      setCategory(e.target.value);
+                      if (e.target.value !== 'Other') setCustomCategory('');
+                      if (e.target.value !== 'Hotel') setSubcategory('');
+                    }}
+                    placeholder="Select a business category"
+                    maxLength={80}
+                    required
+                    aria-required="true"
+                  />
+                  <datalist id="business-category-options">
+                    {BUSINESS_CATEGORIES.map((option) => (
+                      <option key={option} value={option} />
+                    ))}
+                  </datalist>
+                  {category.trim().toLowerCase() === 'other' && (
+                    <input
+                      id="custom-business-category"
+                      className="w-full h-11 px-3.5 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all"
+                      type="text"
+                      value={customCategory}
+                      onChange={(event) => setCustomCategory(event.target.value)}
+                      placeholder="Enter your business category"
+                      maxLength={80}
+                      required
+                      aria-label="Custom business category"
+                    />
+                  )}
+                  {categoryValue === 'Hotel' && (
+                    <div className="space-y-1">
+                      <label htmlFor="business-subcategory" className="text-xs font-semibold text-[#414754]">
+                        Subcategory (optional)
+                      </label>
+                      <select
+                        id="business-subcategory"
+                        value={subcategory}
+                        onChange={(event) => setSubcategory(event.target.value)}
+                        className="w-full h-11 px-3.5 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all"
+                      >
+                        <option value="">No subcategory</option>
+                        {HOTEL_SUBCATEGORIES.map((option) => (
+                          <option key={option} value={option}>{option}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+
+                {/* Brand Crest / Logo Mark */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-[#414754]">Brand Crest / Logo Mark</label>
+                  <div className="p-3 rounded-xl bg-slate-50 flex items-center justify-between gap-3 border border-slate-200">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center p-1 overflow-hidden border border-slate-100">
+                        {logoUrl ? (
+                          <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="material-symbols-outlined text-[#B06000] text-2xl">hotel</span>
+                        )}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs font-semibold text-[#0B1C30] truncate max-w-[140px]">
+                          {logoName || (logoUrl ? 'Active logo applied' : 'Default emblem')}
+                        </span>
+                        <span className="text-[11px] text-[#565E74]">PNG, WebP, JPG up to 5MB</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-xs font-semibold text-[#005BBF] border border-slate-200 shadow-2xs transition-all"
+                        type="button"
+                        disabled={isUploadingLogo || isRemovingLogo}
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        {isUploadingLogo ? 'Uploading...' : logoUrl ? 'Change' : 'Upload'}
+                      </button>
+                      {logoUrl && (
+                        <button
+                          className="px-3 py-1.5 rounded-lg bg-white hover:bg-red-50 text-xs font-semibold text-red-500 border border-slate-200 shadow-2xs transition-all"
+                          type="button"
+                          disabled={isRemovingLogo || isUploadingLogo}
+                          onClick={handleRemoveLogo}
+                        >
+                          {isRemovingLogo ? 'Removing...' : 'Remove'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Venue Cover Thumbnail Box */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-[#414754]">Venue Cover Photo (Customer Mobile Header)</label>
+                  <div className="p-3 rounded-xl bg-slate-50 flex items-center justify-between gap-3 border border-slate-200">
+                    <div className="flex items-center gap-3">
+                      <div className="w-16 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center overflow-hidden border border-slate-100 shrink-0">
+                        {thumbnailUrl ? (
+                          <img src={thumbnailUrl} alt="Cover" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="material-symbols-outlined text-slate-400 text-2xl">landscape</span>
+                        )}
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-xs font-semibold text-[#0B1C30] truncate max-w-[140px]">
+                          {thumbnailName || (thumbnailUrl ? 'Active cover photo' : 'Default venue photo')}
+                        </span>
+                        <span className="text-[11px] text-[#565E74]">16:9 PNG, JPG up to 5MB</span>
+                      </div>
+                    </div>
+                    <button
+                      className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-xs font-semibold text-[#005BBF] border border-slate-200 shadow-2xs transition-all shrink-0"
+                      type="button"
+                      disabled={isUploadingThumbnail}
+                      onClick={() => thumbInputRef.current?.click()}
+                    >
+                      {isUploadingThumbnail ? 'Uploading...' : thumbnailUrl ? 'Change' : 'Upload Cover'}
+                    </button>
                   </div>
                 </div>
 
@@ -2142,178 +2272,6 @@ function QRDesignStudioInner() {
                     <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
                   </button>
                 </section>
-
-                <div className="space-y-1">
-                  <label htmlFor="business-category" className="text-xs font-semibold text-[#414754]">
-                    Business Category
-                  </label>
-                  <input
-                    id="business-category"
-                    list="business-category-options"
-                    className="w-full h-11 px-3.5 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all"
-                    type="search"
-                    value={category}
-                    onChange={(e) => {
-                      setCategory(e.target.value);
-                      if (e.target.value !== 'Other') setCustomCategory('');
-                      if (e.target.value !== 'Hotel') setSubcategory('');
-                    }}
-                    placeholder="Select a business category"
-                    maxLength={80}
-                    required
-                    aria-required="true"
-                  />
-                  <datalist id="business-category-options">
-                    {BUSINESS_CATEGORIES.map((option) => (
-                      <option key={option} value={option} />
-                    ))}
-                  </datalist>
-                  {category.trim().toLowerCase() === 'other' && (
-                    <input
-                      id="custom-business-category"
-                      className="w-full h-11 px-3.5 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all"
-                      type="text"
-                      value={customCategory}
-                      onChange={(event) => setCustomCategory(event.target.value)}
-                      placeholder="Enter your business category"
-                      maxLength={80}
-                      required
-                      aria-label="Custom business category"
-                    />
-                  )}
-                  {categoryValue === 'Hotel' && (
-                    <div className="space-y-1">
-                      <label htmlFor="business-subcategory" className="text-xs font-semibold text-[#414754]">
-                        Subcategory (optional)
-                      </label>
-                      <select
-                        id="business-subcategory"
-                        value={subcategory}
-                        onChange={(event) => setSubcategory(event.target.value)}
-                        className="w-full h-11 px-3.5 rounded-xl bg-slate-50 text-xs text-[#0B1C30] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 focus:bg-white border border-slate-200 transition-all"
-                      >
-                        <option value="">No subcategory</option>
-                        {HOTEL_SUBCATEGORIES.map((option) => (
-                          <option key={option} value={option}>{option}</option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-                </div>
-
-                {/* Logo Uploader Box */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-[#414754]">Brand Crest / Logo Mark</label>
-                  <div className="p-3 rounded-xl bg-slate-50 flex items-center justify-between gap-3 border border-slate-200">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center p-1 overflow-hidden border border-slate-100">
-                        {logoUrl ? (
-                          <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
-                        ) : (
-                          <span className="material-symbols-outlined text-[#B06000] text-2xl">hotel</span>
-                        )}
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-xs font-semibold text-[#0B1C30] truncate max-w-[140px]">
-                          {logoName || (logoUrl ? 'Active logo applied' : 'Default emblem')}
-                        </span>
-                        <span className="text-[11px] text-[#565E74]">PNG, WebP, JPG up to 5MB</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-xs font-semibold text-[#005BBF] border border-slate-200 shadow-2xs transition-all"
-                        type="button"
-                        disabled={isUploadingLogo || isRemovingLogo}
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        {isUploadingLogo ? 'Uploading...' : logoUrl ? 'Change' : 'Upload'}
-                      </button>
-                      {logoUrl && (
-                        <button
-                          className="px-3 py-1.5 rounded-lg bg-white hover:bg-red-50 text-xs font-semibold text-red-500 border border-slate-200 shadow-2xs transition-all"
-                          type="button"
-                          disabled={isRemovingLogo || isUploadingLogo}
-                          onClick={handleRemoveLogo}
-                        >
-                          {isRemovingLogo ? 'Removing...' : 'Remove'}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Venue Cover Thumbnail Box */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-[#414754]">Venue Cover Photo (Customer Mobile Header)</label>
-                  <div className="p-3 rounded-xl bg-slate-50 flex items-center justify-between gap-3 border border-slate-200">
-                    <div className="flex items-center gap-3">
-                      <div className="w-16 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center overflow-hidden border border-slate-100 shrink-0">
-                        {thumbnailUrl ? (
-                          <img src={thumbnailUrl} alt="Cover" className="w-full h-full object-cover" />
-                        ) : (
-                          <span className="material-symbols-outlined text-slate-400 text-2xl">landscape</span>
-                        )}
-                      </div>
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-xs font-semibold text-[#0B1C30] truncate max-w-[140px]">
-                          {thumbnailName || (thumbnailUrl ? 'Active cover photo' : 'Default venue photo')}
-                        </span>
-                        <span className="text-[11px] text-[#565E74]">16:9 PNG, JPG up to 5MB</span>
-                      </div>
-                    </div>
-                    <button
-                      className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-xs font-semibold text-[#005BBF] border border-slate-200 shadow-2xs transition-all shrink-0"
-                      type="button"
-                      disabled={isUploadingThumbnail}
-                      onClick={() => thumbInputRef.current?.click()}
-                    >
-                      {isUploadingThumbnail ? 'Uploading...' : thumbnailUrl ? 'Change' : 'Upload Cover'}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Accent Color Swatches (Image 1) */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-[#414754]">Poster Accent Palette</label>
-                    <span className="text-xs font-mono text-[#565E74]">{accentColor}</span>
-                  </div>
-                  <div className="flex items-center gap-2.5 flex-wrap">
-                    {accentPalette.map((col) => {
-                      const isSelected = accentColor.toLowerCase() === col.hex.toLowerCase();
-                      return (
-                        <button
-                          key={col.hex}
-                          className={`w-9 h-9 rounded-full flex items-center justify-center shadow-sm text-white transition-all ${
-                            isSelected ? 'ring-4 ring-[#D8E2FF] scale-110' : 'hover:scale-105'
-                          }`}
-                          style={{ backgroundColor: col.hex }}
-                          title={col.name}
-                          type="button"
-                          onClick={() => {
-                            handleAccentColorChange(col.hex);
-                            showToast(`Accent set to ${col.name}`);
-                          }}
-                        >
-                          {isSelected && <span className="material-symbols-outlined text-[16px]">check</span>}
-                        </button>
-                      );
-                    })}
-                    <div className="flex items-center gap-1.5 ml-auto">
-                      <input
-                        type="color"
-                        value={accentColor.startsWith('#') && accentColor.length === 7 ? accentColor : '#1A73E8'}
-                        onChange={(e) => handleAccentColorChange(e.target.value)}
-                        className="w-9 h-9 rounded-full border border-slate-200 cursor-pointer p-0.5 bg-white shadow-2xs"
-                        title="Pick custom color"
-                      />
-                      <div className="flex items-center h-9 px-2 rounded-lg bg-slate-50 text-xs font-mono text-[#565E74] border border-slate-200">
-                        {accentColor}
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
                 <button
                   className="w-full mt-2 py-3 px-4 rounded-xl bg-[#005BBF] hover:bg-[#1A73E8] text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
@@ -2879,6 +2837,17 @@ function QRDesignStudioInner() {
                   <span className="material-symbols-outlined text-[16px]">view_in_ar</span>
                   <span>Stand Mockup</span>
                 </button>
+                <button
+                  className={`px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 transition-all ${
+                    viewMode === 'mobile'
+                      ? 'bg-slate-100 text-[#005BBF] font-bold'
+                      : 'hover:bg-slate-50 text-[#414754]'
+                  }`}
+                  onClick={() => setViewMode('mobile')}
+                >
+                  <span className="material-symbols-outlined text-[16px]">smartphone</span>
+                  <span>Mobile View</span>
+                </button>
                 <div className="h-4 w-px bg-slate-200 mx-1"></div>
                 <div className="flex items-center gap-1 text-[#414754] text-xs font-semibold">
                   <button
@@ -2924,29 +2893,118 @@ function QRDesignStudioInner() {
               <div className="w-full flex items-center justify-between pb-4 max-w-[380px]">
                 <span className="flex items-center gap-1.5 text-xs font-bold text-[#006D2C] tracking-wider uppercase">
                   <span className="w-2 h-2 rounded-full bg-[#006D2C] animate-pulse"></span>
-                  LIVE STAND PREVIEW
+                  {viewMode === 'mobile' ? 'CUSTOMER MOBILE VIEW' : 'LIVE STAND PREVIEW'}
                 </span>
                 <span className="text-[11px] text-[#565E74] uppercase font-semibold">
-                  Browser preview; print resolution is not certified
+                  {viewMode === 'mobile' ? 'Live review assistant flow' : 'Browser preview; print resolution is not certified'}
                 </span>
               </div>
 
-              {/* Physical Table Tent Stand Mockup (Image 1) */}
-              <div
-                ref={posterRef}
-                style={{
-                  transform: `scale(${zoomLevel / 100})${viewMode === 'mockup' ? ' rotateY(-12deg) rotateX(5deg)' : ''}`,
-                  transformStyle: 'preserve-3d',
-                  backgroundColor: customColors.posterBg || currentPresetData.bgHex,
-                }}
-                className={`relative w-full max-w-[380px] rounded-3xl shadow-[0_25px_50px_-12px_rgba(15,23,42,0.18)] overflow-hidden flex flex-col items-center transition-all duration-300 border border-black/5 ${
-                  currentPresetData.previewBg
-                } qr-poster-print-art motion-reduce:transition-none`}
-              >
-                {/* Top Google Strip if google-classic */}
-                {selectedPreset === 'google-classic' && (
-                  <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-[#4285F4] via-[#EA4335] via-[#FBBC05] to-[#34A853]"></div>
-                )}
+              {/* View Mode Switching: Mobile View vs Table Tent Stand */}
+              {viewMode === 'mobile' ? (
+                <div
+                  style={{ transform: `scale(${zoomLevel / 100})` }}
+                  className="w-full max-w-[340px] rounded-[36px] bg-[#F8F9FF] shadow-[0_25px_50px_-12px_rgba(15,23,42,0.25)] border-[6px] border-slate-900 overflow-hidden flex flex-col transition-all duration-300 animate-fadeIn"
+                >
+                  {/* Phone Speaker & Dynamic Island */}
+                  <div className="h-6 bg-slate-900 w-full flex items-center justify-center">
+                    <div className="w-20 h-3 bg-black rounded-full"></div>
+                  </div>
+
+                  {/* Header bar */}
+                  <div className="px-4 py-2 bg-white flex items-center justify-between border-b border-slate-100">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      <span className="text-[10px] font-bold text-[#005BBF] tracking-wide">VERIFIED.REVIEWQR.APP</span>
+                    </div>
+                    <span className="text-[10px] font-semibold text-slate-500">&lt; 30s Review</span>
+                  </div>
+
+                  {/* 16:9 Cover Photo Banner */}
+                  <div
+                    className="h-32 w-full bg-cover bg-center relative bg-gradient-to-br from-slate-800 to-slate-900"
+                    style={
+                      thumbnailUrl
+                        ? { backgroundImage: `url(${thumbnailUrl})` }
+                        : {
+                            backgroundImage:
+                              'url(https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80)',
+                          }
+                    }
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
+                  </div>
+
+                  {/* Identity Card overlapping banner */}
+                  <div className="relative px-4 pb-4 -mt-8 flex flex-col items-center text-center">
+                    <div className="w-16 h-16 rounded-full bg-white p-1 shadow-md flex items-center justify-center mb-1.5 overflow-hidden border-2 border-white">
+                      {logoUrl ? (
+                        <img src={logoUrl} alt="Logo" className="w-full h-full rounded-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full rounded-full bg-[#1A73E8] text-white flex items-center justify-center">
+                          <span className="material-symbols-outlined text-2xl">verified</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-center gap-1">
+                      <h2 className="font-extrabold text-sm text-[#0B1C30] tracking-tight">{businessName || 'YOUR BUSINESS NAME'}</h2>
+                      <span className="material-symbols-outlined text-[#1A73E8] text-[16px]">verified</span>
+                    </div>
+                    <p className="text-[10px] text-[#565E74] mt-0.5">{businessDetails}</p>
+
+                    {/* Star Rating Bar */}
+                    <div className="mt-3 w-full bg-white rounded-xl p-3 shadow-sm border border-slate-100 flex flex-col items-center">
+                      <span className="text-[11px] font-bold text-[#0B1C30]">How was your experience?</span>
+                      <div className="flex items-center gap-1 my-1.5 text-amber-400">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <span key={i} className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                            star
+                          </span>
+                        ))}
+                      </div>
+                      <span className="text-[9px] text-[#005BBF] font-semibold">Tap any star for instant review suggestions</span>
+                    </div>
+
+                    {/* Instant Phrasing Preview Box */}
+                    <div className="mt-2.5 w-full bg-white rounded-xl p-3 shadow-sm border border-slate-100 text-left">
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <span className="material-symbols-outlined text-[#005BBF] text-sm">auto_awesome</span>
+                        <span className="text-[10px] font-bold text-[#0B1C30]">Instant Review Phrasing</span>
+                      </div>
+                      <p className="text-[10px] text-slate-600 italic bg-slate-50 p-2 rounded-lg border border-slate-100">
+                        &quot;Outstanding service and warm hospitality at {businessName || 'this business'}. Highly recommended!&quot;
+                      </p>
+                      <div className="mt-2 w-full py-2 rounded-lg bg-[#005BBF] text-white text-[10px] font-bold text-center">
+                        Copy &amp; Open Google Maps
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Physical Table Tent Stand Mockup (Image 1) */
+                <div
+                  ref={posterRef}
+                  style={{
+                    transform: `scale(${zoomLevel / 100})${viewMode === 'mockup' ? ' rotateY(-12deg) rotateX(5deg)' : ''}`,
+                    transformStyle: 'preserve-3d',
+                    backgroundColor: customColors.posterBg || currentPresetData.bgHex,
+                  }}
+                  className={`relative w-full max-w-[380px] rounded-3xl shadow-[0_25px_50px_-12px_rgba(15,23,42,0.18)] overflow-hidden flex flex-col items-center transition-all duration-300 border border-black/5 ${
+                    currentPresetData.previewBg
+                  } qr-poster-print-art motion-reduce:transition-none`}
+                >
+                  {/* Top Google Strip if google-classic */}
+                  {selectedPreset === 'google-classic' && (
+                    <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-[#4285F4] via-[#EA4335] via-[#FBBC05] to-[#34A853]"></div>
+                  )}
+
+                  {/* Venue Cover Photo Banner on Stand (if uploaded) */}
+                  {thumbnailUrl && (
+                    <div className="w-full h-24 relative overflow-hidden shrink-0 border-b border-black/5">
+                      <img src={thumbnailUrl} alt="Venue Cover" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+                    </div>
+                  )}
 
                 {/* Top Header Section */}
                 <div className="w-full pt-8 pb-4 px-6 flex flex-col items-center text-center relative">
@@ -3081,6 +3139,7 @@ function QRDesignStudioInner() {
                   </div>
                 </div>
               </div>
+              )}
 
               {/* Bottom Quick Download Strip below Mockup (Image 1) */}
               <div className="flex items-center gap-3 pt-6 w-full max-w-[380px]">

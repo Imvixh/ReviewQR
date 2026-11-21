@@ -33,6 +33,7 @@ yarn-error.log*
 Thumbs.db
 *.tsbuildinfo
 next-env.d.ts
+.vscode/
 
 # Test results and artifacts
 /test-results/

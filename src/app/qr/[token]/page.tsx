@@ -178,6 +178,16 @@ export default function CustomerReviewJourneyPage() {
             const payload = JSON.parse(jsonStr);
             if (payload.u && safeHttpsUrlSchema.safeParse(payload.u).success) {
               if (cancelled) return;
+
+              let localLogo = '';
+              let localThumb = '';
+              if (typeof window !== 'undefined') {
+                try {
+                  localLogo = localStorage.getItem('reviewqr_guest_logo') || '';
+                  localThumb = localStorage.getItem('reviewqr_guest_thumb') || '';
+                } catch {}
+              }
+
               setQrCode({
                 businessName: payload.n || 'Business',
                 city: payload.c || '',
@@ -188,6 +198,8 @@ export default function CustomerReviewJourneyPage() {
                 tagline: payload.t || 'Scan to share your experience',
                 supportingText: '',
                 accentColor: payload.a || '#1A73E8',
+                logoUrl: payload.l || payload.logo || localLogo || undefined,
+                thumbnailUrl: payload.th || payload.thumb || localThumb || undefined,
               });
               setIsLoading(false);
               return;
@@ -212,6 +224,18 @@ export default function CustomerReviewJourneyPage() {
         if (!safeHttpsUrlSchema.safeParse(publicQr.googleReviewUrl).success) {
           throw new Error('This QR code has an invalid review destination.');
         }
+
+        let localLogo = '';
+        let localThumb = '';
+        if (typeof window !== 'undefined') {
+          try {
+            localLogo = localStorage.getItem('reviewqr_guest_logo') || '';
+            localThumb = localStorage.getItem('reviewqr_guest_thumb') || '';
+          } catch {}
+        }
+        if (!publicQr.logoUrl && localLogo) publicQr.logoUrl = localLogo;
+        if (!publicQr.thumbnailUrl && localThumb) publicQr.thumbnailUrl = localThumb;
+
         setQrCode(publicQr);
         void fetch(`/api/public/qr/${encodeURIComponent(token)}/scan`, { method: 'POST' }).catch(() => {});
       } catch (error) {

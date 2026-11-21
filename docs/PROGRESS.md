@@ -2,6 +2,34 @@
 
 Last updated: 2026-11-21
 
+## Branding Reordering, Logo & Venue Cover Photo Persistence, Public Asset Upload (2026-11-21)
+
+- **Removed Placement / Campaign Tag**:
+  - Removed the `Placement / Campaign Tag` column/input entirely from Tab 1 (`branding`).
+  - `placementTag` cleanly auto-defaults to `businessName || 'Tabletop Standee'`, eliminating all validation blocks.
+- **Tab 1 Reordering per User Request**:
+  - Ordered form fields logically:
+    1. Business Name & City/Location
+    2. Business Category (with datalist, custom category, and subcategory)
+    3. Brand Crest / Logo Mark (uploader card with live emblem preview)
+    4. Venue Cover Photo (Customer Mobile Header) (uploader card with 16:9 preview)
+    5. Review Destination (Find on Google Maps / Paste review link with instant test link and confirmation)
+  - Removed "Poster Accent Palette" entirely from the Branding page.
+- **Logo & Venue Cover Photo Live Studio Preview**:
+  - **Stand Mockup Banner**: When a venue cover photo is uploaded, it renders immediately as an illuminated header banner at the top of the Standee table tent.
+  - **Brand Crest Badge**: Live circular badge and QR center emblem update with the uploaded logo mark.
+  - **Mobile View Toggle**: Added a 3rd viewport toggle (`[Front View] [Stand Mockup] [Mobile View]`) in the canvas toolbar. Clicking `Mobile View` reveals an interactive customer mobile smartphone mockup with the 16:9 venue cover banner, overlapping circular logo, business name, star rating bar, and instant review phrasing assistant.
+- **End-to-End Scanned Review Flow Persistence**:
+  - Created `/api/public/upload` endpoint for guest image uploads to the Supabase `business-assets` public storage bucket (`guest-uploads/...`), returning clean HTTPS URLs.
+  - Updated `createGuestToken` to encode `logo` (`payload.l`) and `thumb` (`payload.th`) directly in the scannable QR payload.
+  - Updated `/qr/[token]` to decode `payload.l` and `payload.th`, rendering the exact uploaded logo and venue cover photo across all mobile device scans.
+  - Added `localStorage` caching (`reviewqr_guest_logo`, `reviewqr_guest_thumb`) for zero-latency local testing and same-browser verification.
+- **Automated Verification Suite**:
+  - `npm run typecheck`: PASS — 0 errors (exit code 0)
+  - `npm run lint`: PASS — 0 errors (exit code 0)
+  - `npm test`: PASS — 85/85 tests passed across 12 test files (exit code 0)
+  - `npm run build`: PASS — 27 routes generated successfully including `/api/public/upload` (exit code 0)
+
 ## Public Creation Flow Streamlining & Guided QR Fix (2026-11-21)
 
 - **Removed Extraneous Top Bar UI**:

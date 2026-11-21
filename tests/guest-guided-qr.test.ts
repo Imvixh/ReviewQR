@@ -2,15 +2,29 @@ import { describe, expect, it } from 'vitest';
 import { safeHttpsUrlSchema } from '../src/lib/validation';
 
 describe('Guest Guided QR Token & Review Assistant Flow', () => {
-  const createGuestToken = (name: string, city: string, url: string, cat?: string, accent?: string) => {
+  const createGuestToken = (
+    name: string,
+    city: string,
+    url: string,
+    cat?: string,
+    accent?: string,
+    logo?: string,
+    thumb?: string
+  ) => {
     try {
-      const payload = {
+      const payload: Record<string, string> = {
         n: name.trim() || 'Business',
         c: city.trim(),
         u: url.trim(),
         cat: cat || '',
         a: accent || '#1A73E8',
       };
+      if (logo && (logo.startsWith('http://') || logo.startsWith('https://'))) {
+        payload.l = logo;
+      }
+      if (thumb && (thumb.startsWith('http://') || thumb.startsWith('https://'))) {
+        payload.th = thumb;
+      }
       const json = JSON.stringify(payload);
       const b64 = btoa(unescape(encodeURIComponent(json)))
         .replace(/\+/g, '-')
@@ -40,6 +54,8 @@ describe('Guest Guided QR Token & Review Assistant Flow', () => {
           tagline: 'Scan to share your experience',
           supportingText: '',
           accentColor: payload.a || '#1A73E8',
+          logoUrl: payload.l || undefined,
+          thumbnailUrl: payload.th || undefined,
         };
       }
       return null;
@@ -55,9 +71,19 @@ describe('Guest Guided QR Token & Review Assistant Flow', () => {
       url: 'https://g.page/r/example/review',
       cat: 'Restaurant',
       accent: '#1A73E8',
+      logo: 'https://example.com/logo.png',
+      thumb: 'https://example.com/cover.jpg',
     };
 
-    const token = createGuestToken(input.name, input.city, input.url, input.cat, input.accent);
+    const token = createGuestToken(
+      input.name,
+      input.city,
+      input.url,
+      input.cat,
+      input.accent,
+      input.logo,
+      input.thumb
+    );
     expect(token).toMatch(/^guest_[A-Za-z0-9_-]+$/);
 
     const decoded = decodeGuestToken(token);
@@ -67,6 +93,8 @@ describe('Guest Guided QR Token & Review Assistant Flow', () => {
     expect(decoded?.googleReviewUrl).toBe('https://g.page/r/example/review');
     expect(decoded?.businessCategory).toBe('Restaurant');
     expect(decoded?.accentColor).toBe('#1A73E8');
+    expect(decoded?.logoUrl).toBe('https://example.com/logo.png');
+    expect(decoded?.thumbnailUrl).toBe('https://example.com/cover.jpg');
   });
 
   it('rejects guest tokens with invalid or non-HTTPS review URLs', () => {
@@ -75,3 +103,4 @@ describe('Guest Guided QR Token & Review Assistant Flow', () => {
     expect(decoded).toBeNull();
   });
 });
+
