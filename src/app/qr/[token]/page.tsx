@@ -140,6 +140,11 @@ export default function CustomerReviewJourneyPage() {
   const [qrCode, setQrCode] = useState<PublicQr | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [isInactive, setIsInactive] = useState(false);
+  const [isNotFound, setIsNotFound] = useState(false);
+  const [inactiveBizName, setInactiveBizName] = useState('');
+  const [logoFailed, setLogoFailed] = useState(false);
+  const [thumbFailed, setThumbFailed] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [language, setLanguage] = useState<'en' | 'hi'>('en');
 
@@ -211,6 +216,15 @@ export default function CustomerReviewJourneyPage() {
 
         const response = await fetch(`/api/public/qr/${encodeURIComponent(token)}`);
         const result = await response.json();
+        if (response.status === 403 || result.code === 'QR_INACTIVE') {
+          setIsInactive(true);
+          setInactiveBizName(result.businessName || '');
+          throw new Error('This QR code touchpoint is currently inactive or subscription has expired.');
+        }
+        if (response.status === 404 || result.code === 'QR_NOT_FOUND') {
+          setIsNotFound(true);
+          throw new Error('This QR code was not found or has been removed.');
+        }
         if (!response.ok || !result.qr) {
           throw new Error(
             response.status === 503
@@ -408,6 +422,60 @@ export default function CustomerReviewJourneyPage() {
   const reviewDestination = qrCode?.googleReviewUrl || '#';
 
   if (isLoading || loadError || !qrCode) {
+    if (isInactive) {
+      return (
+        <main className="min-h-screen bg-[#F0F4F9] text-[#0B1C30] flex items-center justify-center p-6 font-sans">
+          <div className="max-w-md w-full rounded-3xl bg-white p-8 text-center shadow-lg border border-amber-200">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4">
+              <span className="material-symbols-outlined text-3xl">pause_circle</span>
+            </div>
+            <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-wider">
+              Touchpoint Inactive
+            </span>
+            <h1 className="text-lg font-black text-[#0B1C30] mt-2 tracking-tight">
+              Review Assistant Paused
+            </h1>
+            <p className="mt-2 text-xs text-[#565E74] leading-relaxed">
+              {inactiveBizName ? (
+                <>
+                  The review flow for <strong className="text-slate-800">{inactiveBizName}</strong> is currently paused or its subscription has expired.
+                </>
+              ) : (
+                'This QR code touchpoint is currently inactive or its subscription has expired.'
+              )}
+            </p>
+            <div className="my-5 p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-left text-[11px] text-slate-600 space-y-1">
+              <p className="font-semibold text-slate-700">Notice for Business Owner:</p>
+              <p>
+                Please log in to your account or contact platform administration to renew your subscription and reactivate this touchpoint.
+              </p>
+            </div>
+          </div>
+        </main>
+      );
+    }
+
+    if (isNotFound) {
+      return (
+        <main className="min-h-screen bg-[#F0F4F9] text-[#0B1C30] flex items-center justify-center p-6 font-sans">
+          <div className="max-w-md w-full rounded-3xl bg-white p-8 text-center shadow-lg border border-red-200">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mb-4">
+              <span className="material-symbols-outlined text-3xl">search_off</span>
+            </div>
+            <span className="px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 text-[10px] font-bold uppercase tracking-wider">
+              Touchpoint Removed
+            </span>
+            <h1 className="text-lg font-black text-[#0B1C30] mt-2 tracking-tight">
+              QR Code Not Found
+            </h1>
+            <p className="mt-2 text-xs text-[#565E74] leading-relaxed">
+              This QR code does not exist or has been removed from the platform.
+            </p>
+          </div>
+        </main>
+      );
+    }
+
     return (
       <main className="min-h-screen bg-[#F0F4F9] text-[#0B1C30] flex items-center justify-center p-6 font-sans">
         <div className="max-w-md w-full rounded-3xl bg-white p-8 text-center shadow-lg border border-slate-100">
@@ -506,7 +574,7 @@ export default function CustomerReviewJourneyPage() {
               <div
                 className="h-36 w-full bg-cover bg-center relative bg-gradient-to-br from-slate-800 to-slate-900"
                 style={
-                  qrCode.thumbnailUrl
+                  !thumbFailed && qrCode.thumbnailUrl
                     ? { backgroundImage: `url(${qrCode.thumbnailUrl})` }
                     : {
                         backgroundImage:
@@ -521,10 +589,11 @@ export default function CustomerReviewJourneyPage() {
               <div className="relative px-5 pb-5 -mt-10 flex flex-col items-center text-center">
                 {/* Circular Logo Overlapping Banner */}
                 <div className="w-18 h-18 rounded-full bg-white p-1 shadow-md flex items-center justify-center mb-2 overflow-hidden border-2 border-white">
-                  {qrCode.logoUrl ? (
+                  {!logoFailed && qrCode.logoUrl ? (
                     <img
                       src={qrCode.logoUrl}
                       alt={businessName}
+                      onError={() => setLogoFailed(true)}
                       className="w-full h-full rounded-full object-cover"
                     />
                   ) : (
@@ -661,8 +730,13 @@ export default function CustomerReviewJourneyPage() {
             <div className="flex items-center justify-between px-1">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-full bg-[#1A73E8] text-white flex items-center justify-center text-xs font-bold overflow-hidden shadow-2xs">
-                  {qrCode.logoUrl ? (
-                    <img src={qrCode.logoUrl} alt={businessName} className="w-full h-full object-cover" />
+                  {!logoFailed && qrCode.logoUrl ? (
+                    <img
+                      src={qrCode.logoUrl}
+                      alt={businessName}
+                      onError={() => setLogoFailed(true)}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     businessName.slice(0, 2).toUpperCase()
                   )}

@@ -76,10 +76,12 @@ function QRDesignStudioInner() {
   const [location, setLocation] = useState('');
   const [accentColor, setAccentColor] = useState('#1A73E8');
   const [logoUrl, setLogoUrl] = useState<string>('');
+  const [localLogoDataUrl, setLocalLogoDataUrl] = useState<string>('');
   const [logoName, setLogoName] = useState('');
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [isRemovingLogo, setIsRemovingLogo] = useState(false);
   const [thumbnailUrl, setThumbnailUrl] = useState<string>('');
+  const [localThumbDataUrl, setLocalThumbDataUrl] = useState<string>('');
   const [thumbnailName, setThumbnailName] = useState('');
   const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
   const thumbInputRef = useRef<HTMLInputElement>(null);
@@ -1298,6 +1300,7 @@ function QRDesignStudioInner() {
       const reader = new FileReader();
       reader.onload = (event) => {
         const dataUrl = event.target?.result as string;
+        setLocalLogoDataUrl(dataUrl);
         setLogoUrl(dataUrl);
         setStoredOrg({ logoUrl: dataUrl });
         try {
@@ -1357,6 +1360,7 @@ function QRDesignStudioInner() {
         }
       }
       setLogoUrl('');
+      setLocalLogoDataUrl('');
       setLogoName('');
       if (fileInputRef.current) fileInputRef.current.value = '';
       if (centerEmblem === 'business-logo') setCenterEmblem('google-g');
@@ -1390,6 +1394,7 @@ function QRDesignStudioInner() {
       const reader = new FileReader();
       reader.onload = (event) => {
         const dataUrl = event.target?.result as string;
+        setLocalThumbDataUrl(dataUrl);
         setThumbnailUrl(dataUrl);
         setStoredOrg({ thumbnailUrl: dataUrl });
         try {
@@ -1967,15 +1972,24 @@ function QRDesignStudioInner() {
                   <div className="p-3 rounded-xl bg-slate-50 flex items-center justify-between gap-3 border border-slate-200">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center p-1 overflow-hidden border border-slate-100">
-                        {logoUrl ? (
-                          <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                        {(localLogoDataUrl || logoUrl) ? (
+                          <img
+                            src={localLogoDataUrl || logoUrl}
+                            alt="Logo"
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              if (localLogoDataUrl && e.currentTarget.src !== localLogoDataUrl) {
+                                e.currentTarget.src = localLogoDataUrl;
+                              }
+                            }}
+                          />
                         ) : (
                           <span className="material-symbols-outlined text-[#B06000] text-2xl">hotel</span>
                         )}
                       </div>
                       <div className="flex flex-col">
                         <span className="text-xs font-semibold text-[#0B1C30] truncate max-w-[140px]">
-                          {logoName || (logoUrl ? 'Active logo applied' : 'Default emblem')}
+                          {logoName || ((localLogoDataUrl || logoUrl) ? 'Active logo applied' : 'Default emblem')}
                         </span>
                         <span className="text-[11px] text-[#565E74]">PNG, WebP, JPG up to 5MB</span>
                       </div>
@@ -1987,9 +2001,9 @@ function QRDesignStudioInner() {
                         disabled={isUploadingLogo || isRemovingLogo}
                         onClick={() => fileInputRef.current?.click()}
                       >
-                        {isUploadingLogo ? 'Uploading...' : logoUrl ? 'Change' : 'Upload'}
+                        {isUploadingLogo ? 'Uploading...' : (localLogoDataUrl || logoUrl) ? 'Change' : 'Upload'}
                       </button>
-                      {logoUrl && (
+                      {(localLogoDataUrl || logoUrl) && (
                         <button
                           className="px-3 py-1.5 rounded-lg bg-white hover:bg-red-50 text-xs font-semibold text-red-500 border border-slate-200 shadow-2xs transition-all"
                           type="button"
@@ -2009,15 +2023,24 @@ function QRDesignStudioInner() {
                   <div className="p-3 rounded-xl bg-slate-50 flex items-center justify-between gap-3 border border-slate-200">
                     <div className="flex items-center gap-3">
                       <div className="w-16 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center overflow-hidden border border-slate-100 shrink-0">
-                        {thumbnailUrl ? (
-                          <img src={thumbnailUrl} alt="Cover" className="w-full h-full object-cover" />
+                        {(localThumbDataUrl || thumbnailUrl) ? (
+                          <img
+                            src={localThumbDataUrl || thumbnailUrl}
+                            alt="Cover"
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              if (localThumbDataUrl && e.currentTarget.src !== localThumbDataUrl) {
+                                e.currentTarget.src = localThumbDataUrl;
+                              }
+                            }}
+                          />
                         ) : (
                           <span className="material-symbols-outlined text-slate-400 text-2xl">landscape</span>
                         )}
                       </div>
                       <div className="flex flex-col min-w-0">
                         <span className="text-xs font-semibold text-[#0B1C30] truncate max-w-[140px]">
-                          {thumbnailName || (thumbnailUrl ? 'Active cover photo' : 'Default venue photo')}
+                          {thumbnailName || ((localThumbDataUrl || thumbnailUrl) ? 'Active cover photo' : 'Default venue photo')}
                         </span>
                         <span className="text-[11px] text-[#565E74]">16:9 PNG, JPG up to 5MB</span>
                       </div>
@@ -2028,7 +2051,7 @@ function QRDesignStudioInner() {
                       disabled={isUploadingThumbnail}
                       onClick={() => thumbInputRef.current?.click()}
                     >
-                      {isUploadingThumbnail ? 'Uploading...' : thumbnailUrl ? 'Change' : 'Upload Cover'}
+                      {isUploadingThumbnail ? 'Uploading...' : (localThumbDataUrl || thumbnailUrl) ? 'Change' : 'Upload Cover'}
                     </button>
                   </div>
                 </div>
@@ -2251,30 +2274,10 @@ function QRDesignStudioInner() {
                     </p>
                   )}
 
-                  <button
-                    type="button"
-                    onClick={handleConfirmDestination}
-                    disabled={
-                      !destinationValidation.valid ||
-                      !hasConfirmedDestination ||
-                      isSavingDestination ||
-                      isLoadingDestination
-                    }
-                    className="w-full min-h-11 rounded-xl bg-[#005BBF] px-4 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#1A73E8] disabled:cursor-not-allowed disabled:bg-slate-300 flex items-center justify-center gap-2"
-                  >
-                    <span>
-                      {isSavingDestination
-                        ? 'Saving destination…'
-                        : isDestinationSaved
-                        ? 'Destination saved — continue to QR editor'
-                        : 'Confirm destination & continue to QR editor'}
-                    </span>
-                    <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-                  </button>
                 </section>
 
                 <button
-                  className="w-full mt-2 py-3 px-4 rounded-xl bg-[#005BBF] hover:bg-[#1A73E8] text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
+                  className="w-full mt-3 py-3.5 px-4 rounded-xl bg-[#005BBF] hover:bg-[#1A73E8] text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
                   type="button"
                   onClick={() => {
                     if (!destinationValidation.valid) {
@@ -2282,6 +2285,7 @@ function QRDesignStudioInner() {
                       return;
                     }
                     setHasConfirmedDestination(true);
+                    setSavedDestinationUrl(googleReviewUrl.trim());
                     setActiveTab('qrstyle');
                   }}
                 >
@@ -2923,14 +2927,11 @@ function QRDesignStudioInner() {
                   {/* 16:9 Cover Photo Banner */}
                   <div
                     className="h-32 w-full bg-cover bg-center relative bg-gradient-to-br from-slate-800 to-slate-900"
-                    style={
-                      thumbnailUrl
-                        ? { backgroundImage: `url(${thumbnailUrl})` }
-                        : {
-                            backgroundImage:
-                              'url(https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80)',
-                          }
-                    }
+                    style={{
+                      backgroundImage: (localThumbDataUrl || thumbnailUrl)
+                        ? `url("${localThumbDataUrl || thumbnailUrl}")`
+                        : 'url("https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80")',
+                    }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
                   </div>
@@ -2938,8 +2939,17 @@ function QRDesignStudioInner() {
                   {/* Identity Card overlapping banner */}
                   <div className="relative px-4 pb-4 -mt-8 flex flex-col items-center text-center">
                     <div className="w-16 h-16 rounded-full bg-white p-1 shadow-md flex items-center justify-center mb-1.5 overflow-hidden border-2 border-white">
-                      {logoUrl ? (
-                        <img src={logoUrl} alt="Logo" className="w-full h-full rounded-full object-cover" />
+                      {(localLogoDataUrl || logoUrl) ? (
+                        <img
+                          src={localLogoDataUrl || logoUrl}
+                          alt="Logo"
+                          className="w-full h-full rounded-full object-cover"
+                          onError={(e) => {
+                            if (localLogoDataUrl && e.currentTarget.src !== localLogoDataUrl) {
+                              e.currentTarget.src = localLogoDataUrl;
+                            }
+                          }}
+                        />
                       ) : (
                         <div className="w-full h-full rounded-full bg-[#1A73E8] text-white flex items-center justify-center">
                           <span className="material-symbols-outlined text-2xl">verified</span>
@@ -2999,9 +3009,20 @@ function QRDesignStudioInner() {
                   )}
 
                   {/* Venue Cover Photo Banner on Stand (if uploaded) */}
-                  {thumbnailUrl && (
+                  {(localThumbDataUrl || thumbnailUrl) && (
                     <div className="w-full h-24 relative overflow-hidden shrink-0 border-b border-black/5">
-                      <img src={thumbnailUrl} alt="Venue Cover" className="w-full h-full object-cover" />
+                      <img
+                        src={localThumbDataUrl || thumbnailUrl}
+                        alt="Venue Cover"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          if (localThumbDataUrl && e.currentTarget.src !== localThumbDataUrl) {
+                            e.currentTarget.src = localThumbDataUrl;
+                          } else {
+                            e.currentTarget.style.display = 'none';
+                          }
+                        }}
+                      />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
                     </div>
                   )}
@@ -3015,8 +3036,19 @@ function QRDesignStudioInner() {
 
                   {/* Brand Crest / Icon Badge */}
                   <div className="w-12 h-12 rounded-full bg-slate-100 shadow-md flex items-center justify-center p-1.5 mb-2 border border-black/5 overflow-hidden">
-                    {logoUrl ? (
-                      <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                    {(localLogoDataUrl || logoUrl) ? (
+                      <img
+                        src={localLogoDataUrl || logoUrl}
+                        alt="Logo"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          if (localLogoDataUrl && e.currentTarget.src !== localLogoDataUrl) {
+                            e.currentTarget.src = localLogoDataUrl;
+                          } else {
+                            e.currentTarget.style.display = 'none';
+                          }
+                        }}
+                      />
                     ) : (
                       <div className="w-full h-full bg-[#0F172A] text-white rounded-full flex items-center justify-center">
                         <span className="material-symbols-outlined text-[24px]">hotel</span>
@@ -3066,8 +3098,8 @@ function QRDesignStudioInner() {
 
                     {/* Centered Floating Emblem (Image 3) */}
                     <div className="absolute w-11 h-11 rounded-full bg-white shadow-md flex items-center justify-center p-1 border border-slate-100 overflow-hidden pointer-events-none">
-                      {centerEmblem === 'business-logo' && logoUrl ? (
-                        <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                      {centerEmblem === 'business-logo' && (localLogoDataUrl || logoUrl) ? (
+                        <img src={localLogoDataUrl || logoUrl} alt="Logo" className="w-full h-full object-cover" />
                       ) : centerEmblem === 'business-logo' ? (
                         <span className="material-symbols-outlined text-[22px] text-amber-600">crown</span>
                       ) : (

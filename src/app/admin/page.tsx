@@ -4,6 +4,7 @@ import {
   getPlatformOverviewMetrics,
 } from '@/lib/auth/super-admin';
 import AdminDashboardClient from './admin-dashboard-client';
+import AdminLoginClient from './admin-login-client';
 import { AdminAccessDenied, AdminUnconfigured } from './access-denied';
 
 export const dynamic = 'force-dynamic';
@@ -16,13 +17,14 @@ export default async function AdminPage() {
       case 'UNCONFIGURED':
         return <AdminUnconfigured />;
       case 'UNAUTHENTICATED':
-        redirect('/login?redirectTo=/admin');
+        // Display dedicated Super Admin Login directly at /admin (No signup, restricted gateway)
+        return <AdminLoginClient />;
       case 'FORBIDDEN':
         return <AdminAccessDenied userEmail={auth.user.email} />;
       case 'MFA_ENROLLMENT_REQUIRED':
         redirect('/admin/setup-2fa');
       case 'MFA_CHALLENGE_REQUIRED':
-        redirect('/admin/verify-2fa');
+        return <AdminLoginClient />;
     }
   }
 
@@ -36,4 +38,3 @@ export default async function AdminPage() {
     />
   );
 }
-

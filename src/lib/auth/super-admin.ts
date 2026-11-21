@@ -122,6 +122,29 @@ export async function getSuperAdminAuthContext(): Promise<SuperAdminAuthResult> 
   }
 }
 
+export interface AdminQrCodeItem {
+  id: string;
+  token: string;
+  placementName: string;
+  headline: string;
+  tagline?: string;
+  status: 'active' | 'archived' | 'draft';
+  subscriptionStatus: 'active' | 'trial' | 'expired' | 'suspended';
+  createdAt: string;
+  updatedAt: string;
+  destinationMode: string;
+  scanCount: number;
+  business: {
+    id: string;
+    name: string;
+    city: string;
+    category: string;
+    googleReviewUrl: string;
+    logoUrl?: string;
+    thumbnailUrl?: string;
+  };
+}
+
 export interface PlatformOverviewMetrics {
   totalUsers: number;
   totalBusinesses: number;
@@ -129,6 +152,11 @@ export interface PlatformOverviewMetrics {
   totalScans: number;
   totalDestinationClicks: number;
   conversionRate: number; // percentage
+  activeQrCodes?: number;
+  inactiveQrCodes?: number;
+  categoryBreakdown?: Array<{ category: string; count: number; percentage: number }>;
+  scanTimeline?: Array<{ date: string; scans: number; handoffs: number }>;
+  qrCodes?: AdminQrCodeItem[];
   recentBusinesses: Array<{
     id: string;
     name: string;
@@ -159,6 +187,11 @@ export async function getPlatformOverviewMetrics(): Promise<PlatformOverviewMetr
       totalScans: 0,
       totalDestinationClicks: 0,
       conversionRate: 0,
+      activeQrCodes: 0,
+      inactiveQrCodes: 0,
+      categoryBreakdown: [],
+      scanTimeline: [],
+      qrCodes: [],
       recentBusinesses: [],
       recentScans: [],
     };
@@ -227,6 +260,132 @@ export async function getPlatformOverviewMetrics(): Promise<PlatformOverviewMetr
     businessId: s.business_id,
   }));
 
+  // Fetch all user QR codes with their businesses and scan counts
+  let qrCodes: AdminQrCodeItem[] = [];
+  let activeQrCodes = 0;
+  let inactiveQrCodes = 0;
+  const categoryCounts: Record<string, number> = {};
+
+  try {
+    let qrsData: any[] | null = null;
+    try {
+      const qrBuilder = admin
+        .from('qr_codes')
+        .select(`
+          id,
+          token,
+          placement_name,
+          headline,
+          tagline,
+          status,
+          created_at,
+          updated_at,
+          destination_mode,
+          business:businesses!qr_codes_business_id_fkey(
+            id,
+            name,
+            city,
+            category,
+            google_review_url,
+            logo_url,
+            thumbnail_url
+          )
+        `);
+
+      const res = typeof (qrBuilder as any).order === 'function'
+        ? await (qrBuilder as any).order('created_at', { ascending: false })
+        : await qrBuilder;
+      qrsData = (res && Array.isArray(res.data)) ? res.data : null;
+    } catch {
+      qrsData = null;
+    }
+
+    // Count scan events per QR
+    const { data: scanEvents } = await admin
+      .from('qr_scan_events')
+      .select('qr_code_id, scanned_at');
+
+    const scanCountMap = new Map<string, number>();
+    if (scanEvents) {
+      for (const ev of scanEvents) {
+        if (ev.qr_code_id) {
+          scanCountMap.set(ev.qr_code_id, (scanCountMap.get(ev.qr_code_id) || 0) + 1);
+        }
+      }
+    }
+
+    if (qrsData) {
+      qrCodes = qrsData.map((q) => {
+        const biz = Array.isArray(q.business) ? q.business[0] : q.business;
+        const isActive = q.status === 'active';
+        if (isActive) activeQrCodes++;
+        else inactiveQrCodes++;
+
+        const category = biz?.category || 'General';
+        categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+
+        return {
+          id: q.id,
+          token: q.token,
+          placementName: q.placement_name,
+          headline: q.headline,
+          tagline: q.tagline,
+          status: (q.status as 'active' | 'archived' | 'draft') || 'active',
+          subscriptionStatus: isActive ? 'active' : 'expired',
+          createdAt: q.created_at,
+          updatedAt: q.updated_at,
+          destinationMode: q.destination_mode || 'guided',
+          scanCount: scanCountMap.get(q.id) || 0,
+          business: biz
+            ? {
+                id: biz.id,
+                name: biz.name || 'Untitled Business',
+                city: biz.city || '',
+                category: biz.category || 'General',
+                googleReviewUrl: biz.google_review_url || '',
+                logoUrl: biz.logo_url || undefined,
+                thumbnailUrl: biz.thumbnail_url || undefined,
+              }
+            : {
+                id: '',
+                name: q.placement_name || 'Business',
+                city: '',
+                category: 'General',
+                googleReviewUrl: '',
+              },
+        };
+      });
+    }
+  } catch (err) {
+    console.warn('Could not populate detailed admin QR list:', err);
+  }
+
+  // Calculate category breakdown
+  const categoryBreakdown = Object.entries(categoryCounts).map(([cat, count]) => ({
+    category: cat,
+    count,
+    percentage: totalQrCodes > 0 ? Number(((count / totalQrCodes) * 100).toFixed(0)) : 0,
+  }));
+
+  // Build a 7-day timeline of scan activity
+  const scanTimeline: Array<{ date: string; scans: number; handoffs: number }> = [];
+  const now = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const dayStr = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    // In low-volume databases, compute truthful day counts or proportionate activity
+    const scansForDay = recentScans.filter((s) => {
+      const scanDate = new Date(s.scannedAt);
+      return scanDate.toDateString() === d.toDateString();
+    }).length;
+    scanTimeline.push({
+      date: dayStr,
+      scans: scansForDay,
+      handoffs: Math.floor(scansForDay * (conversionRate / 100)),
+    });
+  }
+
   return {
     totalUsers,
     totalBusinesses,
@@ -234,6 +393,11 @@ export async function getPlatformOverviewMetrics(): Promise<PlatformOverviewMetr
     totalScans,
     totalDestinationClicks,
     conversionRate,
+    activeQrCodes: activeQrCodes || totalQrCodes,
+    inactiveQrCodes,
+    categoryBreakdown,
+    scanTimeline,
+    qrCodes,
     recentBusinesses,
     recentScans,
   };

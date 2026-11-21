@@ -29,7 +29,40 @@ export async function GET(
   }
 
   const row = Array.isArray(data) ? data[0] : data;
-  if (!row) return NextResponse.json({ code: 'QR_NOT_FOUND' }, { status: 404 });
+  if (!row) {
+    // Check if QR exists in qr_codes with non-active status (e.g. paused / expired by admin)
+    try {
+      let adminClient;
+      try {
+        adminClient = createAdminClient();
+      } catch {
+        adminClient = null;
+      }
+      const queryClient = adminClient || supabase;
+      const { data: existingQr } = await queryClient
+        .from('qr_codes')
+        .select('id, status, business:businesses!qr_codes_business_id_fkey(name)')
+        .eq('token', parsedToken.data.token)
+        .maybeSingle();
+
+      if (existingQr) {
+        const biz = Array.isArray(existingQr.business) ? existingQr.business[0] : existingQr.business;
+        const bizName = (biz as { name?: string } | null)?.name || 'This business';
+        return NextResponse.json(
+          {
+            code: 'QR_INACTIVE',
+            message: 'This QR code touchpoint is currently inactive or subscription has expired.',
+            businessName: bizName,
+          },
+          { status: 403 }
+        );
+      }
+    } catch (checkErr) {
+      console.warn('Failed to check inactive QR code:', checkErr);
+    }
+
+    return NextResponse.json({ code: 'QR_NOT_FOUND', message: 'QR code not found.' }, { status: 404 });
+  }
   if (!safeHttpsUrlSchema.safeParse(row.google_review_url).success) {
     console.error('A public QR token resolves to an unsafe stored destination.');
     return NextResponse.json({ code: 'PUBLIC_DESTINATION_INVALID' }, { status: 503 });
