@@ -1,4 +1,5 @@
 import { safeHttpsUrlSchema } from './validation';
+import { cleanDestinationUrl } from './qr-engine';
 
 export interface DecodedGuestToken {
   businessName: string;
@@ -37,17 +38,17 @@ export function expandAssetUrl(val?: string): string | undefined {
 }
 
 export function compactReviewUrl(url: string): string {
-  const u = (url || '').trim();
-  if (u.startsWith('https://search.google.com/local/writereview?placeid=')) {
-    return 'g:' + u.slice(52);
+  const cleaned = cleanDestinationUrl(url);
+  if (cleaned.startsWith('https://search.google.com/local/writereview?placeid=')) {
+    return 'g:' + cleaned.slice(52);
   }
-  if (u.startsWith('https://g.page/r/')) {
-    return 'gp:' + u.slice(17);
+  if (cleaned.startsWith('https://g.page/r/')) {
+    return 'gp:' + cleaned.slice(17);
   }
-  if (u.startsWith('https://maps.google.com/?cid=')) {
-    return 'gc:' + u.slice(29);
+  if (cleaned.startsWith('https://maps.google.com/?cid=')) {
+    return 'gc:' + cleaned.slice(29);
   }
-  return u;
+  return cleaned;
 }
 
 export function expandReviewUrl(u?: string): string {
@@ -89,8 +90,9 @@ function fromUrlSafeBase64(b64: string): string {
 
 /**
  * Creates a compact, highly scannable guest token for Guided Review QR codes.
- * Long well-known URLs (Google Maps review endpoints, Supabase storage paths)
- * are compressed with standard lightweight prefixes to minimize QR matrix density.
+ * Long well-known URLs (Google Maps review endpoints) are cleaned and compressed
+ * to minimize QR matrix density. Assets are omitted by default to ensure maximum
+ * QR scannability unless explicitly enabled.
  */
 export function createGuestToken(
   name: string,
@@ -99,7 +101,8 @@ export function createGuestToken(
   cat?: string,
   accent?: string,
   logo?: string,
-  thumb?: string
+  thumb?: string,
+  options?: { includeAssets?: boolean }
 ): string {
   try {
     if (!url) return '';

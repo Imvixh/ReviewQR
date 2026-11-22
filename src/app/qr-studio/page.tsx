@@ -7,6 +7,12 @@ import { getStoredOrg, getStoredQRCodes, saveQRCode, setStoredOrg } from '@/lib/
 import { Organization, QRCode } from '@/lib/types';
 import { generateQrSvg } from '@/lib/qr-geometry';
 import { createGuestToken } from '@/lib/guest-token';
+import {
+  cleanDestinationUrl,
+  generateCleanQr,
+  QrEngineResult,
+  QrStylePreset,
+} from '@/lib/qr-engine';
 import { buildGoogleMapsSearchUrl, validateReviewDestination } from '@/lib/review-destination';
 import { getQrDestinationMode, resolvePublicAppOrigin, resolveQrDestination } from '@/lib/qr-destination';
 import {
@@ -87,9 +93,12 @@ function QRDesignStudioInner() {
   const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
   const thumbInputRef = useRef<HTMLInputElement>(null);
 
-  // QR Code Architecture State (Image 3)
-  const [geometry, setGeometry] = useState<'classic' | 'rounded' | 'dots' | 'premium-eye'>('rounded');
-  const [centerEmblem, setCenterEmblem] = useState<'google-g' | 'business-logo'>('google-g');
+  // QR Code Architecture State (Clean Standard Defaults)
+  const [qrStyle, setQrStyle] = useState<QrStylePreset>('standard');
+  const [geometry, setGeometry] = useState<'classic' | 'rounded' | 'dots' | 'premium-eye'>('classic');
+  const [centerEmblem, setCenterEmblem] = useState<'none' | 'google-g' | 'business-logo'>('none');
+  const [qrValidation, setQrValidation] = useState<QrEngineResult | null>(null);
+  const [printSizeMm, setPrintSizeMm] = useState<number>(40);
 
   // Display Poster Preset (Image 2)
   const [selectedPreset, setSelectedPreset] = useState('google-classic');
@@ -872,9 +881,9 @@ function QRDesignStudioInner() {
     try {
       let targetUrl = '';
       if (qrMode === 'direct') {
-        targetUrl = destinationValidation.url;
+        targetUrl = cleanDestinationUrl(destinationValidation.url);
       } else {
-        // Guided Review Assistant mode: encode guest token if not yet saved in cloud
+        // Guided Review Assistant mode: encode clean guest token if not yet saved in cloud
         const origin =
           typeof window !== 'undefined' && window.location.origin
             ? window.location.origin
@@ -888,26 +897,28 @@ function QRDesignStudioInner() {
             location,
             destinationValidation.url,
             categoryValue,
-            accentColor,
-            logoUrl,
-            thumbnailUrl
+            accentColor
           );
           targetUrl = `${origin}/qr/${encodeURIComponent(gToken)}`;
         }
       }
 
-      setRealQrDataUrl(
-        generateQrSvg(
-          targetUrl,
-          geometry,
-          customColors.qrColor || currentPresetData.finderColor
-        )
-      );
+      const qrEngineResult = generateCleanQr(targetUrl, {
+        style: qrStyle,
+        geometry,
+        centerEmblem,
+        darkColor: customColors.qrColor || currentPresetData.finderColor || '#0B1C30',
+        businessLogoUrl: localLogoDataUrl || logoUrl,
+      });
+
+      setRealQrDataUrl(qrEngineResult.dataUrl);
+      setQrValidation(qrEngineResult);
       setGeneratedQrTarget(targetUrl);
       setQrGenerationMessage(null);
     } catch (error) {
       console.error('Failed to generate preview QR:', error);
       setRealQrDataUrl('');
+      setQrValidation(null);
       setGeneratedQrTarget(null);
       setQrGenerationMessage('Could not generate this QR code. Check the destination URL and try again.');
     }
@@ -916,13 +927,17 @@ function QRDesignStudioInner() {
     canPreviewQr,
     customColors.qrColor,
     currentPresetData.finderColor,
+    qrStyle,
     geometry,
+    centerEmblem,
     qrMode,
     selectedQrToken,
     businessName,
     location,
     categoryValue,
     accentColor,
+    localLogoDataUrl,
+    logoUrl,
   ]);
 
   const showToast = (msg: string) => {
@@ -1453,7 +1468,7 @@ function QRDesignStudioInner() {
           currentTemplate: selectedPreset,
           preset: selectedPreset,
           geometry,
-          centerEmblem,
+          centerEmblem: centerEmblem === 'none' ? undefined : centerEmblem,
           status: 'active',
         });
         setQrList((current) => [savedQr, ...current.filter((qr) => qr.id !== savedQr.id)]);
@@ -1485,7 +1500,7 @@ function QRDesignStudioInner() {
           accentColor,
           preset: selectedPreset,
           geometry,
-          centerEmblem,
+          centerEmblem: centerEmblem === 'none' ? 'google-g' : centerEmblem,
           destinationMode: qrMode,
           businessId: org?.id,
         }),
@@ -1509,7 +1524,7 @@ function QRDesignStudioInner() {
           currentTemplate: selectedPreset,
           preset: selectedPreset,
           geometry,
-          centerEmblem,
+          centerEmblem: centerEmblem === 'none' ? undefined : centerEmblem,
           status: 'active',
         });
         setQrList((current) => [savedQr, ...current.filter((qr) => qr.id !== savedQr.id)]);
@@ -1647,16 +1662,20 @@ function QRDesignStudioInner() {
           <image x="155" y="225" width="290" height="290" href="${realQrDataUrl}"/>
 
           <!-- Centered Floating Emblem inside QR -->
-          <circle cx="300" cy="370" r="26" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
           ${
-            centerEmblem === 'business-logo' && logoUrl
-              ? `<image x="276" y="346" width="48" height="48" clip-path="url(#centerEmblemClip)" href="${logoUrl}" preserveAspectRatio="xMidYMid slice"/>`
-              : `<g transform="translate(286, 356) scale(1.15)">
-                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
-                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
-                </g>`
+            centerEmblem !== 'none'
+              ? `<circle cx="300" cy="370" r="26" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+              ${
+                centerEmblem === 'business-logo' && logoUrl
+                  ? `<image x="276" y="346" width="48" height="48" clip-path="url(#centerEmblemClip)" href="${logoUrl}" preserveAspectRatio="xMidYMid slice"/>`
+                  : `<g transform="translate(286, 356) scale(1.15)">
+                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+                    </g>`
+              }`
+              : ''
           }
 
           <!-- Headline & Stars -->
@@ -1704,6 +1723,25 @@ function QRDesignStudioInner() {
       };
       image.src = svgUrl;
     }, 400);
+  };
+
+  const handleDownloadSVG = () => {
+    if (!destinationValidation.valid || !realQrDataUrl || !generatedQrTarget) {
+      showToast('Enter a valid destination before exporting the SVG.');
+      return;
+    }
+
+    const svgContent =
+      qrValidation?.svg ||
+      decodeURIComponent(realQrDataUrl.replace('data:image/svg+xml;utf8,', ''));
+    const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${businessName.toLowerCase().replace(/\s+/g, '_')}_qr_vector.svg`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showToast('Crisp resolution-independent vector SVG downloaded.');
   };
 
   const handleExportPDF = () => {
@@ -2263,7 +2301,7 @@ function QRDesignStudioInner() {
               </div>
             )}
 
-            {/* TAB 2: QR Code Architecture (Image 3) */}
+            {/* TAB 2: QR Code Architecture & Styling */}
             {activeTab === 'qrstyle' && (
               <div className="p-6 rounded-xl bg-white shadow-sm flex flex-col gap-4 border border-slate-100 animate-fadeIn">
                 <div className="flex items-center justify-between">
@@ -2273,14 +2311,122 @@ function QRDesignStudioInner() {
                     </span>
                     <h2 className="text-base font-bold text-[#0B1C30]">QR Code Architecture</h2>
                   </div>
-                  <span className="text-[10px] uppercase font-bold bg-[#EFF4FF] text-[#005BBF] px-2.5 py-0.5 rounded-full">
-                    Level H (30% ECC)
+                  <span className="text-[10px] uppercase font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    Level M (15% ECC)
                   </span>
                 </div>
 
-                {/* Module & Eye Geometry Grid (Image 3) */}
+                {/* QR Style Selector (Section 6) */}
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-[#414754]">Module &amp; Eye Geometry</label>
+                  <label className="text-xs font-semibold text-[#414754] flex items-center justify-between">
+                    <span>QR Style Preset</span>
+                    <span className="text-[10px] font-normal text-emerald-600">Standard Google review look</span>
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {/* Style 1: Standard QR (Default) */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setQrStyle('standard');
+                        setGeometry('classic');
+                        setCenterEmblem('none');
+                      }}
+                      className={`p-3 rounded-xl text-center flex flex-col items-center gap-1.5 border transition-all ${
+                        qrStyle === 'standard' && centerEmblem === 'none' && geometry === 'classic'
+                          ? 'bg-[#EFF4FF] border-[#005BBF] shadow-sm text-[#001A41]'
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-[#0B1C30]'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[20px] text-[#005BBF]">qr_code_2</span>
+                      <span className="text-xs font-bold leading-tight">Standard QR</span>
+                      <span className="text-[10px] text-[#565E74] leading-tight">Default · No Logo</span>
+                    </button>
+
+                    {/* Style 2: Google Branded QR */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setQrStyle('google-branded');
+                        setGeometry('classic');
+                        setCenterEmblem('google-g');
+                      }}
+                      className={`p-3 rounded-xl text-center flex flex-col items-center gap-1.5 border transition-all ${
+                        (qrStyle === 'google-branded' || centerEmblem === 'google-g') && geometry === 'classic'
+                          ? 'bg-[#EFF4FF] border-[#005BBF] shadow-sm text-[#001A41]'
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-[#0B1C30]'
+                      }`}
+                    >
+                      <div className="w-5 h-5 flex items-center justify-center">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24">
+                          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+                        </svg>
+                      </div>
+                      <span className="text-xs font-bold leading-tight">Google Branded</span>
+                      <span className="text-[10px] text-[#565E74] leading-tight">Small Centered G</span>
+                    </button>
+
+                    {/* Style 3: Print-Friendly QR */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setQrStyle('print-friendly');
+                        setGeometry('classic');
+                        setCenterEmblem('none');
+                      }}
+                      className={`p-3 rounded-xl text-center flex flex-col items-center gap-1.5 border transition-all ${
+                        qrStyle === 'print-friendly'
+                          ? 'bg-[#EFF4FF] border-[#005BBF] shadow-sm text-[#001A41]'
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-[#0B1C30]'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[20px] text-slate-700">print</span>
+                      <span className="text-xs font-bold leading-tight">Print-Friendly</span>
+                      <span className="text-[10px] text-[#565E74] leading-tight">Generous Margin</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Print Physical Dimensions Selector */}
+                <div className="space-y-2 pt-2 border-t border-slate-100">
+                  <label className="text-xs font-semibold text-[#414754] flex items-center justify-between">
+                    <span>Target Physical Print Size</span>
+                    <span className="text-[11px] font-normal text-[#565E74]">
+                      Rec: {qrValidation ? `${qrValidation.recommendedPrintSizeMm} mm+` : '35 mm+'}
+                    </span>
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { size: 30, label: '30 mm', desc: 'Table Cards' },
+                      { size: 40, label: '40 mm', desc: 'Acrylic Stand (Recommended)' },
+                      { size: 50, label: '50 mm', desc: 'Posters / Plaques' },
+                    ].map((preset) => (
+                      <button
+                        key={preset.size}
+                        type="button"
+                        onClick={() => setPrintSizeMm(preset.size)}
+                        className={`p-2 rounded-xl text-center flex flex-col items-center border transition-all ${
+                          printSizeMm === preset.size
+                            ? 'bg-[#D8E2FF] border-[#005BBF] text-[#001A41] font-bold shadow-xs'
+                            : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-[#0B1C30]'
+                        }`}
+                      >
+                        <span className="text-xs">{preset.label}</span>
+                        <span className="text-[10px] text-[#565E74]">{preset.desc}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Module & Eye Geometry Grid */}
+                <div className="space-y-2 pt-2 border-t border-slate-100">
+                  <label className="text-xs font-semibold text-[#414754] flex items-center justify-between">
+                    <span>Module Geometry</span>
+                    <span className="text-[10px] font-normal text-[#565E74]">Classic square recommended</span>
+                  </label>
                   <div className="grid grid-cols-4 gap-2">
                     {/* Classic */}
                     <button
@@ -2340,16 +2486,40 @@ function QRDesignStudioInner() {
                   </div>
                 </div>
 
-                {/* Center Emblem Choice (Image 3) */}
-                <div className="space-y-2">
-                  <label className="text-xs font-semibold text-[#414754]">Center Emblem</label>
-                  <div className="grid grid-cols-2 gap-3">
+                {/* Center Emblem Choice */}
+                <div className="space-y-2 pt-2 border-t border-slate-100">
+                  <label className="text-xs font-semibold text-[#414754] flex items-center justify-between">
+                    <span>Center Emblem Overlay</span>
+                    <span className="text-[10px] font-normal text-emerald-600">None provides 100% scan clarity</span>
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {/* Option 0: None */}
+                    <label
+                      className={`flex items-center gap-2 p-2.5 rounded-xl cursor-pointer transition-all border ${
+                        centerEmblem === 'none'
+                          ? 'bg-[#EFF4FF] border-[#005BBF] shadow-xs'
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="center_emblem"
+                        checked={centerEmblem === 'none'}
+                        onChange={() => setCenterEmblem('none')}
+                        className="text-[#005BBF] focus:ring-0 w-3.5 h-3.5"
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-xs font-semibold text-[#0B1C30]">No Logo</span>
+                        <span className="text-[9px] text-[#565E74]">Clean grid</span>
+                      </div>
+                    </label>
+
                     {/* Option 1: Official Google G */}
                     <label
-                      className={`flex items-center gap-2.5 p-3 rounded-xl cursor-pointer transition-all border ${
+                      className={`flex items-center gap-2 p-2.5 rounded-xl cursor-pointer transition-all border ${
                         centerEmblem === 'google-g'
                           ? 'bg-[#EFF4FF] border-[#005BBF] shadow-xs'
-                          : 'bg-slate-50 hover:bg-slate-100 border-transparent'
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200'
                       }`}
                     >
                       <input
@@ -2357,39 +2527,27 @@ function QRDesignStudioInner() {
                         name="center_emblem"
                         checked={centerEmblem === 'google-g'}
                         onChange={() => setCenterEmblem('google-g')}
-                        className="text-[#005BBF] focus:ring-0 w-4 h-4"
+                        className="text-[#005BBF] focus:ring-0 w-3.5 h-3.5"
                       />
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-xs">
-                          <svg className="w-4 h-4" viewBox="0 0 24 24">
-                            <path
-                              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                              fill="#4285F4"
-                            />
-                            <path
-                              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                              fill="#34A853"
-                            />
-                            <path
-                              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                              fill="#FBBC05"
-                            />
-                            <path
-                              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                              fill="#EA4335"
-                            />
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center shadow-xs">
+                          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
                           </svg>
                         </div>
-                        <span className="text-xs font-semibold text-[#0B1C30]">Official Google G</span>
+                        <span className="text-xs font-semibold text-[#0B1C30]">Google G</span>
                       </div>
                     </label>
 
                     {/* Option 2: Business Logo */}
                     <label
-                      className={`flex items-center gap-2.5 p-3 rounded-xl cursor-pointer transition-all border ${
+                      className={`flex items-center gap-2 p-2.5 rounded-xl cursor-pointer transition-all border ${
                         centerEmblem === 'business-logo'
                           ? 'bg-[#EFF4FF] border-[#005BBF] shadow-xs'
-                          : 'bg-slate-50 hover:bg-slate-100 border-transparent'
+                          : 'bg-slate-50 hover:bg-slate-100 border-slate-200'
                       }`}
                     >
                       <input
@@ -2397,11 +2555,11 @@ function QRDesignStudioInner() {
                         name="center_emblem"
                         checked={centerEmblem === 'business-logo'}
                         onChange={() => setCenterEmblem('business-logo')}
-                        className="text-[#005BBF] focus:ring-0 w-4 h-4"
+                        className="text-[#005BBF] focus:ring-0 w-3.5 h-3.5"
                       />
-                      <div className="flex items-center gap-2">
-                        <span className="material-symbols-outlined text-[20px] text-amber-600">crown</span>
-                        <span className="text-xs font-semibold text-[#0B1C30]">Business Logo</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-[18px] text-amber-600">crown</span>
+                        <span className="text-xs font-semibold text-[#0B1C30]">Logo</span>
                       </div>
                     </label>
                   </div>
@@ -3050,13 +3208,7 @@ function QRDesignStudioInner() {
                       <img
                         src={realQrDataUrl}
                         alt="Scannable QR Code"
-                        className={`w-52 h-52 object-contain ${
-                          geometry === 'rounded'
-                            ? 'rounded-xl'
-                            : geometry === 'dots'
-                            ? 'rounded-2xl'
-                            : 'rounded-none'
-                        }`}
+                        className="w-52 h-52 object-contain"
                       />
                     ) : (
                       <div className="w-52 h-52 bg-slate-50 flex items-center justify-center p-4 text-center text-xs text-[#565E74]">
@@ -3064,34 +3216,63 @@ function QRDesignStudioInner() {
                       </div>
                     )}
 
-                    {/* Centered Floating Emblem (Image 3) */}
-                    <div className="absolute w-11 h-11 rounded-full bg-white shadow-md flex items-center justify-center p-1 border border-slate-100 overflow-hidden pointer-events-none">
-                      {centerEmblem === 'business-logo' && (localLogoDataUrl || logoUrl) ? (
-                        <img src={localLogoDataUrl || logoUrl} alt="Logo" className="w-full h-full object-cover" />
-                      ) : centerEmblem === 'business-logo' ? (
-                        <span className="material-symbols-outlined text-[22px] text-amber-600">crown</span>
+                    {/* Centered Floating Emblem: Only render if centerEmblem !== 'none' */}
+                    {centerEmblem !== 'none' && (
+                      <div className="absolute w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center p-1 border border-slate-100 overflow-hidden pointer-events-none">
+                        {centerEmblem === 'business-logo' && (localLogoDataUrl || logoUrl) ? (
+                          <img src={localLogoDataUrl || logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                        ) : centerEmblem === 'business-logo' ? (
+                          <span className="material-symbols-outlined text-[20px] text-amber-600">crown</span>
+                        ) : (
+                          <svg className="w-5 h-5" viewBox="0 0 24 24">
+                            <path
+                              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                              fill="#4285F4"
+                            />
+                            <path
+                              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                              fill="#34A853"
+                            />
+                            <path
+                              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                              fill="#FBBC05"
+                            />
+                            <path
+                              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                              fill="#EA4335"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Independent Scannability & Print Size Indicators */}
+                  {qrValidation && (
+                    <div className="mt-3 flex flex-col items-center gap-1">
+                      {qrValidation.isValid ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-2xs">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Verified Scannable · {qrValidation.matrixSize}×{qrValidation.matrixSize} Grid
+                          </span>
+                          <span className="text-[10px] text-[#565E74] bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">
+                            Print: {qrValidation.recommendedPrintSizeMm} mm+
+                          </span>
+                        </div>
                       ) : (
-                        <svg className="w-6 h-6" viewBox="0 0 24 24">
-                          <path
-                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                            fill="#4285F4"
-                          />
-                          <path
-                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                            fill="#34A853"
-                          />
-                          <path
-                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                            fill="#FBBC05"
-                          />
-                          <path
-                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                            fill="#EA4335"
-                          />
-                        </svg>
+                        <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                          {qrValidation.validationError || 'Unscannable configuration'}
+                        </span>
+                      )}
+                      {qrValidation.printSizeWarning && (
+                        <span className="text-[10px] text-amber-600 max-w-xs text-center font-medium">
+                          {qrValidation.printSizeWarning}
+                        </span>
                       )}
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Bottom Poster Callout */}
@@ -3141,21 +3322,30 @@ function QRDesignStudioInner() {
               </div>
               )}
 
-              {/* Bottom Quick Download Strip below Mockup (Image 1) */}
-              <div className="flex items-center gap-3 pt-6 w-full max-w-[380px]">
+              {/* Bottom Quick Download Strip below Mockup */}
+              <div className="flex flex-wrap items-center gap-2 pt-6 w-full max-w-[420px]">
                 <button
-                  className="flex-1 h-11 px-4 rounded-xl bg-[#005BBF] text-white hover:bg-[#1A73E8] text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
+                  className="flex-1 min-w-[120px] h-11 px-3 rounded-xl bg-[#005BBF] text-white hover:bg-[#1A73E8] text-xs font-bold shadow-md transition-all flex items-center justify-center gap-1.5 active:scale-95"
                   onClick={handleDownloadPNG}
+                  title="Download 300 DPI Standee Poster"
                 >
                   <span className="material-symbols-outlined text-[18px]">download</span>
-                  <span>Download PNG Artwork</span>
+                  <span>Poster PNG</span>
                 </button>
                 <button
-                  className="h-11 px-4 rounded-xl bg-white text-[#0B1C30] hover:bg-slate-50 text-xs font-bold shadow-sm border border-slate-200 transition-all flex items-center justify-center gap-2 active:scale-95"
+                  className="flex-1 min-w-[120px] h-11 px-3 rounded-xl bg-[#EFF4FF] text-[#005BBF] hover:bg-[#D8E2FF] text-xs font-bold shadow-sm border border-[#005BBF]/20 transition-all flex items-center justify-center gap-1.5 active:scale-95"
+                  onClick={handleDownloadSVG}
+                  title="Download resolution-independent Vector SVG for crisp printing"
+                >
+                  <span className="material-symbols-outlined text-[18px]">code</span>
+                  <span>Vector SVG</span>
+                </button>
+                <button
+                  className="h-11 px-3 rounded-xl bg-white text-[#0B1C30] hover:bg-slate-50 text-xs font-bold shadow-sm border border-slate-200 transition-all flex items-center justify-center gap-1.5 active:scale-95"
                   onClick={handleExportPDF}
                 >
                   <span className="material-symbols-outlined text-[18px]">picture_as_pdf</span>
-                  <span>Print / Save PDF</span>
+                  <span>PDF Print</span>
                 </button>
               </div>
             </div>
