@@ -42,7 +42,7 @@ describe('QR Code Generation', () => {
     const dots = dataUrl('dots');
     const premiumEye = dataUrl('premium-eye');
     const matrixSize = QRCodeLib.create('https://reviewqr.app', {
-      errorCorrectionLevel: 'H',
+      errorCorrectionLevel: 'M',
     }).modules.size;
 
     expect(classic).toMatch(/^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" width="320"/);

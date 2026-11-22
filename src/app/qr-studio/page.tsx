@@ -6,6 +6,7 @@ import { DashboardShell } from '@/components/layout/DashboardShell';
 import { getStoredOrg, getStoredQRCodes, saveQRCode, setStoredOrg } from '@/lib/data-store';
 import { Organization, QRCode } from '@/lib/types';
 import { generateQrSvg } from '@/lib/qr-geometry';
+import { createGuestToken } from '@/lib/guest-token';
 import { buildGoogleMapsSearchUrl, validateReviewDestination } from '@/lib/review-destination';
 import { getQrDestinationMode, resolvePublicAppOrigin, resolveQrDestination } from '@/lib/qr-destination';
 import {
@@ -152,39 +153,6 @@ function QRDesignStudioInner() {
   const isDestinationSaved =
     Boolean(savedDestinationUrl) && savedDestinationUrl === googleReviewUrl.trim();
   const canPreviewQr = destinationValidation.valid;
-  const createGuestToken = (
-    name: string,
-    city: string,
-    url: string,
-    cat?: string,
-    accent?: string,
-    logo?: string,
-    thumb?: string
-  ) => {
-    try {
-      const payload: Record<string, string> = {
-        n: name.trim() || 'Business',
-        c: city.trim(),
-        u: url.trim(),
-        cat: cat || '',
-        a: accent || '#1A73E8',
-      };
-      if (logo && (logo.startsWith('http://') || logo.startsWith('https://'))) {
-        payload.l = logo;
-      }
-      if (thumb && (thumb.startsWith('http://') || thumb.startsWith('https://'))) {
-        payload.th = thumb;
-      }
-      const json = JSON.stringify(payload);
-      const b64 = btoa(unescape(encodeURIComponent(json)))
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '');
-      return `guest_${b64}`;
-    } catch {
-      return '';
-    }
-  };
   const activeMapsSearchUrl = useMemo(() => {
     const name = businessName.trim();
     const loc = location.trim();

@@ -15,8 +15,8 @@ describe('QR destination modes', () => {
     expect(result).toEqual({ ok: true, url });
     if (!result.ok) return;
 
-    const actualSymbol = QRCodeLib.create(result.url, { errorCorrectionLevel: 'H' });
-    const expectedSymbol = QRCodeLib.create(url, { errorCorrectionLevel: 'H' });
+    const actualSymbol = QRCodeLib.create(result.url, { errorCorrectionLevel: 'M' });
+    const expectedSymbol = QRCodeLib.create(url, { errorCorrectionLevel: 'M' });
     expect(actualSymbol.modules.data).toEqual(expectedSymbol.modules.data);
     expect(generateQrSvg(result.url, 'classic', '#1A73E8')).toBe(
       generateQrSvg(url, 'classic', '#1A73E8')

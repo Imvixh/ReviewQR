@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { safeHttpsUrlSchema } from '@/lib/validation';
+import { decodeGuestToken } from '@/lib/guest-token';
 
 interface PublicQr {
   businessName: string;
@@ -177,11 +178,8 @@ export default function CustomerReviewJourneyPage() {
         // Client-side decoding for guest guided review assistant tokens
         if (token.startsWith('guest_')) {
           try {
-            const raw = token.slice(6).replace(/-/g, '+').replace(/_/g, '/');
-            const padded = raw.padEnd(raw.length + ((4 - (raw.length % 4)) % 4), '=');
-            const jsonStr = decodeURIComponent(escape(atob(padded)));
-            const payload = JSON.parse(jsonStr);
-            if (payload.u && safeHttpsUrlSchema.safeParse(payload.u).success) {
+            const decoded = decodeGuestToken(token);
+            if (decoded) {
               if (cancelled) return;
 
               let localLogo = '';
@@ -194,17 +192,17 @@ export default function CustomerReviewJourneyPage() {
               }
 
               setQrCode({
-                businessName: payload.n || 'Business',
-                city: payload.c || '',
-                googleReviewUrl: payload.u,
-                businessCategory: payload.cat || 'Business',
-                businessSubcategory: '',
-                headline: payload.h || 'Review us on Google',
-                tagline: payload.t || 'Scan to share your experience',
-                supportingText: '',
-                accentColor: payload.a || '#1A73E8',
-                logoUrl: payload.l || payload.logo || localLogo || undefined,
-                thumbnailUrl: payload.th || payload.thumb || localThumb || undefined,
+                businessName: decoded.businessName,
+                city: decoded.city,
+                googleReviewUrl: decoded.googleReviewUrl,
+                businessCategory: decoded.businessCategory,
+                businessSubcategory: decoded.businessSubcategory,
+                headline: decoded.headline,
+                tagline: decoded.tagline,
+                supportingText: decoded.supportingText,
+                accentColor: decoded.accentColor,
+                logoUrl: decoded.logoUrl || localLogo || undefined,
+                thumbnailUrl: decoded.thumbnailUrl || localThumb || undefined,
               });
               setIsLoading(false);
               return;

@@ -47,7 +47,7 @@ export const QRPosterFrame: React.FC<QRPosterFrameProps> = ({
 
       try {
         const dataUrl = await QRCodeLib.toDataURL(destinationUrl, {
-          errorCorrectionLevel: 'H',
+          errorCorrectionLevel: 'M',
           margin: 1,
           width: 320,
           color: {

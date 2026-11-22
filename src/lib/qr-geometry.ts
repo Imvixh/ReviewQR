@@ -15,9 +15,10 @@ import QRCodeLib from 'qrcode';
 export function generateQrSvg(
   text: string,
   geometry: 'classic' | 'rounded' | 'dots' | 'premium-eye',
-  darkColor: string
+  darkColor: string,
+  errorCorrectionLevel: 'L' | 'M' | 'Q' | 'H' = 'M'
 ): string {
-  const created = QRCodeLib.create(text, { errorCorrectionLevel: 'H' });
+  const created = QRCodeLib.create(text, { errorCorrectionLevel });
   const modules = created.modules;
   const size = modules.size;
 
