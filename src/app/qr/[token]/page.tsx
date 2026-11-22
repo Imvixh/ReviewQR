@@ -146,8 +146,41 @@ export default function CustomerReviewJourneyPage() {
   const [inactiveBizName, setInactiveBizName] = useState('');
   const [logoFailed, setLogoFailed] = useState(false);
   const [thumbFailed, setThumbFailed] = useState(false);
+  const [displayLogoUrl, setDisplayLogoUrl] = useState<string | undefined>(undefined);
+  const [displayThumbUrl, setDisplayThumbUrl] = useState<string | undefined>(undefined);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [language, setLanguage] = useState<'en' | 'hi'>('en');
+
+  useEffect(() => {
+    if (qrCode) {
+      setDisplayLogoUrl(qrCode.logoUrl);
+      setDisplayThumbUrl(qrCode.thumbnailUrl);
+      setLogoFailed(false);
+      setThumbFailed(false);
+    }
+  }, [qrCode]);
+
+  const handleLogoError = () => {
+    if (displayLogoUrl && displayLogoUrl.includes('/business-assets/')) {
+      const match = displayLogoUrl.match(/\/business-assets\/(.+)$/);
+      if (match && match[1] && !displayLogoUrl.includes('/api/public/asset')) {
+        setDisplayLogoUrl(`/api/public/asset?path=${encodeURIComponent(match[1])}`);
+        return;
+      }
+    }
+    setLogoFailed(true);
+  };
+
+  const handleThumbError = () => {
+    if (displayThumbUrl && displayThumbUrl.includes('/business-assets/')) {
+      const match = displayThumbUrl.match(/\/business-assets\/(.+)$/);
+      if (match && match[1] && !displayThumbUrl.includes('/api/public/asset')) {
+        setDisplayThumbUrl(`/api/public/asset?path=${encodeURIComponent(match[1])}`);
+        return;
+      }
+    }
+    setThumbFailed(true);
+  };
 
   const [rating, setRating] = useState<number | null>(null);
   const [hoveredStar, setHoveredStar] = useState<number | null>(null);
@@ -191,6 +224,17 @@ export default function CustomerReviewJourneyPage() {
                 } catch {}
               }
 
+              const resolvedLogo =
+                decoded.logoUrl ||
+                (localLogo && (localLogo.startsWith('http') || localLogo.startsWith('data:') || localLogo.startsWith('/api/'))
+                  ? localLogo
+                  : undefined);
+              const resolvedThumb =
+                decoded.thumbnailUrl ||
+                (localThumb && (localThumb.startsWith('http') || localThumb.startsWith('data:') || localThumb.startsWith('/api/'))
+                  ? localThumb
+                  : undefined);
+
               setQrCode({
                 businessName: decoded.businessName,
                 city: decoded.city,
@@ -201,8 +245,8 @@ export default function CustomerReviewJourneyPage() {
                 tagline: decoded.tagline,
                 supportingText: decoded.supportingText,
                 accentColor: decoded.accentColor,
-                logoUrl: decoded.logoUrl || localLogo || undefined,
-                thumbnailUrl: decoded.thumbnailUrl || localThumb || undefined,
+                logoUrl: resolvedLogo,
+                thumbnailUrl: resolvedThumb,
               });
               setIsLoading(false);
               return;
@@ -416,7 +460,13 @@ export default function CustomerReviewJourneyPage() {
   };
 
   const businessName = qrCode?.businessName || 'Business';
-  const businessDetails = [qrCode?.businessCategory, qrCode?.city].filter(Boolean).join(' · ');
+  const businessDetails = [
+    qrCode?.businessCategory,
+    qrCode?.businessSubcategory,
+    qrCode?.city,
+  ]
+    .filter(Boolean)
+    .join(' · ');
   const reviewDestination = qrCode?.googleReviewUrl || '#';
 
   if (isLoading || loadError || !qrCode) {
@@ -569,29 +619,29 @@ export default function CustomerReviewJourneyPage() {
             {/* Venue Profile Card with Cover Photo Banner & Circular Logo */}
             <div className="relative overflow-hidden rounded-3xl bg-white shadow-sm border border-slate-200/80">
               {/* Cover Photo Banner (16:9 ratio style) */}
-              <div
-                className="h-36 w-full bg-cover bg-center relative bg-gradient-to-br from-slate-800 to-slate-900"
-                style={
-                  !thumbFailed && qrCode.thumbnailUrl
-                    ? { backgroundImage: `url(${qrCode.thumbnailUrl})` }
-                    : {
-                        backgroundImage:
-                          'url(https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80)',
-                      }
-                }
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
+              <div className="h-36 w-full relative bg-gradient-to-br from-slate-800 to-slate-900 overflow-hidden">
+                <img
+                  src={
+                    !thumbFailed && displayThumbUrl
+                      ? displayThumbUrl
+                      : 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80'
+                  }
+                  alt={businessName}
+                  onError={handleThumbError}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent pointer-events-none"></div>
               </div>
 
               {/* Business Identity */}
               <div className="relative px-5 pb-5 -mt-10 flex flex-col items-center text-center">
                 {/* Circular Logo Overlapping Banner */}
                 <div className="w-18 h-18 rounded-full bg-white p-1 shadow-md flex items-center justify-center mb-2 overflow-hidden border-2 border-white">
-                  {!logoFailed && qrCode.logoUrl ? (
+                  {!logoFailed && displayLogoUrl ? (
                     <img
-                      src={qrCode.logoUrl}
+                      src={displayLogoUrl}
                       alt={businessName}
-                      onError={() => setLogoFailed(true)}
+                      onError={handleLogoError}
                       className="w-full h-full rounded-full object-cover"
                     />
                   ) : (
@@ -605,7 +655,9 @@ export default function CustomerReviewJourneyPage() {
                   <h1 className="font-extrabold text-lg text-[#0B1C30] tracking-tight">{businessName}</h1>
                   <span className="material-symbols-outlined text-[#1A73E8] text-[18px]">verified</span>
                 </div>
-                <p className="text-xs text-[#565E74] mt-0.5 font-medium">{businessDetails}</p>
+                {businessDetails ? (
+                  <p className="text-xs text-[#565E74] mt-0.5 font-medium">{businessDetails}</p>
+                ) : null}
 
                 {/* Rating Badge */}
                 <div className="mt-2.5 inline-flex items-center gap-1.5 bg-amber-50/80 px-3 py-1 rounded-full text-[#0B1C30] border border-amber-200/60">
@@ -728,11 +780,11 @@ export default function CustomerReviewJourneyPage() {
             <div className="flex items-center justify-between px-1">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-full bg-[#1A73E8] text-white flex items-center justify-center text-xs font-bold overflow-hidden shadow-2xs">
-                  {!logoFailed && qrCode.logoUrl ? (
+                  {!logoFailed && displayLogoUrl ? (
                     <img
-                      src={qrCode.logoUrl}
+                      src={displayLogoUrl}
                       alt={businessName}
-                      onError={() => setLogoFailed(true)}
+                      onError={handleLogoError}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -1016,10 +1068,10 @@ export default function CustomerReviewJourneyPage() {
             {/* Mini Business Card */}
             <div className="bg-white p-3.5 rounded-2xl shadow-xs border border-slate-200/80 flex items-center gap-3 text-left">
               <div className="w-11 h-11 rounded-xl bg-slate-800 text-white flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
-                {qrCode.thumbnailUrl ? (
-                  <img src={qrCode.thumbnailUrl} alt={businessName} className="w-full h-full object-cover" />
-                ) : qrCode.logoUrl ? (
-                  <img src={qrCode.logoUrl} alt={businessName} className="w-full h-full object-cover" />
+                {!thumbFailed && displayThumbUrl ? (
+                  <img src={displayThumbUrl} alt={businessName} className="w-full h-full object-cover" onError={handleThumbError} />
+                ) : !logoFailed && displayLogoUrl ? (
+                  <img src={displayLogoUrl} alt={businessName} className="w-full h-full object-cover" onError={handleLogoError} />
                 ) : (
                   <span className="material-symbols-outlined text-xl">hotel</span>
                 )}
@@ -1029,6 +1081,9 @@ export default function CustomerReviewJourneyPage() {
                   <span className="text-xs font-extrabold text-[#0B1C30] truncate">{businessName}</span>
                   <span className="material-symbols-outlined text-[#1A73E8] text-xs">verified</span>
                 </div>
+                {businessDetails ? (
+                  <p className="text-[10px] text-[#565E74] truncate font-medium">{businessDetails}</p>
+                ) : null}
                 <div className="flex items-center gap-1 text-[#FBBC04] text-[11px]">
                   <span>★★★★★</span>
                   <span className="text-[#0B1C30] font-bold ml-1">4.9</span>

@@ -15,15 +15,29 @@ export interface DecodedGuestToken {
   thumbnailUrl?: string;
 }
 
-const SUPABASE_UPLOADS_REGEX =
-  /^https:\/\/[a-z0-9-]+\.supabase\.co\/storage\/v1\/object\/public\/business-assets\/public-uploads\//i;
+const SUPABASE_ASSETS_REGEX =
+  /^https:\/\/[a-z0-9-]+\.supabase\.co\/storage\/v1\/object\/public\/business-assets\//i;
+const PROXY_ASSET_REGEX =
+  /^(?:https?:\/\/[^/]+)?\/api\/public\/asset\?path=/i;
 const DEFAULT_SUPABASE_BASE =
   process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ffqonnfnmuhjkofbtvtm.supabase.co';
 
 export function compactAssetUrl(url?: string): string | undefined {
   if (!url) return undefined;
-  if (SUPABASE_UPLOADS_REGEX.test(url)) {
-    return '~' + url.replace(SUPABASE_UPLOADS_REGEX, '');
+  if (SUPABASE_ASSETS_REGEX.test(url)) {
+    const relative = url.replace(SUPABASE_ASSETS_REGEX, '');
+    if (relative.startsWith('public-uploads/')) {
+      return '~' + relative.replace(/^public-uploads\//, '');
+    }
+    return '~' + relative;
+  }
+  if (PROXY_ASSET_REGEX.test(url)) {
+    const rawPath = url.replace(PROXY_ASSET_REGEX, '');
+    const decodedPath = decodeURIComponent(rawPath);
+    if (decodedPath.startsWith('public-uploads/')) {
+      return '~' + decodedPath.replace(/^public-uploads\//, '');
+    }
+    return '~' + decodedPath;
   }
   return url;
 }
@@ -31,8 +45,12 @@ export function compactAssetUrl(url?: string): string | undefined {
 export function expandAssetUrl(val?: string): string | undefined {
   if (!val) return undefined;
   if (val.startsWith('~')) {
+    const rest = val.slice(1);
     const base = process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_BASE;
-    return `${base}/storage/v1/object/public/business-assets/public-uploads/${val.slice(1)}`;
+    if (rest.includes('/')) {
+      return `${base}/storage/v1/object/public/business-assets/${rest}`;
+    }
+    return `${base}/storage/v1/object/public/business-assets/public-uploads/${rest}`;
   }
   return val;
 }
@@ -102,7 +120,7 @@ export function createGuestToken(
   accent?: string,
   logo?: string,
   thumb?: string,
-  options?: { includeAssets?: boolean }
+  subcat?: string
 ): string {
   try {
     if (!url) return '';
@@ -111,16 +129,17 @@ export function createGuestToken(
       u: compactReviewUrl(url),
     };
     if (city && city.trim()) payload.c = city.trim();
-    if (cat && cat.trim() && cat.trim() !== 'Business') payload.cat = cat.trim();
+    if (cat && cat.trim()) payload.cat = cat.trim();
+    if (subcat && subcat.trim()) payload.sub = subcat.trim();
     if (accent && accent.trim() && accent.trim().toUpperCase() !== '#1A73E8') {
       payload.a = accent.trim();
     }
 
-    if (logo && (logo.startsWith('http://') || logo.startsWith('https://'))) {
+    if (logo && (logo.startsWith('http://') || logo.startsWith('https://') || logo.startsWith('/api/public/asset'))) {
       const compacted = compactAssetUrl(logo);
       if (compacted) payload.l = compacted;
     }
-    if (thumb && (thumb.startsWith('http://') || thumb.startsWith('https://'))) {
+    if (thumb && (thumb.startsWith('http://') || thumb.startsWith('https://') || thumb.startsWith('/api/public/asset'))) {
       const compacted = compactAssetUrl(thumb);
       if (compacted) payload.th = compacted;
     }
@@ -150,7 +169,7 @@ export function decodeGuestToken(token: string): DecodedGuestToken | null {
         city: payload.c || '',
         googleReviewUrl,
         businessCategory: payload.cat || 'Business',
-        businessSubcategory: '',
+        businessSubcategory: payload.sub || '',
         headline: payload.h || 'Review us on Google',
         tagline: payload.t || 'Scan to share your experience',
         supportingText: '',

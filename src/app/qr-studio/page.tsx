@@ -749,6 +749,7 @@ function QRDesignStudioInner() {
       setSubcategory(loadedOrg.subcategory || '');
       if (loadedOrg.accentColor) setAccentColor(loadedOrg.accentColor);
       if (loadedOrg.logoUrl && !isSupabaseConfigured) setLogoUrl(loadedOrg.logoUrl);
+      if (loadedOrg.thumbnailUrl && !isSupabaseConfigured) setThumbnailUrl(loadedOrg.thumbnailUrl);
     } else {
       setCategory('');
       setCustomCategory('');
@@ -800,6 +801,7 @@ function QRDesignStudioInner() {
             setSubcategory(loadedOrg.subcategory || '');
             if (loadedOrg.accentColor) setAccentColor(loadedOrg.accentColor);
             if (loadedOrg.logoUrl) setLogoUrl(loadedOrg.logoUrl);
+            if (loadedOrg.thumbnailUrl) setThumbnailUrl(loadedOrg.thumbnailUrl);
             if (loadedOrg.googleReviewUrl) {
               setGoogleReviewUrl(loadedOrg.googleReviewUrl);
               setSavedDestinationUrl(loadedOrg.googleReviewUrl);
@@ -849,6 +851,21 @@ function QRDesignStudioInner() {
             thumbnailUrl: business.thumbnailUrl,
           });
           setOrg(updatedOrg);
+          if (business.name) setBusinessName(business.name);
+          if (business.city) setLocation(business.city);
+          if (business.category) {
+            const sc = categorySelectionForSavedValue(business.category);
+            setCategory(sc.selection);
+            setCustomCategory(sc.customCategory);
+          }
+          if (business.subcategory) setSubcategory(business.subcategory);
+          if (business.logoUrl) setLogoUrl(business.logoUrl);
+          if (business.thumbnailUrl) setThumbnailUrl(business.thumbnailUrl);
+          if (business.googleReviewUrl) {
+            setGoogleReviewUrl(business.googleReviewUrl);
+            setSavedDestinationUrl(business.googleReviewUrl);
+            setHasConfirmedDestination(true);
+          }
         }
       } catch (error) {
         if (!cancelled) {
@@ -892,12 +909,28 @@ function QRDesignStudioInner() {
         if (selectedQrToken) {
           targetUrl = `${origin}/qr/${encodeURIComponent(selectedQrToken)}`;
         } else {
+          const effectiveLogo =
+            logoUrl && (logoUrl.startsWith('http') || logoUrl.startsWith('/api/public/asset'))
+              ? logoUrl
+              : org?.logoUrl && (org.logoUrl.startsWith('http') || org.logoUrl.startsWith('/api/public/asset'))
+              ? org.logoUrl
+              : undefined;
+          const effectiveThumb =
+            thumbnailUrl && (thumbnailUrl.startsWith('http') || thumbnailUrl.startsWith('/api/public/asset'))
+              ? thumbnailUrl
+              : org?.thumbnailUrl && (org.thumbnailUrl.startsWith('http') || org.thumbnailUrl.startsWith('/api/public/asset'))
+              ? org.thumbnailUrl
+              : undefined;
+
           const gToken = createGuestToken(
             businessName,
             location,
             destinationValidation.url,
             categoryValue,
-            accentColor
+            accentColor,
+            effectiveLogo,
+            effectiveThumb,
+            subcategory
           );
           targetUrl = `${origin}/qr/${encodeURIComponent(gToken)}`;
         }
@@ -935,9 +968,13 @@ function QRDesignStudioInner() {
     businessName,
     location,
     categoryValue,
+    subcategory,
     accentColor,
     localLogoDataUrl,
     logoUrl,
+    thumbnailUrl,
+    org?.logoUrl,
+    org?.thumbnailUrl,
   ]);
 
   const showToast = (msg: string) => {
@@ -1482,6 +1519,7 @@ function QRDesignStudioInner() {
           googleReviewUrl: destinationValidation.url,
           accentColor,
           logoUrl,
+          thumbnailUrl,
         });
         showToast('Direct QR design saved in this browser. Its code opens the exact review URL.');
         setTimeout(() => router.push('/my-qr-codes'), 1000);
@@ -1538,6 +1576,7 @@ function QRDesignStudioInner() {
           googleReviewUrl: destinationValidation.url,
           accentColor,
           logoUrl,
+          thumbnailUrl,
         });
         showToast('QR design saved in your browser. Ready to export PNG or print PDF!');
         return;

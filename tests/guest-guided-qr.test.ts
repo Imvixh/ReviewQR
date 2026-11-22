@@ -93,6 +93,39 @@ describe('Guest Guided QR Token & Review Assistant Flow', () => {
     expect(decoded?.thumbnailUrl).toBe('https://example.com/old-thumb.png');
   });
 
+  it('compacts and expands guest-uploads and public-uploads Supabase storage paths seamlessly', () => {
+    const input = {
+      name: 'The Taj Palace Hotel',
+      city: 'Mumbai',
+      url: 'https://g.page/r/example/review',
+      cat: 'Hotel',
+      subcat: 'Lounge',
+      accent: '#1A73E8',
+      logo: 'https://ffqonnfnmuhjkofbtvtm.supabase.co/storage/v1/object/public/business-assets/guest-uploads/logo-987.png',
+      thumb: 'https://ffqonnfnmuhjkofbtvtm.supabase.co/storage/v1/object/public/business-assets/guest-uploads/cover-654.jpg',
+    };
+
+    const token = createGuestToken(
+      input.name,
+      input.city,
+      input.url,
+      input.cat,
+      input.accent,
+      input.logo,
+      input.thumb,
+      input.subcat
+    );
+
+    const decoded = decodeGuestToken(token);
+    expect(decoded).not.toBeNull();
+    expect(decoded?.businessName).toBe('The Taj Palace Hotel');
+    expect(decoded?.city).toBe('Mumbai');
+    expect(decoded?.businessCategory).toBe('Hotel');
+    expect(decoded?.businessSubcategory).toBe('Lounge');
+    expect(decoded?.logoUrl).toBe(input.logo);
+    expect(decoded?.thumbnailUrl).toBe(input.thumb);
+  });
+
   it('rejects guest tokens with invalid or non-HTTPS review URLs', () => {
     const unsafeToken = createGuestToken('Test Venue', 'City', 'javascript:alert(1)', 'Retail');
     const decoded = decodeGuestToken(unsafeToken);
