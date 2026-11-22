@@ -47,6 +47,19 @@
   .shadow-subtle-card { box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03); }
   .shadow-glass { box-shadow: 0 20px 50px -12px rgba(15, 23, 42, 0.12); }
 
+  /* Standard Max-Width Scale overrides */
+  .max-w-xs { max-width: 20rem !important; }
+  .max-w-sm { max-width: 24rem !important; }
+  .max-w-md { max-width: 28rem !important; }
+  .max-w-lg { max-width: 32rem !important; }
+  .max-w-xl { max-width: 36rem !important; }
+  .max-w-2xl { max-width: 42rem !important; }
+  .max-w-3xl { max-width: 48rem !important; }
+  .max-w-4xl { max-width: 56rem !important; }
+  .max-w-5xl { max-width: 64rem !important; }
+  .max-w-6xl { max-width: 72rem !important; }
+  .max-w-7xl { max-width: 80rem !important; }
+
   /* Surface Layers */
   .bg-surface { background-color: #f8f9ff; }
   .bg-surface-bright { background-color: #f8f9ff; }
