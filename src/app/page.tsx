@@ -13,17 +13,22 @@ const PHRASING_SUGGESTIONS: Record<number, string[]> = {
   4: [
     'Great overall experience. Friendly staff and good location.',
     'Pleasant atmosphere and quick service during our visit.',
+    'Very satisfying visit with good value and attentive personnel.',
   ],
   3: [
-    'Service was reasonable and the staff was polite.',
+    'Service was reasonable and the staff was polite, though slightly slow.',
     'Decent visit, nice venue space and courteous personnel.',
+    'Met basic expectations; fair experience with room for minor improvements.',
   ],
   2: [
     'Experience was fair, but checkout was slightly slow.',
     'Room was acceptable though wait times could be improved.',
+    'Underwhelming visit; service coordination fell short of expectations.',
   ],
   1: [
     'Disappointed with the delay in service during our stay.',
+    'Staff responsiveness was poor and our concerns went unaddressed.',
+    'Unsatisfactory experience overall; significant improvements are needed.',
   ],
 };
 

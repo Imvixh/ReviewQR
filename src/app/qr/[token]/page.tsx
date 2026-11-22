@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { safeHttpsUrlSchema } from '@/lib/validation';
 import { decodeGuestToken } from '@/lib/guest-token';
+import { getInstantSuggestions } from '@/lib/review-suggestions';
 
 interface PublicQr {
   businessName: string;
@@ -316,7 +317,7 @@ export default function CustomerReviewJourneyPage() {
     customText.trim() ||
     (suggestionItems[selectedSuggestionIndex]?.text ?? suggestions[selectedSuggestionIndex] ?? '');
 
-  const handleGenerateSuggestions = async (filterName: string, targetRating: number) => {
+  const handleGenerateSuggestions = async (filterName: string, targetRating: number, seedExperience?: string) => {
     if (suggestionsAbortRef.current) {
       suggestionsAbortRef.current.abort();
     }
@@ -327,25 +328,34 @@ export default function CustomerReviewJourneyPage() {
     setSuggestionError(null);
 
     const defaultPhrasing =
-      filterName === 'Service'
+      seedExperience ||
+      (targetRating >= 4
+        ? filterName === 'Service'
+          ? language === 'hi'
+            ? 'कर्मचारियों की सेवा बहुत अच्छी और मददगार रही।'
+            : 'The service was excellent, and the staff were welcoming and professional.'
+          : filterName === 'Atmosphere'
+          ? language === 'hi'
+            ? 'यहाँ का वातावरण और माहौल बहुत सुंदर और आरामदायक है।'
+            : 'Delicious food and wonderful atmosphere. The dining area was spotless.'
+          : filterName === 'Food & Quality'
+          ? language === 'hi'
+            ? 'यहाँ का खाना और गुणवत्ता बहुत स्वादिष्ट और ताज़ा थी।'
+            : 'High quality food with great presentation and authentic flavors.'
+          : filterName === 'Staff & Hospitality'
+          ? language === 'hi'
+            ? 'स्टाफ बहुत विनम्र, मददगार और पेशेवर था।'
+            : 'Staff members were extremely courteous, attentive, and swift.'
+          : language === 'hi'
+          ? 'यहाँ का पूरा अनुभव बहुत संतोषजनक और सुखद रहा।'
+          : 'Overall a wonderful stay and pleasant experience with quick service.'
+        : targetRating === 3
         ? language === 'hi'
-          ? 'कर्मचारियों की सेवा बहुत अच्छी और मददगार रही।'
-          : 'The service was excellent, and the staff were welcoming and professional.'
-        : filterName === 'Atmosphere'
-        ? language === 'hi'
-          ? 'यहाँ का वातावरण और माहौल बहुत सुंदर और आरामदायक है।'
-          : 'Delicious food and wonderful atmosphere. The dining area was spotless.'
-        : filterName === 'Food & Quality'
-        ? language === 'hi'
-          ? 'यहाँ का खाना और गुणवत्ता बहुत स्वादिष्ट और ताज़ा थी।'
-          : 'High quality food with great presentation and authentic flavors.'
-        : filterName === 'Staff & Hospitality'
-        ? language === 'hi'
-          ? 'स्टाफ बहुत विनम्र, मददगार और पेशेवर था।'
-          : 'Staff members were extremely courteous, attentive, and swift.'
+          ? 'अनुभव सामान्य रहा। व्यवस्था ठीक-ठाक थी और सुधार की गुंजाइश है।'
+          : 'Average experience overall; met basic expectations with room for improvement.'
         : language === 'hi'
-        ? 'यहाँ का पूरा अनुभव बहुत संतोषजनक और सुखद रहा।'
-        : 'Overall a wonderful stay and pleasant experience with quick service.';
+        ? 'सेवा में काफी कमी रही और हमारा अनुभव निराशाजनक रहा।'
+        : 'Underwhelming experience; service was delayed and fell short of expectations.');
 
     try {
       const response = await fetch('/api/public/review-suggestions', {
@@ -368,7 +378,7 @@ export default function CustomerReviewJourneyPage() {
         setSelectedSuggestionIndex(0);
         setCustomText('');
       } else if (response.ok && Array.isArray(result.suggestions) && result.suggestions.length >= 2) {
-        const topics = ['Hospitality & Staff', 'Food & Ambience', 'Overall Impression'];
+        const topics = ['Hospitality & Staff', 'Quality & Ambience', 'Overall Impression'];
         const items = result.suggestions.slice(0, 3).map((text: string, idx: number) => ({
           topic: topics[idx] || 'General',
           text,
@@ -385,21 +395,13 @@ export default function CustomerReviewJourneyPage() {
         return;
       }
       console.warn('Realtime generation error, using curated contextual fallback:', err);
-      // Clean fallback if completely blocked
-      const fallbackItems: SuggestionItem[] = [
-        {
-          topic: 'Hospitality & Staff',
-          text: 'The service was excellent, and the staff were welcoming and professional.',
-        },
-        {
-          topic: 'Food & Ambience',
-          text: 'Delicious food and wonderful atmosphere. The area was spotless and well-maintained.',
-        },
-        {
-          topic: 'Overall Impression',
-          text: 'Overall a wonderful visit with prompt service. Highly recommended to everyone.',
-        },
-      ];
+      // Rating-specific instant fallback — always 3 unique suggestions matching the star rating
+      const fallbackItems = getInstantSuggestions(targetRating, {
+        category: qrCode?.businessCategory,
+        subcategory: qrCode?.businessSubcategory,
+        filter: filterName,
+        language,
+      });
       setSuggestionItems(fallbackItems);
       setSuggestions(fallbackItems.map((i) => i.text));
       setSelectedSuggestionIndex(0);
@@ -413,12 +415,39 @@ export default function CustomerReviewJourneyPage() {
     setStep(2);
     const initialFilter = activeFilter || 'Service';
     setActiveFilter(initialFilter);
-    void handleGenerateSuggestions(initialFilter, val);
+
+    // Show 3 rating-appropriate suggestions instantly (0 ms delay)
+    const instantItems = getInstantSuggestions(val, {
+      category: qrCode?.businessCategory,
+      subcategory: qrCode?.businessSubcategory,
+      filter: initialFilter,
+      language,
+    });
+    setSuggestionItems(instantItems);
+    setSuggestions(instantItems.map((i) => i.text));
+    setSelectedSuggestionIndex(0);
+    setCustomText('');
+
+    void handleGenerateSuggestions(initialFilter, val, instantItems[0]?.text);
   };
 
   const handleFilterClick = (filterId: string) => {
     setActiveFilter(filterId);
-    void handleGenerateSuggestions(filterId, rating || 5);
+    const curRating = rating || 5;
+
+    // Show 3 filter-specific suggestions instantly
+    const instantItems = getInstantSuggestions(curRating, {
+      category: qrCode?.businessCategory,
+      subcategory: qrCode?.businessSubcategory,
+      filter: filterId,
+      language,
+    });
+    setSuggestionItems(instantItems);
+    setSuggestions(instantItems.map((i) => i.text));
+    setSelectedSuggestionIndex(0);
+    setCustomText('');
+
+    void handleGenerateSuggestions(filterId, curRating, instantItems[0]?.text);
   };
 
   const handleCopyAndProceed = async () => {
