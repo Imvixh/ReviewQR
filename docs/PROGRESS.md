@@ -2,6 +2,25 @@
 
 Last updated: 2026-11-22
 
+## Marketing pages, navigation, contact privacy, and SEO (2026-11-22)
+
+- Added shared marketing navigation/footer and implemented `/contact`, `/about`, and `/privacy-policy` using the existing design tokens and visual language.
+- The header links to Product, How It Works, Features, Contact, and About, with the Create Your QR CTA. Live Demo and FAQ sections remain on the home page without header links; Privacy Policy is linked in the footer only. `/landing` now redirects to `/`.
+- Contact email and phone number are initially hidden behind accessible click-to-reveal controls. The form validates required fields and opens an encoded email draft; it does not submit to a server or store messages.
+- Removed AI-related labeling from the marketing UI. Added page-specific metadata, canonical links when a valid public HTTPS `NEXT_PUBLIC_APP_URL` is configured, a marketing-only sitemap, and crawler rules for private/product routes. No public production origin is currently configured, so canonical URLs are omitted and the generated sitemap is empty in this environment.
+- Privacy policy copy is an implementation-based draft and has not received legal review. Marketing pages have not been visually compared in a browser against the supplied screenshots.
+- Built Contact-page HTML was inspected: neither contact value appears before the reveal controls are activated. The built home navigation contains Contact and About and omits Live Demo, FAQ, and Privacy Policy.
+- Follow-up visual adjustment: removed the hero eyebrow badge shown in the supplied screenshot and restored the expanded footer columns (Product, Resources, Company & Legal) with real links and the creator/trademark details.
+- Latest footer/navigation refinement: added Home to the shared header, enlarged header and footer logos slightly, and added email/phone icon controls in the footer that reveal contact details only after activation.
+- Scope stayed within public marketing presentation/routing and the landing-page source split needed for server metadata. Backend APIs, authentication, database, QR, and analytics flows were not changed.
+
+| Check | Result |
+|---|---|
+| `npm.cmd run typecheck` | PASS |
+| `npm.cmd run lint` | PASS |
+| `npm.cmd test -- --run` | PASS — 103 tests across 14 files |
+| `npm.cmd run build` | PASS — 35 routes generated; existing middleware deprecation warning remains |
+
 ## Fix maxWidth Scale Collapse & Layout Restoration (2026-11-22)
 
 - **Root Cause Analysis**:

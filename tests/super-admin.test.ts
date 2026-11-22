@@ -30,7 +30,7 @@ import { GET as getSuperAdminAuthStatus } from '../src/app/api/super-admin/auth/
 describe('Revvly Branding & Public Authentication Cleanup', () => {
   it('confirms the landing page has no login or signup links and uses Revvly brand', () => {
     const landingHtml = fs.readFileSync(
-      path.resolve(__dirname, '../src/app/page.tsx'),
+      path.resolve(__dirname, '../src/app/LandingClient.tsx'),
       'utf-8'
     );
 

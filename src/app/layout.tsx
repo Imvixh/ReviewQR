@@ -1,10 +1,17 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { getMarketingSiteUrl } from '@/lib/marketing-site';
+
+const siteUrl = getMarketingSiteUrl();
 
 export const metadata: Metadata = {
-  title: 'Revvly — Turn In-Store Visits into 5-Star Google Reviews',
+  metadataBase: siteUrl,
+  title: {
+    default: 'Revvly | Google Review QR Codes for Local Businesses',
+    template: '%s | Revvly',
+  },
   description:
-    'Create beautiful, branded QR experiences that help customers share feedback and leave Google reviews with less friction. Design your QR, personalize the experience, and make every customer interaction count.',
+    'Create a QR review experience for your local business and make it easier for customers to find your Google review page.',
   icons: {
     icon: [
       { url: '/favicon.ico' },
@@ -37,4 +44,3 @@ export default function RootLayout({
     </html>
   );
 }
-

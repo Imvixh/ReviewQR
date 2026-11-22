@@ -48,7 +48,7 @@ Earlier local checks passed before the current dual-mode changes. Current checks
 - [ ] Implement design system tokens as CSS variables + Tailwind theme extension [IN PROGRESS]
 
 ## Phase 2 — Marketing & Auth
-- [ ] Landing page (`/landing` and `/`) — implementation based on `reviewqr_saas_landing_page/code.html` and `screen.png`; visual fidelity not verified [IN PROGRESS]
+- [ ] Marketing pages (`/`, `/contact`, `/about`, `/privacy-policy`) — shared navigation/footer, click-to-reveal contact details, AI-label removal, and SEO metadata/routes implemented locally; visual comparison not performed and canonical URLs await configured public HTTPS origin [IN PROGRESS]
 - [ ] Login page (`/login`) — email/password + Google SSO + remember-device + password show/hide [IN PROGRESS]
 - [ ] Signup page (`/signup`) — full name, business name, email, password strength; acknowledges prototype limitations because legal terms are not published [IN PROGRESS]
 - [ ] Protected route middleware (session cookie + server check) [IN PROGRESS]
