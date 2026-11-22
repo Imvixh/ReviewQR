@@ -112,6 +112,7 @@ function QRDesignStudioInner() {
 
   // Display Poster Preset (Image 2)
   const [selectedPreset, setSelectedPreset] = useState('google-classic');
+  const [visiblePresetCount, setVisiblePresetCount] = useState(9);
 
   // Independent Custom Color Overrides (Phase 2)
   const [customColors, setCustomColors] = useState<{
@@ -658,6 +659,84 @@ function QRDesignStudioInner() {
       defaultAccent: '#6D28D9',
       bgHex: '#FAF9FF', textHex: '#4C1D95', subtitleHex: '#6D28D9',
     },
+    {
+      id: 'terracotta-clay',
+      name: 'Terracotta Clay',
+      cardBg: 'bg-[#9A3412]',
+      centerBg: 'bg-[#EA580C]',
+      barBg: 'bg-[#FDBA74]',
+      previewBg: 'bg-[#FFF7ED]',
+      textColor: 'text-[#7C2D12]',
+      subtitleColor: 'text-[#C2410C]',
+      finderColor: '#9A3412',
+      defaultAccent: '#C2410C',
+      bgHex: '#FFF7ED', textHex: '#7C2D12', subtitleHex: '#C2410C',
+    },
+    {
+      id: 'alpine-pine',
+      name: 'Alpine Pine',
+      cardBg: 'bg-[#064E3B]',
+      centerBg: 'bg-[#10B981]',
+      barBg: 'bg-[#6EE7B7]',
+      previewBg: 'bg-[#ECFDF5]',
+      textColor: 'text-[#064E3B]',
+      subtitleColor: 'text-[#047857]',
+      finderColor: '#065F46',
+      defaultAccent: '#047857',
+      bgHex: '#ECFDF5', textHex: '#064E3B', subtitleHex: '#047857',
+    },
+    {
+      id: 'cobalt-pop',
+      name: 'Cobalt Pop',
+      cardBg: 'bg-[#1E3A8A]',
+      centerBg: 'bg-[#2563EB]',
+      barBg: 'bg-[#93C5FD]',
+      previewBg: 'bg-[#EFF6FF]',
+      textColor: 'text-[#172554]',
+      subtitleColor: 'text-[#1D4ED8]',
+      finderColor: '#1D4ED8',
+      defaultAccent: '#2563EB',
+      bgHex: '#EFF6FF', textHex: '#172554', subtitleHex: '#1D4ED8',
+    },
+    {
+      id: 'champagne-ivory',
+      name: 'Champagne Ivory',
+      cardBg: 'bg-[#FEFCE8]',
+      centerBg: 'bg-[#A16207]',
+      barBg: 'bg-[#EAB308]',
+      previewBg: 'bg-[#FFFEF5]',
+      textColor: 'text-[#713F12]',
+      subtitleColor: 'text-[#A16207]',
+      finderColor: '#854D0E',
+      defaultAccent: '#A16207',
+      bgHex: '#FFFEF5', textHex: '#713F12', subtitleHex: '#A16207',
+    },
+    {
+      id: 'berry-sorbet',
+      name: 'Berry Sorbet',
+      cardBg: 'bg-[#9D174D]',
+      centerBg: 'bg-[#DB2777]',
+      barBg: 'bg-[#F9A8D4]',
+      previewBg: 'bg-[#FDF2F8]',
+      textColor: 'text-[#831843]',
+      subtitleColor: 'text-[#BE185D]',
+      finderColor: '#9D174D',
+      defaultAccent: '#DB2777',
+      bgHex: '#FDF2F8', textHex: '#831843', subtitleHex: '#BE185D',
+    },
+    {
+      id: 'glacier-teal',
+      name: 'Glacier Teal',
+      cardBg: 'bg-[#164E63]',
+      centerBg: 'bg-[#0891B2]',
+      barBg: 'bg-[#67E8F9]',
+      previewBg: 'bg-[#ECFEFF]',
+      textColor: 'text-[#164E63]',
+      subtitleColor: 'text-[#0E7490]',
+      finderColor: '#155E75',
+      defaultAccent: '#0891B2',
+      bgHex: '#ECFEFF', textHex: '#164E63', subtitleHex: '#0E7490',
+    },
   ];
 
   const currentPresetData = presets.find((p) => p.id === selectedPreset) || presets[1];
@@ -704,7 +783,7 @@ function QRDesignStudioInner() {
     branding: 'Branding',
     qrstyle: 'QR Code',
     templates: 'Templates',
-    copy: 'Copy',
+    copy: 'Preview / Download',
   };
   const continueFromStep = (step: Exclude<QrStudioStep, 'copy'>) => {
     if (step === 'branding') {
@@ -1912,7 +1991,7 @@ function QRDesignStudioInner() {
           </div>
 
           {/* Right Action Suite */}
-          <div className="flex items-center gap-2.5 flex-wrap">
+          {activeTab === 'copy' && <div className="flex items-center gap-2.5 flex-wrap">
             <button
               className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-[#0B1C30] transition-colors flex items-center gap-1.5 shadow-xs active:scale-95"
               onClick={handleExportPDF}
@@ -1927,7 +2006,7 @@ function QRDesignStudioInner() {
               <span className="material-symbols-outlined text-[18px]">download</span>
               <span>Download PNG</span>
             </button>
-          </div>
+          </div>}
         </div>
 
         {/* Workspace Grid: 2 Columns (Image 1) */}
@@ -1940,7 +2019,7 @@ function QRDesignStudioInner() {
                 { id: 'branding', label: 'Branding', icon: 'badge' },
                 { id: 'qrstyle', label: 'QR Code', icon: 'qr_code_2' },
                 { id: 'templates', label: 'Templates', icon: 'style' },
-                { id: 'copy', label: 'Copy', icon: 'edit_note' },
+                { id: 'copy', label: 'Preview / Download', icon: 'download' },
               ].map((step, index) => {
                 const stepId = step.id as QrStudioStep;
                 const isCurrent = activeTab === stepId;
@@ -2436,10 +2515,6 @@ function QRDesignStudioInner() {
                     </span>
                     <h2 className="text-base font-bold text-[#0B1C30]">QR Code Architecture</h2>
                   </div>
-                  <span className="text-[10px] uppercase font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    Level M (15% ECC)
-                  </span>
                 </div>
 
                 {/* QR Style Selector (Section 6) */}
@@ -2711,14 +2786,11 @@ function QRDesignStudioInner() {
                     </span>
                     <h2 className="text-base font-bold text-[#0B1C30]">Display Poster Preset</h2>
                   </div>
-                  <span className="text-xs text-[#005BBF] font-semibold cursor-pointer hover:underline">
-                    Explore 24+
-                  </span>
                 </div>
 
                 {/* Poster preset grid */}
                 <div className="grid grid-cols-3 gap-3">
-                  {presets.map((preset) => {
+                  {presets.slice(0, visiblePresetCount).map((preset) => {
                     const isSelected = selectedPreset === preset.id;
                     return (
                       <div
@@ -2755,6 +2827,15 @@ function QRDesignStudioInner() {
                     );
                   })}
                 </div>
+                {presets.length > 9 && (
+                  <button
+                    type="button"
+                    onClick={() => setVisiblePresetCount((count) => (count >= presets.length ? 9 : Math.min(count + 9, presets.length)))}
+                    className="self-center px-4 py-2 rounded-full border border-blue-200 bg-white text-xs font-semibold text-[#005BBF] hover:bg-blue-50 transition-colors"
+                  >
+                    {visiblePresetCount >= presets.length ? 'Show less' : `Show more (${presets.length - visiblePresetCount} remaining)`}
+                  </button>
+                )}
 
                 {/* Adjust Preset Colors Section (Accordion) */}
                 <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col gap-3.5">
@@ -2977,20 +3058,20 @@ function QRDesignStudioInner() {
                   type="button"
                   onClick={() => continueFromStep('templates')}
                 >
-                  <span>Continue to Copy &amp; Content</span>
+                  <span>Continue to Preview / Download</span>
                   <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                 </button>
               </div>
             )}
 
-            {/* TAB 4: Copywriting & Content */}
+            {/* TAB 4: Preview & Download */}
             {activeTab === 'copy' && (
               <div className="p-6 rounded-xl bg-white shadow-sm flex flex-col gap-4 border border-slate-100 animate-fadeIn">
                 <div className="flex items-center gap-2">
                   <span className="w-6 h-6 rounded-full bg-[#D8E2FF] text-[#005BBF] flex items-center justify-center text-xs font-bold">
                     4
                   </span>
-                  <h2 className="text-base font-bold text-[#0B1C30]">Content &amp; Microcopy</h2>
+                  <h2 className="text-base font-bold text-[#0B1C30]">Preview &amp; Download</h2>
                 </div>
 
                 <div className="space-y-1">
@@ -3420,25 +3501,6 @@ function QRDesignStudioInner() {
                 </div>
               </div>
               )}
-
-              {/* Bottom Quick Download Strip below Mockup */}
-              <div className="flex flex-wrap items-center gap-2 pt-6 w-full max-w-[420px]">
-                <button
-                  className="flex-1 min-w-[120px] h-11 px-3 rounded-xl bg-[#005BBF] text-white hover:bg-[#1A73E8] text-xs font-bold shadow-md transition-all flex items-center justify-center gap-1.5 active:scale-95"
-                  onClick={handleDownloadPNG}
-                  title="Download 300 DPI Standee Poster"
-                >
-                  <span className="material-symbols-outlined text-[18px]">download</span>
-                  <span>Poster PNG</span>
-                </button>
-                <button
-                  className="h-11 px-3 rounded-xl bg-white text-[#0B1C30] hover:bg-slate-50 text-xs font-bold shadow-sm border border-slate-200 transition-all flex items-center justify-center gap-1.5 active:scale-95"
-                  onClick={handleExportPDF}
-                >
-                  <span className="material-symbols-outlined text-[18px]">picture_as_pdf</span>
-                  <span>PDF Print</span>
-                </button>
-              </div>
 
             </div>
           </div>
