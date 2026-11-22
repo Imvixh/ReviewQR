@@ -2,6 +2,17 @@
 
 Last updated: 2026-11-22
 
+## Fix maxWidth Scale Collapse & Layout Restoration (2026-11-22)
+
+- **Root Cause Analysis**:
+  - `tailwind.config.js` previously defined `spacing: { '2xs': '0.125rem', 'xs': '0.25rem', 'sm': '0.5rem', 'md': '1rem', 'lg': '1.5rem', 'xl': '2rem', '2xl': '3rem' }`.
+  - In Tailwind CSS, spacing is inherited by `maxWidth`. This caused `max-w-2xl` to collapse to `3rem` (48px) and `max-w-sm` to collapse to `0.5rem` (8px), which forced all header text and footer paragraphs to wrap into a vertical single-word column across the entire page.
+- **Resolution**:
+  - Re-prefixed spacing keys in `tailwind.config.js` (`space-2xs` through `space-2xl`).
+  - Restored full default `maxWidth` scale in `tailwind.config.js` (`xs: 20rem`, `sm: 24rem`, `md: 28rem`, `lg: 32rem`, `xl: 36rem`, `2xl: 42rem`, `3xl: 48rem`, `4xl: 56rem`, `7xl: 80rem`).
+  - Added explicit `.max-w-*` utility classes with `!important` in `src/app/globals.css`.
+  - Pushed commit `a3170f2` to `origin/main` for production deployment.
+
 ## Landing Page Rebuild (Revvly) & Super-Admin Registration Removal (2026-11-22)
 
 - **Removed Super-Admin Registration**:
