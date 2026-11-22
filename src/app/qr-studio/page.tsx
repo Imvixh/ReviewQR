@@ -3246,33 +3246,6 @@ function QRDesignStudioInner() {
                       </div>
                     )}
                   </div>
-
-                  {/* Independent Scannability & Print Size Indicators */}
-                  {qrValidation && (
-                    <div className="mt-3 flex flex-col items-center gap-1">
-                      {qrValidation.isValid ? (
-                        <div className="flex items-center gap-2">
-                          <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-2xs">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            Verified Scannable · {qrValidation.matrixSize}×{qrValidation.matrixSize} Grid
-                          </span>
-                          <span className="text-[10px] text-[#565E74] bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">
-                            Print: {qrValidation.recommendedPrintSizeMm} mm+
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1 rounded-full flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                          {qrValidation.validationError || 'Unscannable configuration'}
-                        </span>
-                      )}
-                      {qrValidation.printSizeWarning && (
-                        <span className="text-[10px] text-amber-600 max-w-xs text-center font-medium">
-                          {qrValidation.printSizeWarning}
-                        </span>
-                      )}
-                    </div>
-                  )}
                 </div>
 
                 {/* Bottom Poster Callout */}
