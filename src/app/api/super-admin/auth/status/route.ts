@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
-import { getSuperAdminAuthContext } from '@/lib/auth/super-admin';
+import { getSuperAdminAuthContext, getSuperAdminBootstrapStatus } from '@/lib/auth/super-admin';
 
 export async function GET(): Promise<NextResponse> {
-  const auth = await getSuperAdminAuthContext();
+  const [auth, bootstrap] = await Promise.all([
+    getSuperAdminAuthContext(),
+    getSuperAdminBootstrapStatus(),
+  ]);
 
   if (!auth.ok) {
     return NextResponse.json({
@@ -10,6 +13,7 @@ export async function GET(): Promise<NextResponse> {
       reason: auth.reason,
       user: 'user' in auth ? { id: auth.user.id, email: auth.user.email } : null,
       factorId: 'factorId' in auth ? auth.factorId : null,
+      bootstrapAllowed: bootstrap.registrationAllowed,
     });
   }
 
@@ -19,5 +23,6 @@ export async function GET(): Promise<NextResponse> {
     aal: auth.aal,
     user: { id: auth.user.id, email: auth.user.email },
     factorId: auth.factorId,
+    bootstrapAllowed: bootstrap.registrationAllowed,
   });
 }

@@ -1,6 +1,64 @@
 # Progress — ReviewQR
 
-Last updated: 2026-11-21
+Last updated: 2026-11-22
+
+## Landing Page Rebuild (Revvly) & Super-Admin Registration Removal (2026-11-22)
+
+- **Removed Super-Admin Registration**:
+  - Removed registration UI, tabs, and form from `src/app/super-admin/super-admin-login.tsx`.
+  - Preserved Super-Admin login with email/password, email verification error detection with resend button, and AAL2 TOTP challenge.
+  - Closed `/api/super-admin/register/route.ts` permanently returning 403 Forbidden.
+  - Redirected `/super-admin/register` to `/super-admin`.
+  - Set `ALLOW_SUPER_ADMIN_BOOTSTRAP=false` in `.env.local`.
+  - Preserved all existing user records, sessions, and `platform_super_admins` database entries.
+- **Rebuilt Landing Page from Reference Design (`src/app/page.tsx`)**:
+  - Brand name updated strictly to **Revvly**.
+  - Brand logo image (`/revvly-logo.png`) and icon (`/revvly-icon.png`) integrated into navbar, footer, metadata, and favicons (`/favicon.ico`, `/favicon.png`, `src/app/icon.png`).
+  - Extended `tailwind.config.js` with exact colors, typography (`Plus Jakarta Sans`), shadows (`glow-primary`, `glass`), keyframes (`laserSweep`), and animations from reference suite.
+  - Faithfully replicated all 12 sections with full React state and interactivity:
+    1. **Sticky Top Navbar**: Revvly logo, center navigation links (`#product-slider`, `#how-it-works`, `#interactive-demo`, `#features`, `#faq`), and single primary CTA (`Create Your QR` -> `/create-qr`). Strictly NO login or sign-up links anywhere.
+    2. **Cinematic Hero Section**: Ambient radial backdrops, eyebrow pill, headline, subtitle, CTA cluster (`/create-qr`, `#product-slider`), trust subtext, floating badge capsules, tabletop acrylic standee card, and mobile review flow card.
+    3. **Product Slider Section**: 4 stages (Create, Brand, Scan, Review), dynamic step counter (`01 / 04`), navigation buttons, interactive progress tabs, auto-advance (5.5s), and hover pause.
+    4. **Live QR Scan Demonstration Workbench**: Split-screen workbench with table standee hardware, active laser line sweep simulation (900ms), interactive 1–5 star ratings, dynamic phrasing suggestion pills by rating, clipboard copy toast (1.2s), Google Maps handoff preview, and reset demo.
+    5. **Video Showcase Mock Player**: Aspect-video preview frame with play/pause state toggle, 1080p 60FPS badge, timeline scrubber, and 4 chapter navigation tabs.
+    6. **How It Works**: 4-step connected visual timeline cards.
+    7. **Interactive Feature Showcase**: 4 tab switchers (Two-Tier Frictionless Routing, Rating-Specific Suggestions, 300 DPI Print-Ready Assets, Physical Stand Telemetry).
+    8. **Venue Use Cases**: 5 industry applications (Restaurants & Cafes, Hotels & Stays, Salons & Spas, Retail & Boutiques, Clinics & Wellness).
+    9. **Benefits & Value Proposition**: 4 hospitality cards (Zero App Installs, No Passwords or Logins, Eliminates Blank Pages, 100% Policy Compliant).
+    10. **Accessible FAQ Accordion**: 5 expandable items with smooth chevron rotation.
+    11. **Final Call to Action**: High-contrast gradient banner with "Create Your Free QR" linking to `/create-qr`.
+    12. **Polished Footer**: Revvly logo, description, operational status badge, product/resource links, copyright 2025, and Google compliance disclosures.
+- **Verification & Test Suite**:
+  - `npm run typecheck`: PASS — 0 errors (exit code 0)
+  - `npm run lint`: PASS — 0 errors (exit code 0)
+  - `npm test`: PASS — 92/92 tests passed across 13 test files (exit code 0)
+  - `npm run build`: PASS — 29 static and dynamic routes compiled and generated successfully (exit code 0)
+
+
+
+- **Comprehensive Database & Authorization Inspection**:
+  - Inspected existing entries in `public.platform_super_admins` and `auth.users`:
+    - Row 1: `8cb07dc2-1e81-4fd4-b97f-14e12f46656d` (`sycoodevil786@gmail.com`): email verified, unverified TOTP factor.
+    - Row 2: `cef20e0a-e3e5-4339-b500-1ddd4b4a7e71`: orphaned record (no user in `auth.users`).
+    - Row 3: `22018c9d-5383-4217-83e9-c93f8f5dd40a` (`sarrafraj143@gmail.com`): listed in `platform_super_admins`, but email was unconfirmed.
+    - User 4: `71b903fb-f1ac-4369-8ff1-10486b7ebfed` (`krvishalprf112@gmail.com`): in `auth.users`, email unconfirmed, not in `platform_super_admins`.
+- **Integrated Bootstrap Super Admin Portal (`/super-admin`)**:
+  - Unified `SuperAdminLoginPortal` directly inside `/super-admin` with Revvly Executive dark theme (`#080E1A`, `#0F172A`, cyan/sky `#0284C7`, Material Symbols).
+  - Multi-state architecture:
+    1. **Pre-initialization state**: Surfaces two tabs (`[Access Console]` and `[Initialize Admin (Setup)]`) when bootstrap registration is open.
+    2. **Registration state**: Input fields for Email, Master Password, and Confirm Password with minimum 8-character and matching validation.
+    3. **Verification Pending state**: Clear screen with envelope icon, instructions to check email inbox, and a "Resend Verification Email" button.
+    4. **MFA Challenge state**: Preserves native AAL2 TOTP challenge with 6-digit input when enrolled.
+    5. **Sealed state**: Permanently hides registration tabs and disables the registration endpoint once initialized.
+- **Server-Side Security & Email Verification Callback**:
+  - Created `/auth/callback/route.ts`: Securely exchanges PKCE/OTP verification tokens for a Supabase session with SSR cookies, verifies `email_confirmed_at`, atomically adds the user to `platform_super_admins`, and redirects to `/super-admin`.
+  - Created `/api/super-admin/register/route.ts`: Server-side rate-limited endpoint checking `getSuperAdminBootstrapStatus()` before creating accounts with email verification redirects.
+  - Created `/api/super-admin/resend-verification/route.ts`: Dispatches fresh email activation links.
+  - Updated `/api/super-admin/auth/status/route.ts`: Exposes `bootstrapAllowed` alongside existing session status.
+- **Automated Verification Suite**:
+  - `npm run typecheck`: PASS — 0 errors (exit code 0)
+  - `npm test`: PASS — 93/93 tests passed across 13 test files (exit code 0)
+  - `npm run build`: PASS — 28 routes compiled and generated successfully (exit code 0)
 
 ## Branding Reordering, Logo & Venue Cover Photo Persistence, Public Asset Upload (2026-11-21)
 

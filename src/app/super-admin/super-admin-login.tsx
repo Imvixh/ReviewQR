@@ -4,16 +4,33 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
-export default function SuperAdminLoginPortal() {
+interface SuperAdminLoginPortalProps {
+  initialMfaRequired?: boolean;
+  initialMfaFactorId?: string;
+}
+
+export default function SuperAdminLoginPortal({
+  initialMfaRequired = false,
+  initialMfaFactorId = undefined,
+}: SuperAdminLoginPortalProps) {
   const router = useRouter();
+
+  // Authentication states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  // MFA states
   const [mfaCode, setMfaCode] = useState('');
-  const [mfaRequired, setMfaRequired] = useState(false);
-  const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
+  const [mfaRequired, setMfaRequired] = useState(initialMfaRequired);
+  const [mfaFactorId, setMfaFactorId] = useState<string | null>(initialMfaFactorId || null);
+
+  // UI state
   const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,15 +41,21 @@ export default function SuperAdminLoginPortal() {
 
     setIsLoading(true);
     setErrorMessage(null);
+    setSuccessMessage(null);
+    setUnconfirmedEmail(null);
 
     try {
       const supabase = createClient();
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         password,
       });
 
       if (error) {
+        if (error.message.toLowerCase().includes('email not confirmed')) {
+          setUnconfirmedEmail(email.trim().toLowerCase());
+          throw new Error('Email address has not been confirmed. Please verify your email before entering.');
+        }
         throw new Error(error.message || 'Invalid administrative credentials.');
       }
 
@@ -40,7 +63,7 @@ export default function SuperAdminLoginPortal() {
         throw new Error('Authentication failed. No user session returned.');
       }
 
-      // Verify Super Admin status and MFA requirements
+      // Verify Super Admin status and MFA requirements on the server
       const statusRes = await fetch('/api/super-admin/auth/status');
       const statusData = await statusRes.json();
 
@@ -66,6 +89,31 @@ export default function SuperAdminLoginPortal() {
       setErrorMessage(err instanceof Error ? err.message : 'Sign-in failed.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendVerification = async (targetEmail: string) => {
+    if (!targetEmail) return;
+
+    setIsResending(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    try {
+      const res = await fetch('/api/super-admin/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: targetEmail.trim().toLowerCase() }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to resend verification email.');
+      }
+      setSuccessMessage('Verification email re-dispatched. Please check your inbox.');
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Resend failed.');
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -121,7 +169,9 @@ export default function SuperAdminLoginPortal() {
           </div>
 
           <h1 className="text-lg font-bold text-slate-100">
-            {mfaRequired ? 'Multi-Factor Challenge (AAL2)' : 'Platform Executive Portal'}
+            {mfaRequired
+              ? 'Multi-Factor Challenge (AAL2)'
+              : 'Platform Executive Portal'}
           </h1>
           <p className="text-xs text-slate-400 max-w-xs leading-relaxed">
             {mfaRequired
@@ -130,18 +180,41 @@ export default function SuperAdminLoginPortal() {
           </p>
         </div>
 
-        {/* Error notification banner */}
-        {errorMessage && (
-          <div className="p-3.5 rounded-2xl bg-red-950/70 border border-red-800/80 text-red-200 text-xs flex items-start gap-2.5 animate-shake">
-            <span className="material-symbols-outlined text-base text-red-400 shrink-0 mt-0.5">
-              error
+        {/* Success notification banner */}
+        {successMessage && (
+          <div className="p-3.5 rounded-2xl bg-emerald-950/70 border border-emerald-800/80 text-emerald-200 text-xs flex items-start gap-2.5">
+            <span className="material-symbols-outlined text-base text-emerald-400 shrink-0 mt-0.5">
+              check_circle
             </span>
-            <div className="flex-1 leading-relaxed">{errorMessage}</div>
+            <div className="flex-1 leading-relaxed">{successMessage}</div>
           </div>
         )}
 
-        {/* MFA TOTP Challenge Step */}
+        {/* Error notification banner */}
+        {errorMessage && (
+          <div className="p-3.5 rounded-2xl bg-red-950/70 border border-red-800/80 text-red-200 text-xs flex flex-col gap-2">
+            <div className="flex items-start gap-2.5">
+              <span className="material-symbols-outlined text-base text-red-400 shrink-0 mt-0.5">
+                error
+              </span>
+              <div className="flex-1 leading-relaxed">{errorMessage}</div>
+            </div>
+            {unconfirmedEmail && (
+              <button
+                type="button"
+                onClick={() => handleResendVerification(unconfirmedEmail)}
+                disabled={isResending}
+                className="mt-1 self-start px-3 py-1 bg-red-900/60 hover:bg-red-800 text-red-200 rounded-lg text-[11px] font-semibold border border-red-700/60 transition-colors flex items-center gap-1.5"
+              >
+                <span className="material-symbols-outlined text-sm">forward_to_inbox</span>
+                <span>{isResending ? 'Sending...' : 'Resend Verification Email'}</span>
+              </button>
+            )}
+          </div>
+        )}
+
         {mfaRequired ? (
+          /* MFA TOTP Challenge Step */
           <form onSubmit={handleVerifyMfa} className="space-y-4">
             <div>
               <label htmlFor="mfaCode" className="block text-xs font-semibold text-slate-300 mb-1.5">
@@ -192,7 +265,7 @@ export default function SuperAdminLoginPortal() {
             </button>
           </form>
         ) : (
-          /* Normal Super Admin Password Login Form */
+          /* Standard Super Admin Login Form */
           <form onSubmit={handleSignIn} className="space-y-4">
             <div>
               <label htmlFor="adminEmail" className="block text-xs font-semibold text-slate-300 mb-1.5">
@@ -267,7 +340,7 @@ export default function SuperAdminLoginPortal() {
           </form>
         )}
 
-        {/* Security Notice: NO SIGNUP / RESTRICTED GATEWAY */}
+        {/* Security Notice Footer */}
         <div className="pt-4 border-t border-slate-800 text-center space-y-2">
           <div className="flex items-center justify-center gap-1.5 text-[11px] font-semibold text-emerald-400">
             <span className="material-symbols-outlined text-sm">shield</span>

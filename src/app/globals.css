@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@config "../../tailwind.config.js";
 
 @layer base {
   html,
@@ -18,6 +19,34 @@
 }
 
 @layer utilities {
+  /* Core brand & landing utilities */
+  .bg-navy { background-color: #0F172A; }
+  .text-navy { color: #0F172A; }
+  .border-navy { border-color: #0F172A; }
+
+  .bg-navy-surface { background-color: #090D16; }
+  .text-navy-surface { color: #090D16; }
+
+  .bg-primary-hover { background-color: #1557b0; }
+  .bg-primary-light { background-color: #E8F0FE; }
+  .text-primary-light { color: #E8F0FE; }
+
+  .bg-google-yellow { background-color: #FBBC04; }
+  .text-google-yellow { color: #FBBC04; }
+
+  .bg-google-green { background-color: #34A853; }
+  .text-google-green { color: #34A853; }
+
+  .bg-google-red { background-color: #EA4335; }
+  .text-google-red { color: #EA4335; }
+
+  .bg-surface-card { background-color: #FFFFFF; }
+  .bg-surface-muted { background-color: #F1F5F9; }
+
+  .shadow-glow-primary { box-shadow: 0 0 40px -10px rgba(26, 115, 232, 0.35); }
+  .shadow-subtle-card { box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03); }
+  .shadow-glass { box-shadow: 0 20px 50px -12px rgba(15, 23, 42, 0.12); }
+
   /* Surface Layers */
   .bg-surface { background-color: #f8f9ff; }
   .bg-surface-bright { background-color: #f8f9ff; }
@@ -263,4 +292,29 @@
     letter-spacing: 0.06em;
     font-weight: 700;
   }
+
+  .animate-laser-sweep {
+    animation: laserSweep 2.2s ease-in-out infinite;
+  }
+  .animate-pulse-subtle {
+    animation: pulseSubtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  .animate-float-slow {
+    animation: floatSlow 6s ease-in-out infinite;
+  }
+}
+
+@keyframes laserSweep {
+  0%, 100% { top: 0%; opacity: 0.2; }
+  50% { top: 92%; opacity: 1; }
+}
+
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.03); }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
 }

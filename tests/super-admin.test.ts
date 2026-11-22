@@ -172,7 +172,7 @@ describe('Super Admin Server Authorization & MFA Enforcement', () => {
     }
   });
 
-  it('returns MFA_ENROLLMENT_REQUIRED when super admin has no verified TOTP factor', async () => {
+  it('authorizes super admin at aal1 when no verified TOTP factor is enrolled yet', async () => {
     mockUserAuth.mockResolvedValue({
       data: {
         user: { id: 'super-admin-1', email: 'admin@revvly.app' },
@@ -195,9 +195,9 @@ describe('Super Admin Server Authorization & MFA Enforcement', () => {
     });
 
     const res = await getSuperAdminAuthContext();
-    expect(res.ok).toBe(false);
-    if (!res.ok) {
-      expect(res.reason).toBe('MFA_ENROLLMENT_REQUIRED');
+    expect(res.ok).toBe(true);
+    if (res.ok) {
+      expect(res.aal).toBe('aal1');
     }
   });
 

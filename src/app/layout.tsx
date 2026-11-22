@@ -2,21 +2,28 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Revvly — Direct Google Review QR Posters',
+  title: 'Revvly — Turn In-Store Visits into 5-Star Google Reviews',
   description:
-    'Create high-converting tabletop QR posters that connect customers directly to your Google Business Profile for real reviews.',
+    'Create beautiful, branded QR experiences that help customers share feedback and leave Google reviews with less friction. Design your QR, personalize the experience, and make every customer interaction count.',
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/revvly-icon.png', type: 'image/png' },
+    ],
+    apple: [{ url: '/revvly-icon.png' }],
+  },
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
         <link
@@ -24,9 +31,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-[#F8F9FF] text-[#0B1C30] font-sans antialiased">
+      <body className="bg-surface text-on-surface font-sans antialiased overflow-x-hidden selection:bg-primary-light selection:text-primary">
         {children}
       </body>
     </html>
   );
 }
+

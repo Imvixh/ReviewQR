@@ -48,6 +48,15 @@ module.exports = {
         googleYellow: '#FBBC04',
         googleGreen: '#34A853',
         googleNavy: '#0F172A',
+        'primary-hover': '#1557b0',
+        'primary-light': '#E8F0FE',
+        navy: '#0F172A',
+        'navy-surface': '#090D16',
+        'google-yellow': '#FBBC04',
+        'google-green': '#34A853',
+        'google-red': '#EA4335',
+        'surface-card': '#FFFFFF',
+        'surface-muted': '#F1F5F9',
         // error
         error: '#ba1a1a',
         onError: '#ffffff',
@@ -80,7 +89,10 @@ module.exports = {
       },
       fontFamily: {
         'plus-jakarta': ['Plus Jakarta Sans', 'sans-serif'],
+        display: ['"Plus Jakarta Sans"', 'sans-serif'],
         inter: ['Inter', 'sans-serif'],
+        sans: ['Inter', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
         'material-icons': ['"Material Symbols Outlined"', 'sans-serif'],
       },
       fontSize: {
@@ -102,6 +114,28 @@ module.exports = {
         'level-1': '0 1px 3px 0 rgba(15,23,42,0.05), 0 1px 2px -1px rgba(15,23,42,0.03)',
         'level-2': '0 10px 15px -3px rgba(15,23,42,0.08), 0 4px 6px -4px rgba(15,23,42,0.03)',
         'level-3': '0 20px 25px -5px rgba(15,23,42,0.1), 0 8px 10px -6px rgba(15,23,42,0.04)',
+        'glow-primary': '0 0 40px -10px rgba(26, 115, 232, 0.35)',
+        'subtle-card': '0 10px 30px -10px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03)',
+        glass: '0 20px 50px -12px rgba(15, 23, 42, 0.12)',
+      },
+      animation: {
+        'laser-sweep': 'laserSweep 2.2s ease-in-out infinite',
+        'pulse-subtle': 'pulseSubtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float-slow': 'floatSlow 6s ease-in-out infinite',
+      },
+      keyframes: {
+        laserSweep: {
+          '0%, 100%': { top: '0%', opacity: '0.2' },
+          '50%': { top: '92%', opacity: '1' },
+        },
+        pulseSubtle: {
+          '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+          '50%': { opacity: '0.8', transform: 'scale(1.03)' },
+        },
+        floatSlow: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-8px)' },
+        },
       },
     },
   },

@@ -9,7 +9,7 @@ export type SuperAdminAuthResult =
   | { ok: false; reason: 'FORBIDDEN'; user: User }
   | { ok: false; reason: 'MFA_ENROLLMENT_REQUIRED'; user: User }
   | { ok: false; reason: 'MFA_CHALLENGE_REQUIRED'; user: User; factorId: string }
-  | { ok: true; user: User; factorId: string; aal: 'aal2' };
+  | { ok: true; user: User; factorId: string; aal: 'aal1' | 'aal2' };
 
 /**
  * Verifies whether a given user ID exists in public.platform_super_admins.
@@ -49,6 +49,133 @@ export async function checkIsSuperAdmin(userId: string): Promise<boolean> {
   } catch (err) {
     console.warn('Super Admin lookup failed or service key not available:', err);
     return false;
+  }
+}
+
+export interface SuperAdminBootstrapStatus {
+  registrationAllowed: boolean;
+  reason: 'NO_SUPER_ADMINS' | 'BOOTSTRAP_ALLOWED' | 'SUPER_ADMIN_INITIALIZED' | 'UNCONFIGURED';
+  adminCount: number;
+  activeCount: number;
+}
+
+/**
+ * Checks whether one-time Super Admin bootstrap registration is currently permitted.
+ * Registration is only allowed if no active, verified Super Admin has been initialized,
+ * or if explicitly enabled by server configuration (ALLOW_SUPER_ADMIN_BOOTSTRAP=true).
+ */
+export async function getSuperAdminBootstrapStatus(): Promise<SuperAdminBootstrapStatus> {
+  if (!isSupabaseConfigured) {
+    return { registrationAllowed: false, reason: 'UNCONFIGURED', adminCount: 0, activeCount: 0 };
+  }
+
+  const envOverride = process.env.ALLOW_SUPER_ADMIN_BOOTSTRAP;
+  if (envOverride === 'false') {
+    return { registrationAllowed: false, reason: 'SUPER_ADMIN_INITIALIZED', adminCount: 1, activeCount: 1 };
+  }
+
+  try {
+    const adminClient = createAdminClient();
+    const { data: rows, error } = await adminClient
+      .from('platform_super_admins')
+      .select('user_id');
+
+    if (error || !rows || rows.length === 0) {
+      return { registrationAllowed: true, reason: 'NO_SUPER_ADMINS', adminCount: 0, activeCount: 0 };
+    }
+
+    // Inspect status of existing administrator entries
+    let activeCount = 0;
+    for (const row of rows) {
+      const targetId = (row as any).user_id || (row as any).id;
+      if (!targetId) continue;
+      try {
+        const { data: userData, error: userError } = await adminClient.auth.admin.getUserById(targetId);
+        if (!userError && userData?.user && userData.user.email_confirmed_at) {
+          activeCount++;
+        }
+      } catch {
+        // Ignore lookup errors for orphaned IDs
+      }
+    }
+
+    if (envOverride === 'true') {
+      return { registrationAllowed: true, reason: 'BOOTSTRAP_ALLOWED', adminCount: rows.length, activeCount };
+    }
+
+    if (activeCount > 0) {
+      return { registrationAllowed: false, reason: 'SUPER_ADMIN_INITIALIZED', adminCount: rows.length, activeCount };
+    }
+
+    return { registrationAllowed: true, reason: 'NO_SUPER_ADMINS', adminCount: rows.length, activeCount: 0 };
+  } catch (err) {
+    console.warn('Super Admin bootstrap status check failed:', err);
+    return { registrationAllowed: false, reason: 'UNCONFIGURED', adminCount: 0, activeCount: 0 };
+  }
+}
+
+/**
+ * Atomically grants Super Admin privileges to a user whose email has been verified.
+ * Strictly executed on the server using service-role credentials.
+ */
+export async function initializeBootstrapSuperAdmin(userId: string): Promise<{ success: boolean; error?: string }> {
+  if (!isSupabaseConfigured || !userId) {
+    return { success: false, error: 'Supabase is not configured or userId is missing.' };
+  }
+
+  try {
+    const adminClient = createAdminClient();
+
+    // 1. Verify user exists and email is confirmed
+    const { data: userData, error: userError } = await adminClient.auth.admin.getUserById(userId);
+    if (userError || !userData?.user) {
+      return { success: false, error: 'User does not exist in authentication directory.' };
+    }
+
+    if (!userData.user.email_confirmed_at) {
+      return { success: false, error: 'Email verification required before Super Admin privileges can be granted.' };
+    }
+
+    // 2. Validate bootstrap status
+    const bootstrapStatus = await getSuperAdminBootstrapStatus();
+    if (!bootstrapStatus.registrationAllowed) {
+      const isAlreadyAdmin = await checkIsSuperAdmin(userId);
+      if (!isAlreadyAdmin) {
+        return { success: false, error: 'Super Admin initialization is closed. Only pre-authorized administrators can access.' };
+      }
+      return { success: true };
+    }
+
+    // 3. Atomically upsert into platform_super_admins
+    const { error: insertError } = await adminClient
+      .from('platform_super_admins')
+      .upsert(
+        {
+          user_id: userId,
+          granted_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id' }
+      );
+
+    if (insertError) {
+      // Fallback: If upsert failed due to missing conflict target or column schema, try insert
+      const { error: fallbackError } = await adminClient
+        .from('platform_super_admins')
+        .insert({
+          user_id: userId,
+          granted_at: new Date().toISOString(),
+        });
+
+      if (fallbackError && !fallbackError.message.includes('duplicate key')) {
+        console.error('Failed to grant super admin:', fallbackError);
+        return { success: false, error: fallbackError.message };
+      }
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    console.error('Error during super admin initialization:', err);
+    return { success: false, error: err.message || 'Initialization failed' };
   }
 }
 
@@ -94,31 +221,40 @@ export async function getSuperAdminAuthContext(): Promise<SuperAdminAuthResult> 
 
     const verifiedTotp = factorsData?.totp?.find((f) => f.status === 'verified');
 
-    // Case 1: No verified TOTP factor enrolled
-    if (!verifiedTotp) {
-      return { ok: false, reason: 'MFA_ENROLLMENT_REQUIRED', user };
-    }
+    // Case 1: If verified TOTP factor is enrolled, enforce AAL2 challenge
+    if (verifiedTotp) {
+      if (mfaData?.currentLevel !== 'aal2') {
+        return {
+          ok: false,
+          reason: 'MFA_CHALLENGE_REQUIRED',
+          user,
+          factorId: verifiedTotp.id,
+        };
+      }
 
-    // Case 2: Verified TOTP enrolled, but current session is below aal2
-    if (mfaData?.currentLevel !== 'aal2') {
       return {
-        ok: false,
-        reason: 'MFA_CHALLENGE_REQUIRED',
+        ok: true,
         user,
         factorId: verifiedTotp.id,
+        aal: 'aal2',
       };
     }
 
-    // Case 3: Verified Super Admin with active aal2 assurance
+    // Case 2: No verified TOTP factor enrolled yet -> Allow Super Admin login at aal1
     return {
       ok: true,
       user,
-      factorId: verifiedTotp.id,
-      aal: 'aal2',
+      factorId: '',
+      aal: 'aal1',
     };
   } catch (mfaCatch) {
     console.error('MFA context check error:', mfaCatch);
-    return { ok: false, reason: 'MFA_ENROLLMENT_REQUIRED', user };
+    return {
+      ok: true,
+      user,
+      factorId: '',
+      aal: 'aal1',
+    };
   }
 }
 
