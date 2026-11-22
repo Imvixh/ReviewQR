@@ -22,6 +22,15 @@ import {
   resolveBusinessCategory,
 } from '@/lib/business-category';
 import { isSupabaseConfigured } from '@/lib/supabase/env';
+import {
+  canOpenQrStudioStep,
+  isBrandingStepReady,
+  isCopyStepReady,
+  isQrStudioStepComplete,
+  QR_STUDIO_STEPS,
+  type QrStudioStep,
+  type QrStudioStepSignatures,
+} from '@/lib/qr-studio-steps';
 
 interface PosterPreset {
   id: string;
@@ -58,7 +67,8 @@ function QRDesignStudioInner() {
   const editQrId = searchParams.get('edit') || '';
   const isEditMode = Boolean(editQrId);
   const isCreateMode = !isEditMode;
-  const [activeTab, setActiveTab] = useState<'branding' | 'qrstyle' | 'templates' | 'copy'>('branding');
+  const [activeTab, setActiveTab] = useState<QrStudioStep>('branding');
+  const [completedStepSignatures, setCompletedStepSignatures] = useState<QrStudioStepSignatures>({});
   const [org, setOrg] = useState<Organization | null>(null);
   const [qrList, setQrList] = useState<QRCode[]>([]);
   const [selectedQrId, setSelectedQrId] = useState('');
@@ -654,6 +664,90 @@ function QRDesignStudioInner() {
   const categoryResult = resolveBusinessCategory(category, customCategory);
   const categoryValue = categoryResult.category;
   const businessDetails = [categoryValue, location.trim()].filter(Boolean).join(' · ');
+  const stepSignatures: Record<QrStudioStep, string> = {
+    branding: JSON.stringify([
+      businessName.trim(),
+      location.trim(),
+      category,
+      customCategory,
+      subcategory,
+      googleReviewUrl.trim(),
+      qrMode,
+      hasConfirmedDestination,
+    ]),
+    qrstyle: JSON.stringify([
+      qrStyle,
+      geometry,
+      centerEmblem,
+      printSizeMm,
+      customColors.qrColor,
+    ]),
+    templates: JSON.stringify([
+      selectedPreset,
+      accentColor,
+      customColors,
+    ]),
+    copy: JSON.stringify([headline.trim(), ctaText.trim(), supportingText.trim()]),
+  };
+  const isStepComplete = (step: QrStudioStep) =>
+    step === 'copy'
+      ? isCopyStepReady(headline, ctaText)
+      : isQrStudioStepComplete(step, completedStepSignatures, stepSignatures);
+  const canOpenStep = (step: QrStudioStep) =>
+    canOpenQrStudioStep(step, completedStepSignatures, stepSignatures);
+  const navigateToStep = (step: QrStudioStep) => {
+    if (canOpenStep(step)) setActiveTab(step);
+  };
+  const activeStepIndex = QR_STUDIO_STEPS.indexOf(activeTab);
+  const previousStep = activeStepIndex > 0 ? QR_STUDIO_STEPS[activeStepIndex - 1] : undefined;
+  const stepLabels: Record<QrStudioStep, string> = {
+    branding: 'Branding',
+    qrstyle: 'QR Code',
+    templates: 'Templates',
+    copy: 'Copy',
+  };
+  const continueFromStep = (step: Exclude<QrStudioStep, 'copy'>) => {
+    if (step === 'branding') {
+      const brandingReady = isBrandingStepReady({
+        businessName,
+        location,
+        categoryValid: !categoryResult.error && Boolean(categoryValue),
+        destinationValid: destinationValidation.valid,
+        destinationConfirmed: hasConfirmedDestination,
+      });
+      if (!brandingReady) {
+        if (!businessName.trim() || !location.trim()) {
+          showToast('Add your business name and city or location before continuing.');
+        } else if (categoryResult.error || !categoryValue) {
+          showToast(categoryResult.error || 'Select a business category before continuing.');
+        } else if (!destinationValidation.valid) {
+          showToast('Please enter a valid Google review destination link first.');
+        } else {
+          showToast('Confirm that you checked the review destination before continuing.');
+        }
+        return;
+      }
+      if (subcategory && categoryValue !== 'Hotel') {
+        showToast('Choose a hotel category before selecting a subcategory.');
+        return;
+      }
+      setSavedDestinationUrl(googleReviewUrl.trim());
+    }
+
+    if (step === 'templates' && !presets.some((preset) => preset.id === selectedPreset)) {
+      showToast('Choose a poster template before continuing.');
+      return;
+    }
+
+    const stepIndex = QR_STUDIO_STEPS.indexOf(step);
+    const nextStep = QR_STUDIO_STEPS[stepIndex + 1];
+    if (!nextStep) return;
+    setCompletedStepSignatures((completed) => ({
+      ...completed,
+      [step]: stepSignatures[step],
+    }));
+    setActiveTab(nextStep);
+  };
   const isBusinessCategorySaved =
     Boolean(categoryValue) &&
     org?.category === categoryValue &&
@@ -1764,25 +1858,6 @@ function QRDesignStudioInner() {
     }, 400);
   };
 
-  const handleDownloadSVG = () => {
-    if (!destinationValidation.valid || !realQrDataUrl || !generatedQrTarget) {
-      showToast('Enter a valid destination before exporting the SVG.');
-      return;
-    }
-
-    const svgContent =
-      qrValidation?.svg ||
-      decodeURIComponent(realQrDataUrl.replace('data:image/svg+xml;utf8,', ''));
-    const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${businessName.toLowerCase().replace(/\s+/g, '_')}_qr_vector.svg`;
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    showToast('Crisp resolution-independent vector SVG downloaded.');
-  };
-
   const handleExportPDF = () => {
     if (!destinationValidation.valid || !realQrDataUrl || !generatedQrTarget) {
       showToast('Enter a valid destination before printing the poster.');
@@ -1859,52 +1934,61 @@ function QRDesignStudioInner() {
         <div className="p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start max-w-7xl mx-auto w-full">
           {/* LEFT COLUMN: Customization Controls (5 cols) */}
           <div className="lg:col-span-5 flex flex-col gap-4">
-            {/* Studio Navigation Sub-tabs (Image 1) */}
-            <div className="flex p-1 rounded-xl bg-slate-100 shadow-xs overflow-x-auto text-nowrap">
-              <button
-                className={`flex-1 px-3 py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-all ${
-                  activeTab === 'branding'
-                    ? 'bg-white text-[#005BBF] shadow-sm font-bold'
-                    : 'text-[#414754] hover:text-[#0B1C30]'
-                }`}
-                onClick={() => setActiveTab('branding')}
-              >
-                <span className="material-symbols-outlined text-[18px]">badge</span>
-                <span>Branding</span>
-              </button>
-              <button
-                className={`flex-1 px-3 py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-all ${
-                  activeTab === 'qrstyle'
-                    ? 'bg-white text-[#005BBF] shadow-sm font-bold'
-                    : 'text-[#414754] hover:text-[#0B1C30]'
-                }`}
-                onClick={() => setActiveTab('qrstyle')}
-              >
-                <span className="material-symbols-outlined text-[18px]">qr_code_2</span>
-                <span>QR Code</span>
-              </button>
-              <button
-                className={`flex-1 px-3 py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-all ${
-                  activeTab === 'templates'
-                    ? 'bg-white text-[#005BBF] shadow-sm font-bold'
-                    : 'text-[#414754] hover:text-[#0B1C30]'
-                }`}
-                onClick={() => setActiveTab('templates')}
-              >
-                <span className="material-symbols-outlined text-[18px]">style</span>
-                <span>Templates</span>
-              </button>
-              <button
-                className={`flex-1 px-3 py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-all ${
-                  activeTab === 'copy'
-                    ? 'bg-white text-[#005BBF] shadow-sm font-bold'
-                    : 'text-[#414754] hover:text-[#0B1C30]'
-                }`}
-                onClick={() => setActiveTab('copy')}
-              >
-                <span className="material-symbols-outlined text-[18px]">edit_note</span>
-                <span>Copy</span>
-              </button>
+            {/* Sequential Studio Steps */}
+            <div className="grid grid-cols-4 gap-1 rounded-xl bg-slate-100 p-1 shadow-xs" role="group" aria-label="QR design steps">
+              {[
+                { id: 'branding', label: 'Branding', icon: 'badge' },
+                { id: 'qrstyle', label: 'QR Code', icon: 'qr_code_2' },
+                { id: 'templates', label: 'Templates', icon: 'style' },
+                { id: 'copy', label: 'Copy', icon: 'edit_note' },
+              ].map((step, index) => {
+                const stepId = step.id as QrStudioStep;
+                const isCurrent = activeTab === stepId;
+                const isComplete = isStepComplete(stepId);
+                const isUnlocked = canOpenStep(stepId);
+                return (
+                  <button
+                    key={step.id}
+                    aria-current={isCurrent ? 'step' : undefined}
+                    aria-label={`Step ${index + 1}: ${step.label}, ${isCurrent ? 'current step' : isComplete ? 'complete' : isUnlocked ? 'available' : 'locked'}`}
+                    className={`min-w-0 rounded-lg px-1.5 py-2 text-[10px] transition-all sm:px-2 sm:text-xs ${
+                      isCurrent
+                        ? 'bg-white text-[#005BBF] shadow-sm font-bold'
+                        : isComplete
+                          ? 'text-emerald-800 hover:bg-white/70'
+                          : isUnlocked
+                            ? 'text-[#414754] hover:bg-white/70 hover:text-[#0B1C30]'
+                            : 'cursor-not-allowed text-slate-400'
+                    }`}
+                    disabled={!isUnlocked}
+                    onClick={() => navigateToStep(stepId)}
+                    title={!isUnlocked ? 'Complete the previous step to unlock this one.' : undefined}
+                    type="button"
+                  >
+                    <span className="flex items-center justify-center gap-1">
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/80 text-[10px] font-bold">
+                        {isComplete ? <span aria-hidden="true" className="material-symbols-outlined text-sm">check</span> : index + 1}
+                      </span>
+                      <span className="truncate">{step.label}</span>
+                    </span>
+                    <span className="sr-only">{isComplete ? 'Complete' : isUnlocked ? 'Available' : 'Locked'}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="flex min-h-7 items-center justify-between gap-3 px-1">
+              <p className="text-[11px] font-medium text-[#565E74]" aria-live="polite">
+                Step {activeStepIndex + 1} of {QR_STUDIO_STEPS.length}: {stepLabels[activeTab]}
+              </p>
+              {previousStep && (
+                <button
+                  className="rounded-md text-xs font-semibold text-[#005BBF] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A73E8]"
+                  onClick={() => navigateToStep(previousStep)}
+                  type="button"
+                >
+                  ← Back to {stepLabels[previousStep]}
+                </button>
+              )}
             </div>
 
             {/* TAB 1: Business & Identity (Image 1) */}
@@ -2119,27 +2203,37 @@ function QRDesignStudioInner() {
                       <button
                         type="button"
                         aria-pressed={qrMode === 'direct'}
-                        onClick={() => setQrMode('direct')}
+                        onClick={() => {
+                          setQrMode('direct');
+                        }}
                         className={`min-h-16 rounded-lg border px-3 py-2 text-left text-xs transition-colors ${
                           qrMode === 'direct'
                             ? 'border-[#005BBF] bg-[#EFF4FF] text-[#0B1C30]'
                             : 'border-slate-200 bg-white text-[#414754] hover:bg-slate-50'
                         }`}
                       >
-                        <span className="block font-bold">Direct Google Review</span>
+                        <span className="flex items-center justify-between gap-2">
+                          <span className="font-bold">Direct Google Review</span>
+                          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">Free</span>
+                        </span>
                         <span className="mt-1 block leading-4">QR opens the exact pasted link; no ReviewQR tracking.</span>
                       </button>
                       <button
                         type="button"
                         aria-pressed={qrMode === 'guided'}
-                        onClick={() => setQrMode('guided')}
+                        onClick={() => {
+                          setQrMode('guided');
+                        }}
                         className={`min-h-16 rounded-lg border px-3 py-2 text-left text-xs transition-colors ${
                           qrMode === 'guided'
                             ? 'border-[#005BBF] bg-[#EFF4FF] text-[#0B1C30]'
                             : 'border-slate-200 bg-white text-[#414754] hover:bg-slate-50'
                         }`}
                       >
-                        <span className="block font-bold">Guided Review Assistant</span>
+                        <span className="flex items-center justify-between gap-2">
+                          <span className="font-bold">Guided Review Assistant</span>
+                          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-900">Paid</span>
+                        </span>
                         <span className="mt-1 block leading-4">QR opens the ReviewQR customer page and tracks scans.</span>
                       </button>
                     </div>
@@ -2324,15 +2418,7 @@ function QRDesignStudioInner() {
                 <button
                   className="w-full mt-3 py-3.5 px-4 rounded-xl bg-[#005BBF] hover:bg-[#1A73E8] text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
                   type="button"
-                  onClick={() => {
-                    if (!destinationValidation.valid) {
-                      showToast('Please enter a valid Google review destination link first.');
-                      return;
-                    }
-                    setHasConfirmedDestination(true);
-                    setSavedDestinationUrl(googleReviewUrl.trim());
-                    setActiveTab('qrstyle');
-                  }}
+                  onClick={() => continueFromStep('branding')}
                 >
                   <span>Continue to QR Code Styling</span>
                   <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
@@ -2607,7 +2693,7 @@ function QRDesignStudioInner() {
                 <button
                   className="w-full mt-2 py-3 px-4 rounded-xl bg-[#005BBF] hover:bg-[#1A73E8] text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
                   type="button"
-                  onClick={() => setActiveTab('templates')}
+                  onClick={() => continueFromStep('qrstyle')}
                 >
                   <span>Continue to Poster Templates</span>
                   <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
@@ -2889,7 +2975,7 @@ function QRDesignStudioInner() {
                 <button
                   className="w-full mt-2 py-3 px-4 rounded-xl bg-[#005BBF] hover:bg-[#1A73E8] text-white text-xs font-bold shadow-md transition-all flex items-center justify-center gap-2 active:scale-95"
                   type="button"
-                  onClick={() => setActiveTab('copy')}
+                  onClick={() => continueFromStep('templates')}
                 >
                   <span>Continue to Copy &amp; Content</span>
                   <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
@@ -3132,7 +3218,7 @@ function QRDesignStudioInner() {
                       <span className="text-[11px] font-bold text-[#0B1C30]">How was your experience?</span>
                       <div className="flex items-center gap-1 my-1.5 text-amber-400">
                         {Array.from({ length: 5 }, (_, i) => (
-                          <span key={i} className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                          <span key={i} className="material-symbols-outlined text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>
                             star
                           </span>
                         ))}
@@ -3302,8 +3388,9 @@ function QRDesignStudioInner() {
                     {Array.from({ length: 5 }, (_, index) => (
                       <span
                         key={index}
-                        className="material-symbols-outlined text-xl leading-5"
-                        style={{ color: customColors.starsColor || '#FBBC04' }}
+                        className="material-symbols-outlined text-2xl leading-6 sm:text-3xl"
+                        style={{ color: customColors.starsColor || '#FBBC04', fontVariationSettings: "'FILL' 1" }}
+                        aria-hidden="true"
                       >
                         star
                       </span>
@@ -3345,14 +3432,6 @@ function QRDesignStudioInner() {
                   <span>Poster PNG</span>
                 </button>
                 <button
-                  className="flex-1 min-w-[120px] h-11 px-3 rounded-xl bg-[#EFF4FF] text-[#005BBF] hover:bg-[#D8E2FF] text-xs font-bold shadow-sm border border-[#005BBF]/20 transition-all flex items-center justify-center gap-1.5 active:scale-95"
-                  onClick={handleDownloadSVG}
-                  title="Download resolution-independent Vector SVG for crisp printing"
-                >
-                  <span className="material-symbols-outlined text-[18px]">code</span>
-                  <span>Vector SVG</span>
-                </button>
-                <button
                   className="h-11 px-3 rounded-xl bg-white text-[#0B1C30] hover:bg-slate-50 text-xs font-bold shadow-sm border border-slate-200 transition-all flex items-center justify-center gap-1.5 active:scale-95"
                   onClick={handleExportPDF}
                 >
@@ -3360,6 +3439,7 @@ function QRDesignStudioInner() {
                   <span>PDF Print</span>
                 </button>
               </div>
+
             </div>
           </div>
         </div>

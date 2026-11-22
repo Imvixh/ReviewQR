@@ -71,6 +71,7 @@ Earlier local checks passed before the current dual-mode changes. Current checks
 - [ ] Remove Display Format and physical hardware specs (A5, A6, Sticker selector cards) without leaving layout gaps [IN PROGRESS]
 - [ ] Free manual Google Maps search + pasted HTTPS destination, explicit user confirmation, and owner-scoped Supabase business persistence [IN PROGRESS; mocked API tests pass, live Supabase/RLS not verified]
 - [ ] Direct and Guided QR destinations; exact URL preservation, public-origin validation, and mode persistence [IN PROGRESS; local logic/browser checks pass; new hosted migration and public deployment remain blocked]
+- [x] QR Studio UI stepper, Free/Paid labels, filled stars, Vector SVG action removal, and Guided demo removal [VERIFIED locally by typecheck, lint, tests, and build; backend unchanged]
 - [ ] 4 Module & Eye Geometry architecture options (Classic, Rounded, Dots, Premium Eye) [IN PROGRESS]
 - [ ] 2 Center Emblem options: Official Google G and custom Business Logo [IN PROGRESS]
 - [ ] 36 Poster Presets, including 15 recently added options [IN PROGRESS]
@@ -112,4 +113,4 @@ Earlier local checks passed before the current dual-mode changes. Current checks
 - [x] `npm run build` [VERIFIED locally: 21 pages; middleware deprecation warning remains]
 - [ ] Playwright end-to-end flow for the current implementation [BLOCKED pending browser-cookie verification]
 - [ ] Apply approved corrective migration `20261109000002_revoke_anon_owner_analytics.sql` [BLOCKED pending approval; do not reapply `20261109000001`]
-- [ ] Production deployment [BLOCKED pending integration evidence and explicit approval]
+- [ ] Production deployment [BLOCKED; revoke anonymous analytics grant, verify Storage policies/migration catalog/browser auth, and configure a public HTTPS deployment URL before release]

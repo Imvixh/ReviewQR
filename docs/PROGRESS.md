@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-22
 
+## QR Studio UI flow (2026-11-22)
+
+- Implemented the sequential Branding → QR Code → Templates → Copy stepper with previous-step navigation, required Branding validation, step signatures, and locked future steps.
+- Added Free/Paid presentation labels for Direct Google Review and Guided Review Assistant, filled and enlarged front/mobile preview stars, and removed the Vector SVG preview action. The separate Guided demo panel was later removed; the existing Mobile View remains.
+- Focused helper tests cover sequential access, stale-step invalidation, Branding readiness, and Copy readiness. No backend/API, auth, database, billing, QR encoding, scan, or analytics behavior changed.
+- `npm.cmd run typecheck`, `npm.cmd run lint`, and `npm.cmd test -- --run` passed; 107 tests across 15 files. The most recent production build before the demo-only removal passed for 35 routes with the existing middleware deprecation warning.
+
 ## Marketing pages, navigation, contact privacy, and SEO (2026-11-22)
 
 - Added shared marketing navigation/footer and implemented `/contact`, `/about`, and `/privacy-policy` using the existing design tokens and visual language.
@@ -12,6 +19,7 @@ Last updated: 2026-11-22
 - Built Contact-page HTML was inspected: neither contact value appears before the reveal controls are activated. The built home navigation contains Contact and About and omits Live Demo, FAQ, and Privacy Policy.
 - Follow-up visual adjustment: removed the hero eyebrow badge shown in the supplied screenshot and restored the expanded footer columns (Product, Resources, Company & Legal) with real links and the creator/trademark details.
 - Latest footer/navigation refinement: added Home to the shared header, enlarged header and footer logos slightly, and added email/phone icon controls in the footer that reveal contact details only after activation.
+- Commit `da2e01a` was pushed to `origin/main`. Production deployment remains BLOCKED by the release gates in `docs/DEPLOYMENT.md`: anonymous analytics grant, Storage/migration/auth verification, and missing public HTTPS origin.
 - Scope stayed within public marketing presentation/routing and the landing-page source split needed for server metadata. Backend APIs, authentication, database, QR, and analytics flows were not changed.
 
 | Check | Result |
