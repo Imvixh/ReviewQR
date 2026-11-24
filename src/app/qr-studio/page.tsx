@@ -1801,9 +1801,55 @@ function QRDesignStudioInner() {
     const qrTarget = generatedQrTarget;
 
     showToast('Preparing QR poster PNG…');
-    setTimeout(() => {
+    setTimeout(async () => {
       const link = document.createElement('a');
       link.download = `${businessName.toLowerCase().replace(/\s+/g, '_')}_${selectedPreset}_standee.png`;
+      let exportLogoImage: HTMLImageElement | null = null;
+      const logoSource = localLogoDataUrl || logoUrl;
+      if (logoSource) {
+        try {
+          let imageSource = logoSource;
+          if (!logoSource.startsWith('data:image/')) {
+            try {
+              const parsedLogoUrl = new URL(logoSource, window.location.origin);
+              const storedAsset = parsedLogoUrl.pathname.match(
+                /\/storage\/v1\/object\/(?:sign|public)\/business-assets\/(.+)$/
+              );
+              if (storedAsset) {
+                imageSource = `/api/public/asset?path=${encodeURIComponent(decodeURIComponent(storedAsset[1]))}`;
+              }
+            } catch {
+              // Relative app asset URLs are fetched directly below.
+            }
+
+            const logoResponse = await fetch(imageSource, { cache: 'no-store' });
+            if (!logoResponse.ok) throw new Error('Logo image request failed.');
+            const logoBlob = await logoResponse.blob();
+            if (!['image/png', 'image/jpeg', 'image/webp'].includes(logoBlob.type) || logoBlob.size === 0) {
+              throw new Error('Unsupported logo image.');
+            }
+            const logoDataUrl = await new Promise<string>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => typeof reader.result === 'string'
+                ? resolve(reader.result)
+                : reject(new Error('Could not read the logo image.'));
+              reader.onerror = () => reject(new Error('Could not read the logo image.'));
+              reader.readAsDataURL(logoBlob);
+            });
+            imageSource = logoDataUrl;
+          }
+
+          exportLogoImage = await new Promise<HTMLImageElement>((resolve, reject) => {
+            const logoImage = new Image();
+            logoImage.onload = () => resolve(logoImage);
+            logoImage.onerror = () => reject(new Error('Could not decode the logo image.'));
+            logoImage.src = imageSource;
+          });
+        } catch {
+          showToast('Could not load the business logo for this PNG. Please try again.');
+          return;
+        }
+      }
       const escapeXml = (value: string) =>
         value.replace(/[&<>"']/g, (character) => {
           const entities: Record<string, string> = {
@@ -1869,8 +1915,8 @@ function QRDesignStudioInner() {
           <!-- Brand Crest Badge -->
           <circle cx="300" cy="100" r="28" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1.5"/>
           ${
-            logoUrl
-              ? `<image x="272" y="72" width="56" height="56" clip-path="url(#logoCrestClip)" href="${logoUrl}" preserveAspectRatio="xMidYMid slice"/>`
+            exportLogoImage
+              ? ''
               : `<circle cx="300" cy="100" r="26" fill="#0F172A"/><path d="M290 98 h20 v8 h-20 z M292 94 h5 v4 h-5 z" fill="#FFFFFF"/>`
           }
 
@@ -1887,8 +1933,8 @@ function QRDesignStudioInner() {
             centerEmblem !== 'none'
               ? `<circle cx="300" cy="370" r="26" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
               ${
-                centerEmblem === 'business-logo' && logoUrl
-                  ? `<image x="276" y="346" width="48" height="48" clip-path="url(#centerEmblemClip)" href="${logoUrl}" preserveAspectRatio="xMidYMid slice"/>`
+                centerEmblem === 'business-logo' && exportLogoImage
+                  ? ''
                   : `<g transform="translate(286, 356) scale(1.15)">
                       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                       <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -1926,6 +1972,30 @@ function QRDesignStudioInner() {
         }
 
         context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        if (exportLogoImage) {
+          const drawCircularLogo = (centerX: number, centerY: number, radius: number) => {
+            const imageWidth = exportLogoImage?.naturalWidth || exportLogoImage?.width || 1;
+            const imageHeight = exportLogoImage?.naturalHeight || exportLogoImage?.height || 1;
+            const diameter = radius * 2;
+            const scale = Math.max(diameter / imageWidth, diameter / imageHeight);
+            const drawWidth = imageWidth * scale;
+            const drawHeight = imageHeight * scale;
+            context.save();
+            context.beginPath();
+            context.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            context.clip();
+            context.drawImage(
+              exportLogoImage,
+              centerX - drawWidth / 2,
+              centerY - drawHeight / 2,
+              drawWidth,
+              drawHeight
+            );
+            context.restore();
+          };
+          drawCircularLogo(300, 100, 28);
+          if (centerEmblem === 'business-logo') drawCircularLogo(300, 370, 24);
+        }
         canvas.toBlob((blob) => {
           if (!blob) {
             showToast('Could not export the poster PNG.');
