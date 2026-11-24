@@ -1,6 +1,16 @@
 # Progress — ReviewQR
 
-Last updated: 2026-11-22
+Last updated: 2026-11-24
+
+## QR download tracking and Super Admin management (2026-11-24)
+
+- Added an additive migration for per-delivery QR download records, a private `qr-downloads` Storage bucket, denied browser-role table access, an atomic metadata audit function, and exact scan/handoff aggregate RPC. The user applied the migration; read-only checks against the configured Supabase project confirmed both tables and RPCs exist, the bucket is present with `public=false`, and anonymous table/RPC reads fail with PostgreSQL `42501`.
+- PNG export now stores the finished client-rendered artwork privately, serves it through a one-time delivery token, and records completion after the browser receives the image. If Supabase or the migration is unavailable, the existing guest download falls back to the original local export.
+- Added a Super Admin-only QR Downloads tab with private previews, QR/business/template details, recorded download times, read-only saved-QR status, and scan/handoff counts only for linked guided QRs with existing server events. Guest-guided and direct-to-Google scans/handoffs are explicitly marked untracked. Google handoffs are not presented as posted reviews.
+- Super Admin metadata edits update the download snapshot (QR name, business name/city, and template) and write an atomic audit record. They do not change the stored poster image, destination, or existing customer QR behavior. No enable/disable UI, API, or routing behavior was added or changed.
+- Limitations: a browser can confirm the PNG reached JavaScript and the save action was invoked, but cannot verify the operating system wrote the file to disk. Existing Print/Save PDF behavior is untouched and cannot be counted as a successful download because browsers do not expose print-dialog completion. Direct Google QR scans and guest self-contained guided QR visits remain unobservable by the app.
+- A disposable valid PNG was sent through the local guest download APIs and Supabase Storage; the file endpoint returned the identical image, completion was recorded, and the metadata/audit RPC wrote the expected audit entry. Anonymous download of the stored private object was denied. The disposable table row, audit row (cascade), and object were removed and deletion was confirmed. No customer data was modified.
+- `npm.cmd run typecheck`, `npm.cmd run lint`, `npm.cmd test -- --run`, and `npm.cmd run build` passed. Tests: 110 across 16 files. Build retained the existing Next.js middleware deprecation warning. The full Super Admin UI has not been exercised with a live Super Admin browser session; route denial for a non-admin is covered by mocked tests.
 
 ## QR Studio UI flow (2026-11-22)
 

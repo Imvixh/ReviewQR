@@ -24,6 +24,23 @@ interface SuperAdminDashboardProps {
   initialMetrics: PlatformOverviewMetrics;
 }
 
+interface AdminQrDownload {
+  id: string;
+  qrCodeId: string | null;
+  qrStatus: 'active' | 'archived' | 'draft' | null;
+  qrName: string;
+  businessName: string;
+  businessCity: string;
+  qrType: 'direct' | 'guided';
+  template: string;
+  destinationUrl: string;
+  preparedAt: string;
+  downloadedAt: string;
+  scanCount: number | null;
+  handoffCount: number | null;
+  analyticsNote: string | null;
+}
+
 export default function SuperAdminDashboard({
   userEmail,
   userId,
@@ -33,10 +50,16 @@ export default function SuperAdminDashboard({
   const [metrics, setMetrics] = useState<PlatformOverviewMetrics>(initialMetrics);
   const [qrs, setQrs] = useState<AdminQrCodeItem[]>(initialMetrics.qrCodes || []);
   const [users, setUsers] = useState<SuperAdminUserItem[]>([]);
-  const [activeTab, setActiveTab] = useState<'analytics' | 'qrs' | 'users'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'qrs' | 'downloads' | 'users'>('analytics');
 
   const [isLoadingQrs, setIsLoadingQrs] = useState(false);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [downloads, setDownloads] = useState<AdminQrDownload[]>([]);
+  const [isLoadingDownloads, setIsLoadingDownloads] = useState(false);
+  const [downloadsError, setDownloadsError] = useState<string | null>(null);
+  const [editingDownload, setEditingDownload] = useState<AdminQrDownload | null>(null);
+  const [downloadEditForm, setDownloadEditForm] = useState({ qrName: '', businessName: '', businessCity: '', template: '' });
+  const [isSavingDownload, setIsSavingDownload] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
@@ -102,31 +125,59 @@ export default function SuperAdminDashboard({
     }
   };
 
+  const loadDownloads = async () => {
+    setIsLoadingDownloads(true);
+    try {
+      const res = await fetch('/api/super-admin/downloads');
+      const data = await res.json();
+      if (res.ok && data.ok && Array.isArray(data.downloads)) {
+        setDownloads(data.downloads);
+        setDownloadsError(null);
+      } else {
+        setDownloadsError(data.message || data.code || 'Download history is unavailable.');
+      }
+    } catch (err) {
+      console.error('Failed to load QR download history:', err);
+      setDownloadsError('Download history is unavailable. Please refresh and try again.');
+    } finally {
+      setIsLoadingDownloads(false);
+    }
+  };
+
   useEffect(() => {
     if (!initialMetrics.qrCodes || initialMetrics.qrCodes.length === 0) {
       void loadQrs();
     }
     void loadUsers();
+    void loadDownloads();
   }, []);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
-      const [overviewRes, qrsRes, usersRes] = await Promise.all([
+      const [overviewRes, qrsRes, usersRes, downloadsRes] = await Promise.all([
         fetch('/api/super-admin/overview'),
         fetch('/api/super-admin/qrs'),
         fetch('/api/super-admin/users'),
+        fetch('/api/super-admin/downloads'),
       ]);
 
-      const [overviewData, qrsData, usersData] = await Promise.all([
+      const [overviewData, qrsData, usersData, downloadsData] = await Promise.all([
         overviewRes.json(),
         qrsRes.json(),
         usersRes.json(),
+        downloadsRes.json(),
       ]);
 
       if (overviewRes.ok && overviewData.ok) setMetrics(overviewData.metrics);
       if (qrsRes.ok && qrsData.ok && Array.isArray(qrsData.qrs)) setQrs(qrsData.qrs);
       if (usersRes.ok && usersData.ok && Array.isArray(usersData.users)) setUsers(usersData.users);
+      if (downloadsRes.ok && downloadsData.ok && Array.isArray(downloadsData.downloads)) {
+        setDownloads(downloadsData.downloads);
+        setDownloadsError(null);
+      } else {
+        setDownloadsError(downloadsData.message || downloadsData.code || 'Download history is unavailable.');
+      }
 
       showToast('Super Admin telemetry and live registries refreshed.');
     } catch {
@@ -303,6 +354,40 @@ export default function SuperAdminDashboard({
     }
   };
 
+  const openDownloadEdit = (item: AdminQrDownload) => {
+    setEditingDownload(item);
+    setDownloadEditForm({
+      qrName: item.qrName,
+      businessName: item.businessName,
+      businessCity: item.businessCity,
+      template: item.template,
+    });
+  };
+
+  const handleSaveDownloadEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingDownload) return;
+    setIsSavingDownload(true);
+    try {
+      const res = await fetch(`/api/super-admin/downloads/${encodeURIComponent(editingDownload.id)}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(downloadEditForm),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || data.code || 'Could not update QR metadata.');
+      setDownloads((items) => items.map((item) => item.id === editingDownload.id
+        ? { ...item, ...downloadEditForm }
+        : item));
+      setEditingDownload(null);
+      showToast('Downloaded QR metadata updated and recorded.');
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Could not update QR metadata.', 'error');
+    } finally {
+      setIsSavingDownload(false);
+    }
+  };
+
   // Delete User QR Permanently
   const handleDeleteQr = async () => {
     if (!deletingQr) return;
@@ -349,6 +434,13 @@ export default function SuperAdminDashboard({
       );
     });
   }, [qrs, statusFilter, searchQuery]);
+
+  const filteredDownloads = useMemo(() => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return downloads;
+    return downloads.filter((item) => [item.qrName, item.businessName, item.businessCity, item.template, item.qrType]
+      .some((value) => value.toLowerCase().includes(query)));
+  }, [downloads, searchQuery]);
 
   // Aggregate Category Breakdown
   const categoryCounts = useMemo(() => {
@@ -468,6 +560,19 @@ export default function SuperAdminDashboard({
           >
             <span className="material-symbols-outlined text-base">qr_code_2</span>
             <span>QR Touchpoints &amp; Subscriptions ({qrs.length})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('downloads')}
+            className={`py-3.5 px-4 text-xs font-bold transition-all border-b-2 flex items-center gap-2 ${
+              activeTab === 'downloads'
+                ? 'border-[#38BDF8] text-[#38BDF8]'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <span className="material-symbols-outlined text-base">download</span>
+            <span>QR Downloads ({downloads.length})</span>
           </button>
 
           <button
@@ -876,6 +981,92 @@ export default function SuperAdminDashboard({
           </section>
         )}
 
+        {activeTab === 'downloads' && (
+          <section className="bg-[#0F172A] rounded-3xl p-6 md:p-8 border border-slate-800 shadow-xl space-y-6 animate-fade-in">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+              <div>
+                <h2 className="text-base font-extrabold text-white tracking-tight flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[#38BDF8]">download_for_offline</span>
+                  <span>Completed QR Poster Downloads</span>
+                </h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  PNG files received by the browser. Guided scan and Google handoff counts appear only when recorded by an existing QR route. A handoff is not a confirmed Google review.
+                </p>
+              </div>
+              <input
+                type="search"
+                aria-label="Search QR downloads"
+                placeholder="Search QR, business, city, template"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                className="w-full md:w-72 h-9 px-3 text-xs rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#38BDF8]"
+              />
+            </div>
+
+            {isLoadingDownloads ? (
+              <div className="py-16 text-center text-xs text-slate-500">Loading completed downloads…</div>
+            ) : downloadsError ? (
+              <div role="alert" className="py-16 text-center text-xs text-amber-300">Download history unavailable: {downloadsError}</div>
+            ) : filteredDownloads.length === 0 ? (
+              <div className="py-16 text-center text-xs text-slate-500">No completed PNG downloads found.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-800 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      <th className="pb-3">Poster Preview</th>
+                      <th className="pb-3">QR / Business</th>
+                      <th className="pb-3">Type / Template</th>
+                      <th className="pb-3">Saved QR status</th>
+                      <th className="pb-3">Downloaded</th>
+                      <th className="pb-3 text-center">Scans</th>
+                      <th className="pb-3 text-center">Google handoffs</th>
+                      <th className="pb-3">Destination</th>
+                      <th className="pb-3 text-right">Metadata</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/80 text-slate-300">
+                    {filteredDownloads.map((item) => (
+                      <tr key={item.id} className="hover:bg-slate-800/40 transition-colors align-top">
+                        <td className="py-3 pr-3">
+                          <a href={`/api/super-admin/downloads/${encodeURIComponent(item.id)}/preview`} target="_blank" rel="noopener noreferrer" title="Open protected poster preview">
+                            <img src={`/api/super-admin/downloads/${encodeURIComponent(item.id)}/preview`} alt={`${item.businessName} QR poster`} className="w-16 h-20 object-contain rounded-lg border border-slate-700 bg-white" />
+                          </a>
+                        </td>
+                        <td className="py-3 pr-3">
+                          <div className="font-bold text-white">{item.qrName}</div>
+                          <div className="mt-1">{item.businessName}{item.businessCity ? ` · ${item.businessCity}` : ''}</div>
+                          <div className="mt-1 text-[10px] text-slate-500 font-mono">{item.id.slice(0, 8)}…</div>
+                        </td>
+                        <td className="py-3 pr-3">
+                          <div className="capitalize">{item.qrType}</div>
+                          <div className="mt-1 text-slate-400">{item.template}</div>
+                        </td>
+                        <td className="py-3 pr-3">
+                          <span className="capitalize">{item.qrStatus || 'Not linked'}</span>
+                          {item.qrType === 'direct' && item.qrStatus && <p className="mt-1 text-[10px] text-slate-500">Direct Google QR is unaffected by app status.</p>}
+                        </td>
+                        <td className="py-3 pr-3 whitespace-nowrap">{new Date(item.downloadedAt).toLocaleString()}</td>
+                        <td className="py-3 text-center font-mono">{item.scanCount ?? 'Not tracked'}</td>
+                        <td className="py-3 text-center font-mono">{item.handoffCount ?? 'Not tracked'}</td>
+                        <td className="py-3 pr-3 max-w-48">
+                          <a href={item.destinationUrl} target="_blank" rel="noopener noreferrer" className="text-sky-300 hover:underline break-all">{item.destinationUrl}</a>
+                          {item.analyticsNote && <p className="mt-1 text-[10px] text-amber-300 leading-relaxed">{item.analyticsNote}</p>}
+                        </td>
+                        <td className="py-3 text-right">
+                          <button type="button" onClick={() => openDownloadEdit(item)} className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700">
+                            Edit metadata
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        )}
+
         {/* TAB 3: USER ACCOUNTS & OWNERS */}
         {activeTab === 'users' && (
           <section className="bg-[#0F172A] rounded-3xl p-6 md:p-8 border border-slate-800 shadow-xl space-y-6 animate-fade-in">
@@ -960,6 +1151,43 @@ export default function SuperAdminDashboard({
           </section>
         )}
       </main>
+
+      {editingDownload && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-lg bg-[#0F172A] rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-700 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <h3 className="text-base font-extrabold text-white">Edit downloaded QR metadata</h3>
+              <button type="button" onClick={() => setEditingDownload(null)} className="text-slate-400 hover:text-white" aria-label="Close metadata editor">×</button>
+            </div>
+            <p className="text-xs text-slate-400">These fields annotate the saved download record. The QR image, printed code, destination, and scan behavior are unchanged. Changes are audit logged.</p>
+            <form onSubmit={handleSaveDownloadEdit} className="space-y-4 text-xs">
+              {([
+                ['QR name', 'qrName'],
+                ['Business name', 'businessName'],
+                ['City', 'businessCity'],
+                ['Template / preset', 'template'],
+              ] as const).map(([label, key]) => (
+                <div key={key}>
+                  <label className="block font-bold text-slate-300 mb-1" htmlFor={`download-${key}`}>{label}</label>
+                  <input
+                    id={`download-${key}`}
+                    required={key !== 'businessCity'}
+                    value={downloadEditForm[key]}
+                    onChange={(event) => setDownloadEditForm((current) => ({ ...current, [key]: event.target.value }))}
+                    className="w-full h-10 px-3 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-[#38BDF8]"
+                  />
+                </div>
+              ))}
+              <div className="pt-3 border-t border-slate-800 flex justify-end gap-2.5">
+                <button type="button" onClick={() => setEditingDownload(null)} className="px-4 py-2 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 font-bold">Cancel</button>
+                <button type="submit" disabled={isSavingDownload} className="px-5 py-2 rounded-xl bg-[#0284C7] hover:bg-sky-600 disabled:opacity-50 text-white font-bold">
+                  {isSavingDownload ? 'Saving…' : 'Save metadata'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* EDIT MODAL */}
       {editingQr && (

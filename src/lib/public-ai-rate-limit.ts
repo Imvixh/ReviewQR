@@ -2,6 +2,7 @@ const WINDOW_MS = 60_000;
 const MAX_REQUESTS_PER_WINDOW = 5;
 const MAX_TRACKED_CLIENTS = 2_000;
 const requestsByClient = new Map<string, { count: number; resetAt: number }>();
+const downloadRequestsByClient = new Map<string, { count: number; resetAt: number }>();
 
 export function consumePublicAiRequest(clientId: string, now = Date.now()): boolean {
   for (const [key, record] of requestsByClient) {
@@ -20,5 +21,26 @@ export function consumePublicAiRequest(clientId: string, now = Date.now()): bool
     if (oldestKey) requestsByClient.delete(oldestKey);
   }
   requestsByClient.set(clientId, { count: 1, resetAt: now + WINDOW_MS });
+  return true;
+}
+
+/** Best-effort per-instance protection for the guest PNG upload endpoint. */
+export function consumeQrDownloadRequest(clientId: string, now = Date.now()): boolean {
+  for (const [key, record] of downloadRequestsByClient) {
+    if (record.resetAt <= now) downloadRequestsByClient.delete(key);
+  }
+
+  const current = downloadRequestsByClient.get(clientId);
+  if (current && current.resetAt > now) {
+    if (current.count >= 12) return false;
+    current.count += 1;
+    return true;
+  }
+
+  if (downloadRequestsByClient.size >= MAX_TRACKED_CLIENTS) {
+    const oldestKey = downloadRequestsByClient.keys().next().value;
+    if (oldestKey) downloadRequestsByClient.delete(oldestKey);
+  }
+  downloadRequestsByClient.set(clientId, { count: 1, resetAt: now + 60_000 });
   return true;
 }

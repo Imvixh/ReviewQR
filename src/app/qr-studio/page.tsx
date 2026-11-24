@@ -72,6 +72,7 @@ function QRDesignStudioInner() {
   const [org, setOrg] = useState<Organization | null>(null);
   const [qrList, setQrList] = useState<QRCode[]>([]);
   const [selectedQrId, setSelectedQrId] = useState('');
+  const [qrListFromServer, setQrListFromServer] = useState(false);
 
   // Touchpoint & Destination State (merged from Create QR)
   const [placementTag, setPlacementTag] = useState('');
@@ -888,6 +889,7 @@ function QRDesignStudioInner() {
     // In create mode: reset all QR and business form fields to blank — clean fresh start on every visit
     if (isCreateMode) {
       setSelectedQrId('');
+      setQrListFromServer(false);
       setPlacementTag('');
       setHeadline('Review us on Google');
       setCtaText('Scan to share your experience');
@@ -942,6 +944,7 @@ function QRDesignStudioInner() {
       }
       const localQrs = getStoredQRCodes();
       setQrList(localQrs);
+      setQrListFromServer(false);
       if (isEditMode) {
         const target = localQrs.find((q) => q.id === editQrId);
         if (target) applyQrToState(target);
@@ -983,6 +986,7 @@ function QRDesignStudioInner() {
           }
           const localQrs = getStoredQRCodes();
           setQrList(localQrs);
+          setQrListFromServer(false);
           if (isEditMode) {
             const target = localQrs.find((q) => q.id === editQrId);
             if (target) applyQrToState(target);
@@ -1006,6 +1010,7 @@ function QRDesignStudioInner() {
         if (cancelled) return;
         const qrs = qrResult.qrs as QRCode[];
         setQrList(qrs);
+        setQrListFromServer(true);
         if (isEditMode) {
           const target = qrs.find((q) => q.id === editQrId);
           if (target) applyQrToState(target);
@@ -1406,6 +1411,7 @@ function QRDesignStudioInner() {
       const result = await response.json();
       if (response.status === 401) {
         // Guest user: save locally to browser storage
+        setQrListFromServer(false);
         const localOrg = setStoredOrg({
           id: org?.id || crypto.randomUUID(),
           name: businessName.trim(),
@@ -1719,6 +1725,7 @@ function QRDesignStudioInner() {
       const result = await response.json();
       if (response.status === 401) {
         // Guest user: save locally to browser storage
+        setQrListFromServer(false);
         const savedQr = saveQRCode({
           id: selectedQrId || undefined,
           orgId: org?.id || 'guest-business',
@@ -1760,6 +1767,7 @@ function QRDesignStudioInner() {
       }
 
       const savedQr = result.qr as QRCode;
+      setQrListFromServer(true);
       setQrList((current) => [
         savedQr,
         ...current.filter((qr) => qr.id !== savedQr.id),
@@ -1790,6 +1798,7 @@ function QRDesignStudioInner() {
       showToast('Enter a valid destination before exporting the poster.');
       return;
     }
+    const qrTarget = generatedQrTarget;
 
     showToast('Preparing QR poster PNG…');
     setTimeout(() => {
@@ -1922,11 +1931,59 @@ function QRDesignStudioInner() {
             showToast('Could not export the poster PNG.');
             return;
           }
-          const pngUrl = URL.createObjectURL(blob);
-          link.href = pngUrl;
-          link.click();
-          setTimeout(() => URL.revokeObjectURL(pngUrl), 1000);
-          showToast('Poster PNG downloaded.');
+          const downloadBlob = (file: Blob) => {
+            const pngUrl = URL.createObjectURL(file);
+            link.href = pngUrl;
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(pngUrl), 1000);
+          };
+
+          void (async () => {
+            try {
+              const form = new FormData();
+              form.set('image', blob, link.download);
+              form.set('qrName', placementTag.trim() || businessName.trim());
+              form.set('businessName', businessName.trim());
+              form.set('businessCity', location.trim());
+              form.set('qrType', qrMode);
+              form.set('template', selectedPreset);
+              form.set('destinationUrl', qrTarget);
+              if (qrListFromServer && selectedQr && selectedQrToken && !selectedQrToken.startsWith('guest_')) {
+                form.set('qrCodeId', selectedQr.id);
+                form.set('qrToken', selectedQrToken);
+              }
+
+              const prepareResponse = await fetch('/api/qr-downloads', { method: 'POST', body: form });
+              const prepared = await prepareResponse.json();
+              if (!prepareResponse.ok || !prepared.ok || !prepared.id || !prepared.deliveryToken) {
+                throw new Error('Download tracking could not be prepared.');
+              }
+
+              const fileResponse = await fetch(`/api/qr-downloads/${encodeURIComponent(prepared.id)}/file`, {
+                headers: { Authorization: `Bearer ${prepared.deliveryToken}` },
+              });
+              if (!fileResponse.ok) throw new Error('Stored poster could not be retrieved.');
+              const deliveredBlob = await fileResponse.blob();
+              if (deliveredBlob.size === 0 || deliveredBlob.type !== 'image/png') {
+                throw new Error('Stored poster response was invalid.');
+              }
+              downloadBlob(deliveredBlob);
+
+              const completedResponse = await fetch(`/api/qr-downloads/${encodeURIComponent(prepared.id)}/complete`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${prepared.deliveryToken}` },
+              });
+              if (completedResponse.ok) {
+                showToast('Poster PNG downloaded and recorded.');
+              } else {
+                showToast('Poster PNG downloaded. Its delivery could not be recorded.');
+              }
+            } catch {
+              // Keep guest exports available if Supabase or the tracking migration is unavailable.
+              downloadBlob(blob);
+              showToast('Poster PNG downloaded. Download tracking was unavailable.');
+            }
+          })();
         }, 'image/png');
       };
       image.onerror = () => {

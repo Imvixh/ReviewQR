@@ -79,6 +79,7 @@ Earlier local checks passed before the current dual-mode changes. Current checks
 
 ## Phase 5 — QR Management
 - [ ] My QR Codes page (`/my-qr-codes`) — authenticated owner-filtered list with accurate error/empty states [IN PROGRESS; mocked API tests pass]
+- [ ] Guest and account PNG downloads recorded with private poster references and Super Admin metadata/analytics [IN PROGRESS; migration applied; disposable delivery, private object access, and metadata audit verified against configured Supabase; live Super Admin UI session not exercised]
 - [x] Public QR test link resolves through token-scoped API [VERIFIED against configured project with disposable token]
 - [ ] QR status update and deletion use owner-filtered API routes [IN PROGRESS; mocked foreign-owner tests pass]
 
